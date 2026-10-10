@@ -1,0 +1,27 @@
+{
+  "name": "balatro-web-game",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Production-ready web-based roguelike poker deckbuilder game engine inspired by Balatro",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist"
+  },
+  "keywords": [
+    "balatro",
+    "poker",
+    "roguelike",
+    "deckbuilder",
+    "vite",
+    "card-game",
+    "touchscreen"
+  ],
+  "author": "Game Engine Lead",
+  "license": "MIT",
+  "devDependencies": {
+    "gh-pages": "^6.1.1",
+    "vite": "^5.2.8"
+  }
+}

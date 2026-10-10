@@ -1,0 +1,596 @@
+/* Balatro Style Sheet - Authentic Visuals, Vibrant Palette, and Tactile Card Animations */
+
+:root {
+  --balatro-gold: #f39c12;
+  --balatro-red: #fe5f55;
+  --balatro-blue: #009dff;
+  --card-width: 82px;
+  --card-height: 122px;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --card-width: 94px;
+    --card-height: 138px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --card-width: 104px;
+    --card-height: 152px;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #0b0702;
+  font-family: 'Outfit', sans-serif;
+  touch-action: manipulation;
+}
+
+/* CRT Scanlines & Retro Arcade Shader Overlay */
+.crt-overlay {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.22) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 180, 0, 0.03),
+    rgba(0, 0, 0, 0.01),
+    rgba(255, 100, 0, 0.03)
+  );
+  background-size: 100% 4px, 6px 100%;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.vignette-overlay {
+  background: radial-gradient(
+    circle at center,
+    transparent 50%,
+    rgba(10, 6, 2, 0.85) 100%
+  );
+  pointer-events: none;
+}
+
+/* Canvas Background for Liquid Gold Vortex */
+#bg-canvas {
+  filter: contrast(1.15) brightness(0.95);
+}
+
+/* Sidebar Console Bezel */
+.sidebar-console {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(243, 156, 18, 0.15);
+}
+
+/* Playing Card Base Architecture */
+.playing-card {
+  width: var(--card-width);
+  height: var(--card-height);
+  border-radius: 9px;
+  background-color: #fcfbf7;
+  color: #1e293b;
+  border: 3px solid #2d3748;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 5px 6px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.55), 0 2px 4px rgba(0,0,0,0.3);
+  cursor: pointer;
+  touch-action: none;
+  /* Smooth bouncy spring transition for selecting & deselecting */
+  transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.3), box-shadow 0.2s ease, border-color 0.2s ease;
+  will-change: transform;
+}
+
+/* Tactile Hover (Desktop): goes up only a bit */
+@media (hover: hover) {
+  .playing-card:hover:not(.is-dragging):not(.card-selected) {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 14px 22px rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* Selected State: Goes COMPLETELY up (-54px) with golden glowing halo & deep elevation */
+.playing-card.card-selected {
+  transform: translateY(-54px) scale(1.06) !important;
+  border-color: #f1c40f !important;
+  box-shadow: 0 30px 48px rgba(0, 0, 0, 0.85), 0 0 24px rgba(241, 196, 15, 0.8) !important;
+  z-index: 35 !important;
+}
+
+/* Dragging State */
+.playing-card.is-dragging {
+  opacity: 0.94;
+  transform: scale(1.12) rotate(4deg);
+  box-shadow: 0 28px 45px rgba(0, 0, 0, 0.8), 0 0 22px rgba(0, 157, 255, 0.6);
+  z-index: 50 !important;
+  cursor: grabbing;
+}
+
+/* Scoring Pop Animation */
+@keyframes cardScorePop {
+  0% { transform: translateY(-34px) scale(1.05); filter: brightness(1); }
+  50% { transform: translateY(-56px) scale(1.22) rotate(-2deg); filter: brightness(1.35); }
+  100% { transform: translateY(-34px) scale(1.05); filter: brightness(1); }
+}
+
+.playing-card.card-scoring {
+  animation: cardScorePop 0.4s ease-out forwards;
+  z-index: 45 !important;
+  border-color: #fff !important;
+}
+
+/* Pip Grid Layout Inside Playing Cards */
+.card-pips-container {
+  display: grid;
+  flex: 1;
+  width: 100%;
+  padding: 2px 4px;
+  pointer-events: none;
+}
+
+.pips-1 { display: flex; align-items: center; justify-content: center; font-size: 26px; }
+.pips-2 { display: flex; flex-direction: column; justify-content: space-between; align-items: center; font-size: 14px; }
+.pips-3 { display: flex; flex-direction: column; justify-content: space-between; align-items: center; font-size: 13px; }
+.pips-4 { display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; font-size: 12px; }
+.pips-5 { display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; font-size: 11px; position: relative; }
+.pips-5 .pip-center { position: absolute; font-size: 12px; }
+.pips-6 { display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; font-size: 11px; }
+.pips-7 { display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; font-size: 10px; position: relative; }
+.pips-7 .pip-center { position: absolute; font-size: 10px; top: 32%; }
+.pips-8 { display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; font-size: 10px; }
+.pips-9 { display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; font-size: 9px; position: relative; }
+.pips-9 .pip-center { position: absolute; font-size: 9px; }
+.pips-10 { display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; font-size: 9px; }
+.pips-face { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; }
+
+/* Authentic Balatro High-Contrast Suit Colors */
+.suit-hearts {
+  color: #e63946;
+}
+.suit-diamonds {
+  color: #f77f00;
+}
+.suit-clubs {
+  color: #0077b6;
+}
+.suit-spades {
+  color: #1e293b;
+}
+
+/* Card Editions: Foil, Holographic, Polychrome */
+.edition-foil {
+  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%) !important;
+  border-color: #38bdf8 !important;
+}
+.edition-foil::after {
+  content: "FOIL";
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: 7px;
+  font-weight: 900;
+  color: #0284c7;
+}
+
+.edition-holo {
+  background: linear-gradient(135deg, #fbcfe8 0%, #f472b6 50%, #c084fc 100%) !important;
+  border-color: #f43f5e !important;
+}
+.edition-holo::after {
+  content: "HOLO";
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: 7px;
+  font-weight: 900;
+  color: #be185d;
+}
+
+@keyframes polychromeShift {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+.edition-polychrome {
+  animation: polychromeShift 6s linear infinite;
+  background: linear-gradient(135deg, #fca5a5 0%, #fde047 33%, #86efac 66%, #93c5fd 100%) !important;
+  border-color: #a855f7 !important;
+}
+
+/* Card Enhancement Mutations */
+.enhancement-bonus {
+  border-color: #009dff !important;
+  box-shadow: 0 0 12px rgba(0, 157, 255, 0.4);
+}
+.enhancement-mult {
+  border-color: #fe5f55 !important;
+  box-shadow: 0 0 12px rgba(254, 95, 85, 0.4);
+}
+.enhancement-wild {
+  background: linear-gradient(135deg, #fff 40%, #e9d5ff 100%) !important;
+  border-color: #a855f7 !important;
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.45);
+}
+.enhancement-glass {
+  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(186, 230, 253, 0.7) 100%) !important;
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.6), inset 0 0 8px rgba(255,255,255,0.8);
+}
+.enhancement-steel {
+  background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 50%, #64748b 100%) !important;
+  border-color: #475569 !important;
+  box-shadow: 0 0 12px rgba(100, 116, 139, 0.5);
+  color: #0f172a !important;
+}
+.enhancement-gold {
+  background: linear-gradient(135deg, #fef08a 0%, #fde047 50%, #eab308 100%) !important;
+  border-color: #ca8a04 !important;
+  box-shadow: 0 0 15px rgba(234, 179, 8, 0.55);
+  color: #713f12 !important;
+}
+.enhancement-stone {
+  background: repeating-linear-gradient(45deg, #64748b, #64748b 4px, #475569 4px, #475569 8px) !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+.enhancement-lucky {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.55);
+}
+
+/* CRT Retro Scanline Texture Overlay */
+.crt-overlay {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.18) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+}
+
+/* Blind Column Cards on Blind Select Screen */
+.blind-column-card {
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2), box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.blind-column-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 35px rgba(0,0,0,0.85);
+}
+
+/* Debuffed State */
+.card-debuffed {
+  filter: grayscale(0.9) brightness(0.7);
+  opacity: 0.7;
+}
+.card-debuffed::before {
+  content: "✕ DEBUFF";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-25deg);
+  font-size: 9px;
+  font-weight: 900;
+  color: #ef4444;
+  white-space: nowrap;
+  background: rgba(0,0,0,0.9);
+  padding: 2px 5px;
+  border-radius: 4px;
+  z-index: 10;
+}
+
+/* Red Deck Pile Card (Reference Image bottom right) */
+.deck-pile-card {
+  width: 64px;
+  height: 94px;
+  border-radius: 7px;
+  background-color: #d63031;
+  border: 3px solid #ff7675;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.7), -4px -4px 0 #961b1c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.deck-pattern {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  border: 2px solid #ffffff;
+  background: repeating-linear-gradient(
+    45deg,
+    #c0392b,
+    #c0392b 3px,
+    #e74c3c 3px,
+    #e74c3c 6px
+  );
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.5);
+}
+
+/* Joker Card Representation */
+.joker-card {
+  width: 76px;
+  height: 106px;
+  border-radius: 9px;
+  background: #18140f;
+  border: 3px solid #635035;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  flex-shrink: 0;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.6);
+}
+
+@media (min-width: 640px) {
+  .joker-card {
+    width: 88px;
+    height: 120px;
+  }
+}
+
+.joker-card:hover {
+  transform: translateY(-6px) scale(1.05);
+  border-color: var(--balatro-gold);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7);
+}
+
+.joker-card.joker-active {
+  animation: jokerTrigger 0.4s ease-out;
+  border-color: #fe5f55 !important;
+}
+
+@keyframes jokerTrigger {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.22) translateY(-10px); box-shadow: 0 0 25px rgba(254, 95, 85, 0.9); }
+  100% { transform: scale(1); }
+}
+
+.joker-rarity-common { border-color: #95a5a6; }
+.joker-rarity-uncommon { border-color: #2ecc71; }
+.joker-rarity-rare { border-color: #e74c3c; }
+
+/* Floating Score Number Particles */
+.score-particle {
+  position: absolute;
+  font-family: 'VT323', monospace;
+  font-size: 32px;
+  font-weight: 900;
+  pointer-events: none;
+  animation: floatUpFade 0.85s ease-out forwards;
+  z-index: 60;
+  text-shadow: 0 3px 10px rgba(0,0,0,0.9);
+}
+
+@keyframes floatUpFade {
+  0% { opacity: 1; transform: translateY(0) scale(0.85); }
+  50% { opacity: 1; transform: translateY(-34px) scale(1.3); }
+  100% { opacity: 0; transform: translateY(-65px) scale(1); }
+}
+
+/* Screen Shake Effect */
+@keyframes screenShake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-5px, 4px); }
+  40% { transform: translate(5px, -4px); }
+  60% { transform: translate(-4px, -3px); }
+  80% { transform: translate(4px, 3px); }
+}
+
+.screen-shake {
+  animation: screenShake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* Scrollbars */
+#jokers-container::-webkit-scrollbar, #consumables-container::-webkit-scrollbar, #hand-levels-list::-webkit-scrollbar {
+  height: 4px;
+  width: 4px;
+}
+#jokers-container::-webkit-scrollbar-thumb, #consumables-container::-webkit-scrollbar-thumb, #hand-levels-list::-webkit-scrollbar-thumb {
+  background: #524128;
+  border-radius: 4px;
+}
+
+/* Consumable Card Representation (Top-Right Bar) */
+.consumable-card {
+  width: 68px;
+  height: 98px;
+  border-radius: 8px;
+  background: #141824;
+  border: 2px solid #546e7a;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+@media (min-width: 640px) {
+  .consumable-card {
+    width: 78px;
+    height: 110px;
+  }
+}
+
+.consumable-card:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
+}
+
+.consumable-type-tarot {
+  border-color: #9c27b0;
+  background: linear-gradient(180deg, #1d1128 0%, #100b17 100%);
+}
+.consumable-type-planet {
+  border-color: #00bcd4;
+  background: linear-gradient(180deg, #0a1f29 0%, #081116 100%);
+}
+
+/* Booster Pack Shelf Cards */
+.booster-pack-card {
+  width: 100%;
+  max-width: 150px;
+  height: 195px;
+  border-radius: 12px;
+  border: 3px solid #f39c12;
+  background: radial-gradient(circle at center, #2c1e08 0%, #150e04 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.8), inset 0 0 15px rgba(243, 156, 18, 0.2);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.booster-pack-card:hover {
+  transform: translateY(-6px) scale(1.04);
+  border-color: #ffda79;
+}
+
+/* Pack Opening Stage Overlay */
+#pack-overlay {
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ==========================================================================
+   AUTHENTIC BALATRO CARD MUTATIONS & ENHANCEMENTS
+   ========================================================================== */
+
+/* Glass Card: Translucent crystalline cyan sheen, ×2 Mult */
+.playing-card.enhancement-glass {
+  background: linear-gradient(135deg, rgba(224, 247, 250, 0.92) 0%, rgba(128, 222, 234, 0.75) 100%) !important;
+  border-color: #26c6da !important;
+  box-shadow: 0 0 16px rgba(38, 198, 218, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(4px);
+}
+
+/* Steel Card: Brushed industrial metallic steel plate, ×1.5 in hand */
+.playing-card.enhancement-steel {
+  background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 45%, #64748b 100%) !important;
+  border-color: #475569 !important;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Gold Card: Glistening molten yellow-gold plate, +$3 end of round */
+.playing-card.enhancement-gold {
+  background: linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #d97706 100%) !important;
+  border-color: #fbbf24 !important;
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.65), inset 0 0 12px rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Lucky Card: Clover emerald green gradient */
+.playing-card.enhancement-lucky {
+  background: linear-gradient(135deg, #ecfdf5 0%, #6ee7b7 40%, #10b981 100%) !important;
+  border-color: #059669 !important;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.55), inset 0 0 8px rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Stone Card: Heavy chiseled granite rock slab, +50 Chips */
+.playing-card.enhancement-stone {
+  background: linear-gradient(135deg, #475569 0%, #334155 50%, #1e293b 100%) !important;
+  border-color: #0f172a !important;
+  color: #f8fafc !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.85), inset 0 0 15px rgba(0, 0, 0, 0.6) !important;
+}
+.playing-card.enhancement-stone .card-pips-container,
+.playing-card.enhancement-stone .card-center-stone {
+  color: #94a3b8 !important;
+  text-shadow: 1px 1px 0 #000;
+}
+
+/* Wild Card: Prismatic color borders */
+.playing-card.enhancement-wild {
+  border-color: #a855f7 !important;
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.6), inset 0 0 6px rgba(236, 72, 153, 0.3) !important;
+}
+
+/* Bonus Card: Cyan energy glow, +30 Chips */
+.playing-card.enhancement-bonus {
+  border-color: #009dff !important;
+  box-shadow: 0 0 12px rgba(0, 157, 255, 0.5) !important;
+}
+
+/* Mult Card: Fiery red aura, +4 Mult */
+.playing-card.enhancement-mult {
+  border-color: #fe5f55 !important;
+  box-shadow: 0 0 12px rgba(254, 95, 85, 0.5) !important;
+}
+
+/* ==========================================================================
+   BALATRO EDITIONS (Foil, Holographic, Polychrome)
+   ========================================================================== */
+
+/* Foil: +50 Chips silvery luster */
+.playing-card.edition-foil, .joker-card.edition-foil {
+  box-shadow: 0 0 20px rgba(224, 242, 254, 0.8), inset 0 0 12px rgba(255, 255, 255, 0.7) !important;
+  border-color: #bae6fd !important;
+}
+
+/* Holographic: +10 Mult prismatic sheen */
+.playing-card.edition-holo, .joker-card.edition-holo {
+  box-shadow: 0 0 22px rgba(236, 72, 153, 0.7), inset 0 0 14px rgba(147, 51, 234, 0.5) !important;
+  border-color: #f472b6 !important;
+}
+
+/* Polychrome: ×1.5 Mult shifting prismatic rainbow */
+@keyframes polyShimmer {
+  0% { box-shadow: 0 0 24px rgba(239, 68, 68, 0.8), inset 0 0 10px rgba(245, 158, 11, 0.6); border-color: #ef4444; }
+  33% { box-shadow: 0 0 24px rgba(16, 185, 129, 0.8), inset 0 0 10px rgba(59, 130, 246, 0.6); border-color: #10b981; }
+  66% { box-shadow: 0 0 24px rgba(168, 85, 247, 0.8), inset 0 0 10px rgba(236, 72, 153, 0.6); border-color: #a855f7; }
+  100% { box-shadow: 0 0 24px rgba(239, 68, 68, 0.8), inset 0 0 10px rgba(245, 158, 11, 0.6); border-color: #ef4444; }
+}
+
+.playing-card.edition-polychrome, .joker-card.edition-polychrome {
+  animation: polyShimmer 3s infinite ease-in-out !important;
+}
+
+/* Pack Card Item Layout */
+.pack-card-slot {
+  background: rgba(18, 14, 10, 0.85);
+  border: 2px solid #524128;
+  border-radius: 16px;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.pack-card-slot:hover {
+  transform: translateY(-4px) scale(1.03);
+  border-color: #f0ad28;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.75), 0 0 14px rgba(240, 173, 40, 0.35);
+}
+

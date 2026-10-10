@@ -1,0 +1,1052 @@
+[
+  {
+    "nr": 1,
+    "name": "Joker",
+    "effect": "+4 &#160; Mult",
+    "cost": 2,
+    "rarity": "common"
+  },
+  {
+    "nr": 2,
+    "name": "Greedy Joker",
+    "effect": "Played cards with .mw-parser-output .suit-diamond{color:var(--suit-diamond)}.mw-parser-output .suit-heart{color:var(--suit-heart)}.mw-parser-output .suit-spade{color:var(--suit-spade)}.mw-parser-output .suit-club{color:var(--suit-club)} &#160;Diamond suit give +3 &#160; Mult when scored",
+    "cost": 5,
+    "rarity": "common"
+  },
+  {
+    "nr": 3,
+    "name": "Lusty Joker",
+    "effect": "Played cards with &#160;Heart suit give +3 &#160; Mult when scored",
+    "cost": 5,
+    "rarity": "common"
+  },
+  {
+    "nr": 4,
+    "name": "Wrathful Joker",
+    "effect": "Played cards with &#160;Spade suit give +3 &#160; Mult when scored",
+    "cost": 5,
+    "rarity": "common"
+  },
+  {
+    "nr": 5,
+    "name": "Gluttonous Joker",
+    "effect": "Played cards with &#160;Club suit give +3 &#160; Mult when scored",
+    "cost": 5,
+    "rarity": "common"
+  },
+  {
+    "nr": 6,
+    "name": "Jolly Joker",
+    "effect": "+8 &#160; Mult if played hand contains a Pair",
+    "cost": 3,
+    "rarity": "common"
+  },
+  {
+    "nr": 7,
+    "name": "Zany Joker",
+    "effect": "+12 &#160; Mult if played hand contains a Three of a Kind",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 8,
+    "name": "Mad Joker",
+    "effect": "+10 &#160; Mult if played hand contains a Two Pair",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 9,
+    "name": "Crazy Joker",
+    "effect": "+12 &#160; Mult if played hand contains a Straight",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 10,
+    "name": "Droll Joker",
+    "effect": "+10 &#160; Mult if played hand contains a Flush",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 11,
+    "name": "Sly Joker",
+    "effect": "+50 &#160; Chips if played hand contains a Pair",
+    "cost": 3,
+    "rarity": "common"
+  },
+  {
+    "nr": 12,
+    "name": "Wily Joker",
+    "effect": "+100 &#160; Chips if played hand contains a Three of a Kind",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 13,
+    "name": "Clever Joker",
+    "effect": "+80 &#160; Chips if played hand contains a Two Pair",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 14,
+    "name": "Devious Joker",
+    "effect": "+100 &#160; Chips if played hand contains a Straight",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 15,
+    "name": "Crafty Joker",
+    "effect": "+80 &#160; Chips if played hand contains a Flush",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 16,
+    "name": "Half Joker",
+    "effect": "+20 &#160; Mult if played hand contains 3 or fewer cards",
+    "cost": 5,
+    "rarity": "common"
+  },
+  {
+    "nr": 17,
+    "name": "Joker Stencil",
+    "effect": "X1 &#160; Mult for each empty Joker slot Joker Stencil included (Currently X1 )",
+    "cost": 8,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 18,
+    "name": "Four Fingers",
+    "effect": "All Flushes and Straights can be made with 4 cards",
+    "cost": 7,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 19,
+    "name": "Mime",
+    "effect": "Retrigger all card held in hand abilities",
+    "cost": 5,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 20,
+    "name": "Credit Card",
+    "effect": "Go up to -$20 in debt",
+    "cost": 1,
+    "rarity": "common"
+  },
+  {
+    "nr": 21,
+    "name": "Ceremonial Dagger",
+    "effect": "When Blind is selected, destroy Joker to the right and permanently add double its sell value to this Mult (Currently +0 &#160; Mult )",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 22,
+    "name": "Banner",
+    "effect": "+30 &#160; Chips for each remaining discard",
+    "cost": 5,
+    "rarity": "common"
+  },
+  {
+    "nr": 23,
+    "name": "Mystic Summit",
+    "effect": "+15 &#160; Mult when 0 discards remaining",
+    "cost": 5,
+    "rarity": "common"
+  },
+  {
+    "nr": 24,
+    "name": "Marble Joker",
+    "effect": "Adds one Stone card to the deck when Blind is selected",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 25,
+    "name": "Loyalty Card",
+    "effect": "X4 &#160; Mult every 6 hands played 5 remaining",
+    "cost": 5,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 26,
+    "name": "8 Ball",
+    "effect": "1 in 4 chance for each played 8 to create a Tarot card when scored (Must have room)",
+    "cost": 5,
+    "rarity": "common"
+  },
+  {
+    "nr": 27,
+    "name": "Misprint",
+    "effect": "+0-23 &#160; Mult",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 28,
+    "name": "Dusk",
+    "effect": "Retrigger all played cards in final hand of the round",
+    "cost": 5,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 29,
+    "name": "Raised Fist",
+    "effect": "Adds double the rank of lowest ranked card held in hand to Mult",
+    "cost": 5,
+    "rarity": "common"
+  },
+  {
+    "nr": 30,
+    "name": "Chaos the Clown",
+    "effect": "1 free Reroll per shop",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 31,
+    "name": "Fibonacci",
+    "effect": "Each played Ace , 2 , 3 , 5 , or 8 gives +8 &#160; Mult when scored",
+    "cost": 8,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 32,
+    "name": "Steel Joker",
+    "effect": "Gives X0.2 &#160; Mult for each Steel Card in your full deck (Currently X1 &#160; Mult )",
+    "cost": 7,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 33,
+    "name": "Scary Face",
+    "effect": "Played face cards give +30 &#160; Chips when scored",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 34,
+    "name": "Abstract Joker",
+    "effect": "+3 &#160; Mult for each Joker card (Currently +0 &#160; Mult )",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 35,
+    "name": "Delayed Gratification",
+    "effect": "Earn $2 per discard if no discards are used by end of the round",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 36,
+    "name": "Hack",
+    "effect": "Retrigger each played 2 , 3 , 4 , or 5",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 37,
+    "name": "Pareidolia",
+    "effect": "All cards are considered face cards",
+    "cost": 5,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 38,
+    "name": "Gros Michel",
+    "effect": "+15 &#160; Mult 1 in 6 chance this card is destroyed at end of round",
+    "cost": 5,
+    "rarity": "common"
+  },
+  {
+    "nr": 39,
+    "name": "Even Steven",
+    "effect": "Played cards with even rank give +4 &#160; Mult when scored (10, 8, 6, 4, 2)",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 40,
+    "name": "Odd Todd",
+    "effect": "Played cards with odd rank give +31 &#160; Chips when scored (A, 9, 7, 5, 3)",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 41,
+    "name": "Scholar",
+    "effect": "Played Aces give +20 &#160; Chips and +4 &#160; Mult when scored",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 42,
+    "name": "Business Card",
+    "effect": "Played face cards have a 1 in 2 chance to give $2 when scored",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 43,
+    "name": "Supernova",
+    "effect": "Adds the number of times poker hand has been played this run to Mult",
+    "cost": 5,
+    "rarity": "common"
+  },
+  {
+    "nr": 44,
+    "name": "Ride the Bus",
+    "effect": "This Joker gains +1 &#160; Mult per consecutive hand played without a scoring face card (Currently +0 &#160; Mult )",
+    "cost": 6,
+    "rarity": "common"
+  },
+  {
+    "nr": 45,
+    "name": "Space Joker",
+    "effect": "1 in 4 chance to upgrade level of played poker hand",
+    "cost": 5,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 46,
+    "name": "Egg",
+    "effect": "Gains $3 of sell value at end of round",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 47,
+    "name": "Burglar",
+    "effect": "When Blind is selected, gain +3 Hands and lose all discards",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 48,
+    "name": "Blackboard",
+    "effect": "X3 &#160; Mult if all cards held in hand are &#160;Spades or &#160;Clubs",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 49,
+    "name": "Runner",
+    "effect": "Gains +15 &#160; Chips if played hand contains a Straight (Currently +0 &#160; Chips )",
+    "cost": 5,
+    "rarity": "common"
+  },
+  {
+    "nr": 50,
+    "name": "Ice Cream",
+    "effect": "+100 &#160; Chips -5 &#160; Chips for every hand played",
+    "cost": 5,
+    "rarity": "common"
+  },
+  {
+    "nr": 51,
+    "name": "DNA",
+    "effect": "If first hand of round has only 1 card, add a permanent copy to deck and draw it to hand",
+    "cost": 8,
+    "rarity": "rare"
+  },
+  {
+    "nr": 52,
+    "name": "Splash",
+    "effect": "Every played card counts in scoring",
+    "cost": 3,
+    "rarity": "common"
+  },
+  {
+    "nr": 53,
+    "name": "Blue Joker",
+    "effect": "+2 &#160; Chips for each remaining card in deck (Currently +104 &#160; Chips )",
+    "cost": 5,
+    "rarity": "common"
+  },
+  {
+    "nr": 54,
+    "name": "Sixth Sense",
+    "effect": "If first hand of round is a single 6 , destroy it and create a Spectral card (Must have room)",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 55,
+    "name": "Constellation",
+    "effect": "This Joker gains X0.1 &#160; Mult every time a Planet card is used (Currently X1 &#160; Mult )",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 56,
+    "name": "Hiker",
+    "effect": "Every played card permanently gains +5 &#160; Chips when scored",
+    "cost": 5,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 57,
+    "name": "Faceless Joker",
+    "effect": "Earn $5 if 3 or more face cards are discarded at the same time",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 58,
+    "name": "Green Joker",
+    "effect": "+1 &#160; Mult per hand played -1 &#160; Mult per discard (Currently +0 &#160; Mult )",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 59,
+    "name": "Superposition",
+    "effect": "Create a Tarot card if poker hand contains an Ace and a Straight (Must have room)",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 60,
+    "name": "To Do List",
+    "effect": "Earn $4 if poker hand is a [Poker&#160;Hand] , poker hand changes at end of round",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 61,
+    "name": "Cavendish",
+    "effect": "X3 &#160; Mult 1 in 1000 chance this card is destroyed at the end of round",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 62,
+    "name": "Card Sharp",
+    "effect": "X3 &#160; Mult if played poker hand has already been played this round",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 63,
+    "name": "Red Card",
+    "effect": "This Joker gains +3 &#160; Mult when any Booster Pack is skipped (Currently +0 &#160; Mult )",
+    "cost": 5,
+    "rarity": "common"
+  },
+  {
+    "nr": 64,
+    "name": "Madness",
+    "effect": "When Small Blind or Big Blind is selected, gain X0.5 &#160; Mult and destroy a random Joker (Currently X1 &#160; Mult )",
+    "cost": 7,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 65,
+    "name": "Square Joker",
+    "effect": "This Joker gains +4 &#160; Chips if played hand has exactly 4 cards (Currently 0 &#160; Chips )",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 66,
+    "name": "S\u00e9ance",
+    "effect": "If poker hand is a Straight Flush , create a random Spectral card (Must have room)",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 67,
+    "name": "Riff-Raff",
+    "effect": "When Blind is selected, create 2 Common Jokers (Must have room)",
+    "cost": 6,
+    "rarity": "common"
+  },
+  {
+    "nr": 68,
+    "name": "Vampire",
+    "effect": "This Joker gains X0.1 &#160; Mult per scoring Enhanced card played, removes card Enhancement (Currently X1 &#160; Mult )",
+    "cost": 7,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 69,
+    "name": "Shortcut",
+    "effect": "Allows Straights to be made with gaps of 1 rank (ex: 10 8 6 5 3 )",
+    "cost": 7,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 70,
+    "name": "Hologram",
+    "effect": "This Joker gains X0.25 &#160; Mult every time a playing card is added to your deck (Currently X1 &#160; Mult )",
+    "cost": 7,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 71,
+    "name": "Vagabond",
+    "effect": "Create a Tarot card if hand is played with $4 or less",
+    "cost": 8,
+    "rarity": "rare"
+  },
+  {
+    "nr": 72,
+    "name": "Baron",
+    "effect": "Each King held in hand gives X1.5 &#160; Mult",
+    "cost": 8,
+    "rarity": "rare"
+  },
+  {
+    "nr": 73,
+    "name": "Cloud 9",
+    "effect": "Earn $1 for each 9 in your full deck at end of round (Currently $4 )",
+    "cost": 7,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 74,
+    "name": "Rocket",
+    "effect": "Earn $1 at end of round. Payout increases by $2 when Boss Blind is defeated",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 75,
+    "name": "Obelisk",
+    "effect": "This Joker gains X0.2 &#160; Mult per consecutive hand played without playing your most played poker hand (Currently X1 &#160; Mult )",
+    "cost": 8,
+    "rarity": "rare"
+  },
+  {
+    "nr": 76,
+    "name": "Midas Mask",
+    "effect": "All played face cards become Gold cards when scored",
+    "cost": 7,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 77,
+    "name": "Luchador",
+    "effect": "Sell this card to disable the current Boss Blind",
+    "cost": 5,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 78,
+    "name": "Photograph",
+    "effect": "First played face card gives X2 &#160; Mult when scored",
+    "cost": 5,
+    "rarity": "common"
+  },
+  {
+    "nr": 79,
+    "name": "Gift Card",
+    "effect": "Add $1 of sell value to every Joker and Consumable card at end of round",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 80,
+    "name": "Turtle Bean",
+    "effect": "+5 hand size, reduces by 1 each round",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 81,
+    "name": "Erosion",
+    "effect": "+4 &#160; Mult for each card below [the deck's starting size] in your full deck (Currently +0 &#160; Mult )",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 82,
+    "name": "Reserved Parking",
+    "effect": "Each face card held in hand has a 1 in 2 chance to give $1",
+    "cost": 6,
+    "rarity": "common"
+  },
+  {
+    "nr": 83,
+    "name": "Mail-In Rebate",
+    "effect": "Earn $5 for each discarded [rank] , rank changes every round",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 84,
+    "name": "To the Moon",
+    "effect": "Earn an extra $1 of interest for every $5 you have at end of round",
+    "cost": 5,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 85,
+    "name": "Hallucination",
+    "effect": "1 in 2 chance to create a Tarot card when any Booster Pack is opened (Must have room)",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 86,
+    "name": "Fortune Teller",
+    "effect": "+1 &#160; Mult per Tarot card used this run (Currently +0 )",
+    "cost": 6,
+    "rarity": "common"
+  },
+  {
+    "nr": 87,
+    "name": "Juggler",
+    "effect": "+1 hand size",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 88,
+    "name": "Drunkard",
+    "effect": "+1 discard each round",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 89,
+    "name": "Stone Joker",
+    "effect": "Gives +25 &#160; Chips for each Stone Card in your full deck (Currently +0 &#160; Chips )",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 90,
+    "name": "Golden Joker",
+    "effect": "Earn $4 at end of round",
+    "cost": 6,
+    "rarity": "common"
+  },
+  {
+    "nr": 91,
+    "name": "Lucky Cat",
+    "effect": "This Joker gains X0.25 &#160; Mult every time a Lucky card successfully triggers (Currently X1 &#160; Mult )",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 92,
+    "name": "Baseball Card",
+    "effect": "Uncommon Jokers each give X1.5 &#160; Mult",
+    "cost": 8,
+    "rarity": "rare"
+  },
+  {
+    "nr": 93,
+    "name": "Bull",
+    "effect": "+2 &#160; Chips for each $1 you have (Currently +0 &#160; Chips )",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 94,
+    "name": "Diet Cola",
+    "effect": "Sell this card to create a free Double Tag",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 95,
+    "name": "Trading Card",
+    "effect": "If first discard of round has only 1 card, destroy it and earn $3",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 96,
+    "name": "Flash Card",
+    "effect": "This Joker gains +2 &#160; Mult per reroll in the shop (Currently +0 &#160; Mult )",
+    "cost": 5,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 97,
+    "name": "Popcorn",
+    "effect": "+20 &#160; Mult -4 &#160; Mult per round played",
+    "cost": 5,
+    "rarity": "common"
+  },
+  {
+    "nr": 98,
+    "name": "Spare Trousers",
+    "effect": "This Joker gains +2 &#160; Mult if played hand contains a Two Pair (Currently +0 &#160; Mult )",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 99,
+    "name": "Ancient Joker",
+    "effect": "Each played card with [suit] gives X1.5 &#160; Mult when scored, suit changes at end of round",
+    "cost": 8,
+    "rarity": "rare"
+  },
+  {
+    "nr": 100,
+    "name": "Ramen",
+    "effect": "X2 &#160; Mult , loses X0.01 &#160; Mult per card discarded",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 101,
+    "name": "Walkie Talkie",
+    "effect": "Each played 10 or 4 gives +10 &#160; Chips and +4 &#160; Mult when scored",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 102,
+    "name": "Seltzer",
+    "effect": "Retrigger all cards played for the next 10 hands",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 103,
+    "name": "Castle",
+    "effect": "This Joker gains +3 &#160; Chips per discarded [suit] card, suit changes every round (Currently +0 &#160; Chips )",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 104,
+    "name": "Smiley Face",
+    "effect": "Played face cards give +5 &#160; Mult when scored",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 105,
+    "name": "Campfire",
+    "effect": "This Joker gains X0.25 &#160; Mult for each card sold , resets when Boss Blind is defeated (Currently X1 &#160; Mult )",
+    "cost": 9,
+    "rarity": "rare"
+  },
+  {
+    "nr": 106,
+    "name": "Golden Ticket",
+    "effect": "Played Gold cards earn $4 when scored",
+    "cost": 5,
+    "rarity": "common"
+  },
+  {
+    "nr": 107,
+    "name": "Mr. Bones",
+    "effect": "Prevents Death if chips scored are at least 25% of required chips self destructs",
+    "cost": 5,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 108,
+    "name": "Acrobat",
+    "effect": "X3 &#160; Mult on final hand of round",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 109,
+    "name": "Sock and Buskin",
+    "effect": "Retrigger all played face cards",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 110,
+    "name": "Swashbuckler",
+    "effect": "Adds the sell value of all other owned Jokers to Mult (Currently +1 &#160; Mult )",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 111,
+    "name": "Troubadour",
+    "effect": "+2 hand size, -1 hand each round",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 112,
+    "name": "Certificate",
+    "effect": "When round begins, add a random playing card with a random seal to your hand",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 113,
+    "name": "Smeared Joker",
+    "effect": "&#160;Hearts and &#160;Diamonds count as the same suit, &#160;Spades and &#160;Clubs count as the same suit",
+    "cost": 7,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 114,
+    "name": "Throwback",
+    "effect": "X0.25 &#160; Mult for each Blind skipped this run (Currently X1 &#160; Mult )",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 115,
+    "name": "Hanging Chad",
+    "effect": "Retrigger first played card used in scoring 2 additional times",
+    "cost": 4,
+    "rarity": "common"
+  },
+  {
+    "nr": 116,
+    "name": "Rough Gem",
+    "effect": "Played cards with &#160;Diamond suit earn $1 when scored",
+    "cost": 7,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 117,
+    "name": "Bloodstone",
+    "effect": "1 in 2 chance for played cards with &#160;Heart suit to give X1.5 &#160; Mult when scored",
+    "cost": 7,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 118,
+    "name": "Arrowhead",
+    "effect": "Played cards with &#160;Spade suit give +50 &#160; Chips when scored",
+    "cost": 7,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 119,
+    "name": "Onyx Agate",
+    "effect": "Played cards with &#160;Club suit give +7 &#160; Mult when scored",
+    "cost": 7,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 120,
+    "name": "Glass Joker",
+    "effect": "This Joker gains X0.75 &#160; Mult for every Glass Card that is destroyed (Currently X1 &#160; Mult )",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 121,
+    "name": "Showman",
+    "effect": "Joker , Tarot , Planet , and Spectral cards may appear multiple times",
+    "cost": 5,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 122,
+    "name": "Flower Pot",
+    "effect": "X3 &#160; Mult if poker hand contains a &#160;Diamond card, &#160;Club card, &#160;Heart card, and &#160;Spade card",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 123,
+    "name": "Blueprint",
+    "effect": "Copies ability of Joker to the right",
+    "cost": 10,
+    "rarity": "rare"
+  },
+  {
+    "nr": 124,
+    "name": "Wee Joker",
+    "effect": "This Joker gains +8 &#160; Chips when each played 2 is scored (Currently +0 &#160; Chips )",
+    "cost": 8,
+    "rarity": "rare"
+  },
+  {
+    "nr": 125,
+    "name": "Merry Andy",
+    "effect": "+3 discards each round, -1 hand size",
+    "cost": 7,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 126,
+    "name": "Oops! All 6s",
+    "effect": "Doubles all listed probabilities (ex: 1 in 3 -&gt; 2 in 3 )",
+    "cost": 4,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 127,
+    "name": "The Idol",
+    "effect": "Each played [rank] of [suit] gives X2 &#160; Mult when scored Card changes every round",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 128,
+    "name": "Seeing Double",
+    "effect": "X2 &#160; Mult if played hand has a scoring &#160;Club card and a scoring card of any other suit",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 129,
+    "name": "Matador",
+    "effect": "Earn $8 if played hand triggers the Boss Blind ability",
+    "cost": 7,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 130,
+    "name": "Hit the Road",
+    "effect": "This Joker gains X0.5 &#160; Mult for every Jack discarded this round (Currently X1 &#160; Mult )",
+    "cost": 8,
+    "rarity": "rare"
+  },
+  {
+    "nr": 131,
+    "name": "The Duo",
+    "effect": "X2 &#160; Mult if played hand contains a Pair",
+    "cost": 8,
+    "rarity": "rare"
+  },
+  {
+    "nr": 132,
+    "name": "The Trio",
+    "effect": "X3 &#160; Mult if played hand contains a Three of a Kind",
+    "cost": 8,
+    "rarity": "rare"
+  },
+  {
+    "nr": 133,
+    "name": "The Family",
+    "effect": "X4 &#160; Mult if played hand contains a Four of a Kind",
+    "cost": 8,
+    "rarity": "rare"
+  },
+  {
+    "nr": 134,
+    "name": "The Order",
+    "effect": "X3 &#160; Mult if played hand contains a Straight",
+    "cost": 8,
+    "rarity": "rare"
+  },
+  {
+    "nr": 135,
+    "name": "The Tribe",
+    "effect": "X2 &#160; Mult if played hand contains a Flush",
+    "cost": 8,
+    "rarity": "rare"
+  },
+  {
+    "nr": 136,
+    "name": "Stuntman",
+    "effect": "+250 &#160; Chips , -2 hand size",
+    "cost": 7,
+    "rarity": "rare"
+  },
+  {
+    "nr": 137,
+    "name": "Invisible Joker",
+    "effect": "After 2 rounds, sell this card to Duplicate a random Joker (Currently 0 /2) (Removes Negative from copy)",
+    "cost": 8,
+    "rarity": "rare"
+  },
+  {
+    "nr": 138,
+    "name": "Brainstorm",
+    "effect": "Copies the ability of leftmost Joker",
+    "cost": 10,
+    "rarity": "rare"
+  },
+  {
+    "nr": 139,
+    "name": "Satellite",
+    "effect": "Earn $1 at end of round per unique Planet card used this run",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 140,
+    "name": "Shoot the Moon",
+    "effect": "Each Queen held in hand gives +13 &#160; Mult",
+    "cost": 5,
+    "rarity": "common"
+  },
+  {
+    "nr": 141,
+    "name": "Driver's License",
+    "effect": "X3 &#160; Mult if you have at least 16 Enhanced cards in your full deck (Currently 0 )",
+    "cost": 7,
+    "rarity": "rare"
+  },
+  {
+    "nr": 142,
+    "name": "Cartomancer",
+    "effect": "Create a Tarot card when Blind is selected (Must have room)",
+    "cost": 6,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 143,
+    "name": "Astronomer",
+    "effect": "All Planet cards and Celestial Packs in the shop are free",
+    "cost": 8,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 144,
+    "name": "Burnt Joker",
+    "effect": "Upgrade the level of the first discarded poker hand each round",
+    "cost": 8,
+    "rarity": "rare"
+  },
+  {
+    "nr": 145,
+    "name": "Bootstraps",
+    "effect": "+2 &#160; Mult for every $5 you have (Currently +0 &#160; Mult )",
+    "cost": 7,
+    "rarity": "uncommon"
+  },
+  {
+    "nr": 146,
+    "name": "Canio",
+    "effect": "This Joker gains X1 &#160; Mult when a face card is destroyed (Currently X1 &#160; Mult )",
+    "cost": 20,
+    "rarity": "legendary"
+  },
+  {
+    "nr": 147,
+    "name": "Triboulet",
+    "effect": "Played Kings and Queens each give X2 &#160; Mult when scored",
+    "cost": 20,
+    "rarity": "legendary"
+  },
+  {
+    "nr": 148,
+    "name": "Yorick",
+    "effect": "This Joker gains X1 &#160; Mult every 23 [23] cards discarded (Currently X1 &#160; Mult )",
+    "cost": 20,
+    "rarity": "legendary"
+  },
+  {
+    "nr": 149,
+    "name": "Chicot",
+    "effect": "Disables effect of every Boss Blind",
+    "cost": 20,
+    "rarity": "legendary"
+  },
+  {
+    "nr": 150,
+    "name": "Perkeo",
+    "effect": "Creates a Negative copy of 1 random consumable card in your possession at the end of the shop",
+    "cost": 20,
+    "rarity": "legendary"
+  }
+]

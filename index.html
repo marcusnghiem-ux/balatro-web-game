@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#1a1408" />
+  <title>Balatro - Roguelike Poker Engine</title>
+  
+  <!-- Modern & Retro Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=VT323&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            pixel: ['VT323', 'monospace'],
+            sans: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            balatro: {
+              gold: '#f39c12',
+              goldBorder: '#e67e22',
+              red: '#fe5f55',
+              blue: '#009dff',
+              darkRed: '#c0392b',
+              darkBlue: '#0984e3',
+              felt: '#1b231a',
+              deck: '#d63031'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="./src/style.css" />
+</head>
+<body class="bg-black text-slate-100 select-none overflow-hidden m-0 p-0 w-screen h-screen">
+  <!-- CRT & Scanline Retro Shader Overlay -->
+  <div class="crt-overlay pointer-events-none fixed inset-0 z-50"></div>
+  <div class="vignette-overlay pointer-events-none fixed inset-0 z-40"></div>
+
+  <!-- Hypnotic Golden/Tinted Spiral Vortex Canvas -->
+  <canvas id="bg-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
+
+  <!-- CRT Scanline Retro Arcade Texture Overlay -->
+  <div class="fixed inset-0 crt-overlay pointer-events-none z-10"></div>
+
+  <!-- Main Game Layout: 2-Column Balatro Arena with 3-Zone Architecture -->
+  <div id="app" class="relative z-20 w-full h-full flex flex-col lg:flex-row justify-between p-2 sm:p-3 md:p-4 gap-3 lg:gap-4 touch-manipulation max-w-[1650px] mx-auto">
+    
+    <!-- LEFT SIDEBAR: Zone A.3 Run Stats & Controls Console -->
+    <aside class="sidebar-console flex flex-col justify-between w-full lg:w-[310px] xl:w-[330px] shrink-0 bg-[#251f15]/95 border-4 border-[#e5a024] rounded-2xl p-3 shadow-2xl backdrop-blur-md">
+      
+      <!-- Top: Blind Card Container or Blind Select Header -->
+      <div class="flex flex-col gap-2">
+        <!-- Title Banner when in Blind Select Phase (Exact match to reference photo!) -->
+        <div id="blind-select-sidebar-title" class="px-2 pt-2 pb-1 text-white font-pixel text-4xl sm:text-5xl uppercase leading-tight tracking-wide text-left mb-1">
+          Choose your<br><span class="text-amber-300">next Blind</span>
+        </div>
+
+        <div id="blind-card" class="bg-[#f0ad28] border-2 border-[#ffdb70] rounded-xl p-3 shadow-lg text-slate-950 flex flex-col gap-1.5 transition-all duration-300">
+          <div class="flex items-center gap-2">
+            <div id="blind-coin" class="w-10 h-10 rounded-full bg-[#f39c12] border-2 border-[#fff0a8] shadow-md flex items-center justify-center font-pixel text-2xl font-bold text-amber-950">
+              ❂
+            </div>
+            <div class="flex flex-col">
+              <span id="blind-name" class="font-pixel text-2xl sm:text-3xl leading-none font-bold tracking-wide uppercase text-slate-900">Small Blind</span>
+              <span id="blind-condition" class="text-[11px] font-extrabold text-amber-950 tracking-tight">Score to beat this blind</span>
+            </div>
+          </div>
+
+          <!-- Target Score Box -->
+          <div class="bg-[#1b1713] rounded-lg p-2 border border-[#524128] flex items-center justify-between shadow-inner mt-1">
+            <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Score at least</span>
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs text-slate-400">❂</span>
+              <span id="target-score" class="font-pixel text-3xl sm:text-4xl text-[#fe5f55] font-black tracking-wider leading-none">300</span>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center text-[11px] font-black px-1 text-amber-950">
+            <span>Reward: <span id="blind-reward" class="text-emerald-900 font-bold">$$$$</span></span>
+            <span id="ante-counter" class="bg-amber-900/20 px-2 py-0.5 rounded text-amber-950 font-bold">Ante 1/8</span>
+          </div>
+
+          <!-- Skip Blind Action Button (earns $0 money) -->
+          <button id="skip-blind-btn" class="w-full mt-1 py-1.5 bg-[#d35400] hover:bg-[#e67e22] text-white font-black text-xs uppercase rounded-lg border border-amber-200 shadow transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">
+            Skip Blind (Earn $0)
+          </button>
+        </div>
+
+        <!-- Round Score Box -->
+        <div class="bg-[#1b1713] border-2 border-[#4a391e] rounded-xl p-2.5 flex items-center justify-between shadow-md">
+          <div class="flex flex-col">
+            <span class="text-[10px] font-black tracking-wider text-[#f0ad28] uppercase">Round score</span>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <span class="text-sm text-slate-400">❂</span>
+              <span id="current-score" class="font-pixel text-3xl sm:text-4xl text-white font-bold leading-none tracking-wide">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interest Bar (Every 5 coins = +1 coin, capping at 50 coins) -->
+        <div id="interest-card" class="bg-[#1b1713] border-2 border-[#4a391e] rounded-xl p-2.5 flex flex-col gap-1.5 shadow-md">
+          <div class="flex justify-between items-center text-[10px] font-black uppercase">
+            <span class="text-[#f0ad28]">Interest (+$1 / $5)</span>
+            <span id="interest-current-val" class="text-amber-200 font-pixel text-base">+$0 / +$10</span>
+          </div>
+          <div class="w-full bg-black/70 rounded-full h-2.5 overflow-hidden border border-amber-900/70">
+            <div id="interest-bar-fill" class="bg-gradient-to-r from-amber-600 to-yellow-400 h-full rounded-full transition-all duration-300" style="width: 8%;"></div>
+          </div>
+          <div class="flex justify-between items-center text-[9px] font-bold text-slate-400">
+            <span>$<span id="interest-money-num">4</span> / $50 cap</span>
+            <span id="interest-next-num" class="text-amber-300">Next +$1 at $5</span>
+          </div>
+        </div>
+
+        <!-- Live Score Calculation Box (Hand Preview) -->
+        <div id="live-hand-card" class="bg-[#16120d] border-2 border-[#4a391e] rounded-xl p-2.5 flex flex-col gap-1.5 shadow-md">
+          <div class="flex items-center justify-between">
+            <span id="preview-hand-name" class="font-pixel text-xl sm:text-2xl text-amber-400 tracking-wider">Select Cards</span>
+            <span id="preview-hand-level" class="text-[10px] font-black text-slate-400 bg-slate-800 px-1.5 py-0.5 rounded">lvl. 1</span>
+          </div>
+
+          <!-- Blue Chips x Red Mult badges -->
+          <div class="flex items-center justify-center gap-2 font-pixel text-3xl sm:text-4xl py-0.5">
+            <div id="preview-chips-box" class="bg-[#009dff] text-white px-4 py-1 rounded-lg border-2 border-[#54b8ff] shadow-md min-w-[75px] text-center">
+              0
+            </div>
+            <span class="text-[#fe5f55] text-2xl font-black">✕</span>
+            <div id="preview-mult-box" class="bg-[#fe5f55] text-white px-4 py-1 rounded-lg border-2 border-[#ff8d85] shadow-md min-w-[65px] text-center">
+              0
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom: Controls & Matrix -->
+      <div class="flex flex-col gap-2 mt-2">
+        <div class="grid grid-cols-3 gap-2">
+          <!-- Run Info Button -->
+          <button id="run-info-btn" class="bg-[#fe5f55] hover:bg-[#e0453b] text-white font-black text-xs uppercase p-2 rounded-xl border border-red-300 shadow-md transition active:scale-95 flex flex-col items-center justify-center">
+            <span>Run</span>
+            <span class="text-[10px]">Info</span>
+          </button>
+
+          <!-- Hands Left Badge -->
+          <div class="bg-[#16120d] border border-[#009dff]/60 rounded-xl p-1.5 flex flex-col items-center justify-center shadow-md">
+            <span class="text-[9px] font-bold text-[#009dff] uppercase">Hands</span>
+            <span id="hands-left" class="font-pixel text-3xl text-white font-bold leading-none">4</span>
+          </div>
+
+          <!-- Discards Left Badge -->
+          <div class="bg-[#16120d] border border-[#fe5f55]/60 rounded-xl p-1.5 flex flex-col items-center justify-center shadow-md">
+            <span class="text-[9px] font-bold text-[#fe5f55] uppercase">Discards</span>
+            <span id="discards-left" class="font-pixel text-3xl text-white font-bold leading-none">3</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 items-center">
+          <!-- Options / Sound Button -->
+          <button id="sound-toggle" class="bg-[#f39c12] hover:bg-[#d68910] text-slate-950 font-black text-xs uppercase p-2 rounded-xl border border-amber-200 shadow-md transition active:scale-95 flex flex-col items-center justify-center">
+            <span>Sound</span>
+            <span id="sound-state-label" class="text-[10px] font-bold">ON 🔊</span>
+          </button>
+
+          <!-- Money Badge -->
+          <div class="bg-[#16120d] border-2 border-[#f0ad28] rounded-xl p-1.5 flex items-center justify-center gap-1 shadow-md col-span-1">
+            <span class="font-pixel text-3xl text-[#f0ad28] font-black leading-none">$<span id="money-display">4</span></span>
+          </div>
+
+          <!-- Ante & Round stats -->
+          <div class="bg-[#16120d] border border-[#4a391e] rounded-xl p-1.5 flex flex-col items-center justify-center text-[10px] font-black text-slate-300 shadow-md">
+            <span class="text-amber-400">Ante <span id="ante-sub">1</span>/8</span>
+            <span class="text-slate-400">Round <span id="round-sub">1</span></span>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- RIGHT/MAIN PLAYFIELD: Zone A Top Inventory Bars + Center Playfield + Bottom Player Hand -->
+    <main class="flex-1 flex flex-col justify-between items-center w-full min-h-0 relative">
+      
+      <!-- ZONE A: Top Inventory Bars (Jokers Bar & Consumables Bar) -->
+      <div class="w-full flex flex-col sm:flex-row items-center justify-between gap-3 px-1 max-w-4xl">
+        
+        <!-- Zone A.1 Joker Slots Bar (Top Middle) -->
+        <div class="flex-1 w-full flex flex-col items-center sm:items-start">
+          <div class="flex items-center justify-between w-full px-2 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-black uppercase tracking-wider text-amber-200 drop-shadow">Jokers</span>
+              <span id="joker-count" class="text-xs px-2 py-0.5 rounded-md bg-black/60 border border-amber-500/40 text-amber-300 font-pixel text-sm">0 / 5</span>
+            </div>
+            <div id="joker-trigger-banner" class="opacity-0 transition-opacity duration-200 text-white font-pixel text-2xl tracking-wide bg-red-600/90 px-3 py-0.5 rounded-lg shadow-lg border border-red-300">
+              Again!
+            </div>
+          </div>
+
+          <div id="jokers-container" class="w-full min-h-[105px] sm:min-h-[120px] bg-black/40 border-2 border-[#e5a024]/50 rounded-2xl p-2 flex gap-2.5 overflow-x-auto justify-start sm:justify-center items-center shadow-2xl backdrop-blur-sm">
+            <!-- Dynamically populated Jokers -->
+          </div>
+        </div>
+
+        <!-- Zone A.2 Consumable Slots Bar (Top Right) -->
+        <div class="w-full sm:w-auto min-w-[190px] flex flex-col items-center sm:items-end">
+          <div class="flex items-center justify-between w-full px-2 mb-1">
+            <span class="text-xs font-black uppercase tracking-wider text-cyan-200 drop-shadow">Consumables</span>
+            <span id="consumable-count" class="text-xs px-2 py-0.5 rounded-md bg-black/60 border border-cyan-500/40 text-cyan-300 font-pixel text-sm">0 / 2</span>
+          </div>
+
+          <div id="consumables-container" class="w-full min-h-[105px] sm:min-h-[120px] bg-black/40 border-2 border-cyan-500/40 rounded-2xl p-2 flex gap-2.5 overflow-x-auto justify-center items-center shadow-2xl backdrop-blur-sm">
+            <!-- Dynamically populated Consumables -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ZONE: "Choose your next Blind" Selection Screen (Exact layout from user screenshot) -->
+      <div id="blind-select-stage" class="flex-1 w-full flex flex-col justify-between items-center relative my-auto py-2 max-w-5xl">
+        
+        <!-- Three Tall Blind Columns Container -->
+        <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-3 lg:gap-5 items-stretch justify-center max-w-4xl px-2 my-auto">
+          
+          <!-- Column 0: Small Blind -->
+          <div id="blind-col-0" class="blind-column-card relative bg-[#182024]/90 border-4 border-[#009dff] rounded-2xl p-4 flex flex-col justify-between items-center shadow-2xl transition-all duration-300 min-h-[380px] sm:min-h-[420px]">
+            <!-- Top Action Button -->
+            <button id="blind-select-btn-0" class="w-full py-2 bg-[#f39c12] hover:bg-[#e67e22] text-slate-950 font-black text-sm uppercase rounded-xl border-2 border-amber-200 shadow-md active:scale-95 transition" data-index="0">
+              Select
+            </button>
+
+            <!-- Blind Title Pill -->
+            <div id="blind-title-0" class="w-full text-center py-1 bg-[#0072b2] text-white font-pixel text-xl uppercase rounded-lg border border-blue-300 mt-2 shadow">
+              Small Blind
+            </div>
+
+            <!-- Big Circular Badge -->
+            <div id="blind-badge-0" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#0072b2] border-4 border-[#54b8ff] shadow-xl flex flex-col items-center justify-center text-white my-auto font-pixel text-xs sm:text-sm font-black text-center leading-tight p-1">
+              <span>SMALL</span>
+              <span>BLIND</span>
+            </div>
+
+            <!-- Score at least box -->
+            <div class="w-full bg-[#13191c] rounded-xl p-2.5 border border-[#2b3a42] flex flex-col items-center shadow-inner">
+              <span class="text-[10px] font-black uppercase text-slate-400">Score at least</span>
+              <div class="flex items-center gap-1.5 font-pixel text-3xl sm:text-4xl text-[#fe5f55] font-black mt-0.5">
+                <span class="text-xs text-white">❂</span>
+                <span id="blind-score-target-0">800</span>
+              </div>
+              <span class="text-[11px] font-bold text-amber-300 mt-0.5">Reward: <span id="blind-reward-label-0">$$$+</span></span>
+            </div>
+
+            <!-- Divider -->
+            <span class="text-xs font-bold text-slate-400 my-1">or</span>
+
+            <!-- Skip Blind Button with Tag -->
+            <div class="w-full flex items-center gap-2">
+              <div id="blind-tag-icon-0" class="w-10 h-10 rounded-xl bg-white/10 border border-slate-500/50 flex items-center justify-center text-xl shadow" title="Skip Tag Reward">
+                🎲
+              </div>
+              <button id="blind-skip-btn-0" class="flex-1 py-2.5 bg-[#fe5f55] hover:bg-[#e0453b] text-white font-black text-xs uppercase rounded-xl border border-red-300 shadow active:scale-95 transition disabled:opacity-40 disabled:cursor-not-allowed" data-index="0">
+                Skip Blind
+              </button>
+            </div>
+          </div>
+
+          <!-- Column 1: Big Blind -->
+          <div id="blind-col-1" class="blind-column-card relative bg-[#182024]/70 border-4 border-slate-600/60 rounded-2xl p-4 flex flex-col justify-between items-center shadow-2xl transition-all duration-300 min-h-[380px] sm:min-h-[420px]">
+            <!-- Top Action Button -->
+            <button id="blind-select-btn-1" class="w-full py-2 bg-slate-700 text-slate-400 font-black text-sm uppercase rounded-xl border border-slate-600 transition" disabled data-index="1">
+              Upcoming
+            </button>
+
+            <!-- Blind Title Pill -->
+            <div id="blind-title-1" class="w-full text-center py-1 bg-[#8c6d1f] text-amber-200 font-pixel text-xl uppercase rounded-lg border border-amber-600 mt-2 shadow">
+              Big Blind
+            </div>
+
+            <!-- Big Circular Badge -->
+            <div id="blind-badge-1" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#8c6d1f] border-4 border-[#d4ac0d] shadow-xl flex flex-col items-center justify-center text-amber-200 my-auto font-pixel text-xs sm:text-sm font-black text-center leading-tight p-1">
+              <span>BIG</span>
+              <span>BLIND</span>
+            </div>
+
+            <!-- Score at least box -->
+            <div class="w-full bg-[#13191c] rounded-xl p-2.5 border border-[#2b3a42] flex flex-col items-center shadow-inner">
+              <span class="text-[10px] font-black uppercase text-slate-400">Score at least</span>
+              <div class="flex items-center gap-1.5 font-pixel text-3xl sm:text-4xl text-[#fe5f55] font-black mt-0.5">
+                <span class="text-xs text-white">❂</span>
+                <span id="blind-score-target-1">1,200</span>
+              </div>
+              <span class="text-[11px] font-bold text-amber-300 mt-0.5">Reward: <span id="blind-reward-label-1">$$$$+</span></span>
+            </div>
+
+            <!-- Divider -->
+            <span class="text-xs font-bold text-slate-400 my-1">or</span>
+
+            <!-- Skip Blind Button with Tag -->
+            <div class="w-full flex items-center gap-2">
+              <div id="blind-tag-icon-1" class="w-10 h-10 rounded-xl bg-white/5 border border-slate-600/30 flex items-center justify-center text-xl shadow" title="Skip Tag Reward">
+                🏷️
+              </div>
+              <button id="blind-skip-btn-1" class="flex-1 py-2.5 bg-slate-800 text-slate-500 font-black text-xs uppercase rounded-xl border border-slate-700 transition" disabled data-index="1">
+                Skip Blind
+              </button>
+            </div>
+          </div>
+
+          <!-- Column 2: Boss Blind (e.g. The Hook) - NEVER SKIPPABLE -->
+          <div id="blind-col-2" class="blind-column-card relative bg-[#182024]/70 border-4 border-[#8b2626]/70 rounded-2xl p-4 flex flex-col justify-between items-center shadow-2xl transition-all duration-300 min-h-[380px] sm:min-h-[420px]">
+            <!-- Top Action Button -->
+            <button id="blind-select-btn-2" class="w-full py-2 bg-slate-700 text-slate-400 font-black text-sm uppercase rounded-xl border border-slate-600 transition" disabled data-index="2">
+              Upcoming
+            </button>
+
+            <!-- Boss Title Pill -->
+            <div id="blind-title-2" class="w-full text-center py-1 bg-[#8b2626] text-white font-pixel text-xl uppercase rounded-lg border border-red-400 mt-2 shadow truncate px-1">
+              The Hook
+            </div>
+
+            <!-- Big Circular Badge -->
+            <div id="blind-badge-2" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#8b2626] border-4 border-[#e74c3c] shadow-xl flex items-center justify-center text-white my-auto font-pixel text-3xl font-black">
+              ⚓
+            </div>
+
+            <!-- Boss Debuff Desc -->
+            <span id="blind-boss-desc-2" class="text-[11px] font-bold text-center text-slate-300 px-1 leading-snug my-1 min-h-[32px] flex items-center justify-center">
+              Discards 2 random cards per hand played
+            </span>
+
+            <!-- Score at least box -->
+            <div class="w-full bg-[#13191c] rounded-xl p-2.5 border border-[#2b3a42] flex flex-col items-center shadow-inner">
+              <span class="text-[10px] font-black uppercase text-slate-400">Score at least</span>
+              <div class="flex items-center gap-1.5 font-pixel text-3xl sm:text-4xl text-[#fe5f55] font-black mt-0.5">
+                <span class="text-xs text-white">❂</span>
+                <span id="blind-score-target-2">1,600</span>
+              </div>
+              <span class="text-[11px] font-bold text-amber-300 mt-0.5">Reward: <span id="blind-reward-label-2">$$$$$+</span></span>
+            </div>
+
+            <!-- Boss footer rules (Exact text from screenshot: "Up the Ante", "Raise all Blinds", "Refresh Blinds") -->
+            <div class="w-full text-center flex flex-col items-center mt-2 pt-1 border-t border-slate-700/50">
+              <span class="font-pixel text-sm text-amber-400 font-bold uppercase tracking-wide">Up the Ante</span>
+              <span class="text-[10px] text-slate-400 font-bold">Raise all Blinds</span>
+              <span class="text-[10px] text-slate-400 font-bold">Refresh Blinds</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Deck Pile Indicator on Blind Select Screen (Bottom Right) -->
+        <div class="w-full flex justify-end px-4 mt-2">
+          <div class="flex flex-col items-center">
+            <div class="deck-pile-card shadow-2xl relative cursor-pointer active:scale-95 transition">
+              <div class="deck-pattern"></div>
+            </div>
+            <span id="blind-deck-counter" class="text-xs font-pixel text-amber-300 font-bold mt-1 bg-black/60 px-2 py-0.5 rounded border border-amber-500/40">
+              52/52
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ACTIVE PLAY ARENA (Played Cards Stage + Hand Shelf + Controls) -->
+      <div id="play-arena" class="flex-1 w-full flex flex-col justify-between items-center hidden relative">
+        
+        <!-- Center: Scoring Animation Stage / Center Played Hand -->
+        <div class="flex-1 w-full flex flex-col items-center justify-center relative my-2">
+          
+          <!-- Scored Cards Spotlight Container -->
+          <div id="played-cards-stage" class="flex items-center justify-center gap-2 sm:gap-3 min-h-[120px] sm:min-h-[150px] w-full">
+            <!-- Played cards animate here -->
+          </div>
+
+          <!-- Scoring Tally Board Overlay -->
+          <div id="scoring-stage" class="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-30 hidden">
+            <div id="scoring-board" class="bg-black/90 border-4 border-[#f0ad28] p-5 sm:p-7 rounded-3xl shadow-2xl flex flex-col items-center gap-3 scale-95 opacity-0 transition-all duration-300">
+              <h2 id="scoring-hand-title" class="font-pixel text-4xl sm:text-5xl text-amber-300 tracking-wider drop-shadow">FLUSH</h2>
+              <div class="flex items-center gap-4 font-pixel text-5xl sm:text-6xl">
+                <div id="tally-chips" class="bg-[#009dff] text-white px-5 py-2 rounded-2xl shadow-lg border-2 border-blue-200 min-w-[110px] text-center">35</div>
+                <div class="text-[#fe5f55] font-black text-3xl sm:text-4xl">✕</div>
+                <div id="tally-mult" class="bg-[#fe5f55] text-white px-5 py-2 rounded-2xl shadow-lg border-2 border-red-200 min-w-[90px] text-center">4</div>
+              </div>
+              <div class="font-pixel text-3xl sm:text-4xl text-slate-200 mt-1">
+                Total: <span id="tally-total" class="text-amber-400 font-bold text-4xl sm:text-5xl">140</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Bottom Controls & Player Hand -->
+        <div class="w-full flex flex-col items-center gap-2">
+          
+          <!-- Action Buttons Bar -->
+          <div class="w-full flex items-center justify-between max-w-4xl px-2 sm:px-4">
+            <div class="flex items-center gap-2">
+              <button id="sort-rank-btn" class="px-3 py-1.5 text-xs font-black uppercase rounded-xl bg-black/60 hover:bg-black/80 text-amber-200 border-2 border-amber-500/50 transition active:scale-95 shadow">
+                Sort Rank
+              </button>
+              <button id="sort-suit-btn" class="px-3 py-1.5 text-xs font-black uppercase rounded-xl bg-black/60 hover:bg-black/80 text-amber-200 border-2 border-amber-500/50 transition active:scale-95 shadow">
+                Sort Suit
+              </button>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <button id="discard-btn" disabled class="px-5 py-2 sm:py-2.5 rounded-2xl font-black text-sm uppercase tracking-wider bg-[#c0392b] hover:bg-[#e74c3c] disabled:opacity-40 disabled:cursor-not-allowed text-white shadow-xl active:scale-95 transition border-2 border-red-400">
+                Discard (<span id="discard-count">0</span>)
+              </button>
+
+              <button id="play-btn" disabled class="px-6 py-2 sm:py-2.5 rounded-2xl font-black text-sm uppercase tracking-wider bg-[#009dff] hover:bg-[#29b6f6] disabled:opacity-40 disabled:cursor-not-allowed text-white shadow-xl active:scale-95 transition border-2 border-blue-300">
+                Play Hand (<span id="play-count">0</span>/5)
+              </button>
+            </div>
+          </div>
+
+          <!-- Hand Shelf & Deck Stack -->
+          <div class="w-full flex items-end justify-center relative min-h-[175px] sm:min-h-[210px] pb-1">
+            
+            <!-- Player Hand Container (8 cards fan/shelf) -->
+            <div id="player-hand" class="relative flex items-end justify-center w-full max-w-3xl h-full select-none z-10">
+              <!-- Cards rendered here with authentic pips -->
+            </div>
+
+            <!-- Red Ornamental Deck Pile (bottom right) -->
+            <div class="hidden sm:flex flex-col items-center absolute right-2 sm:right-6 bottom-2 z-20">
+              <div class="deck-pile-card shadow-2xl relative cursor-pointer active:scale-95 transition">
+                <div class="deck-pattern"></div>
+              </div>
+              <span id="deck-counter" class="text-xs font-pixel text-amber-300 font-bold mt-1 bg-black/60 px-2 py-0.5 rounded border border-amber-500/40">
+                44/52
+              </span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ZONE B: MAIN SHOP AREA (Full Exact Balatro Layout) -->
+  <div id="shop-modal" class="fixed inset-0 z-40 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-3 sm:p-5">
+    <div class="bg-[#1b1713] border-4 border-[#f0ad28] rounded-3xl p-5 sm:p-7 max-w-4xl w-full flex flex-col gap-5 shadow-2xl relative max-h-[95vh] overflow-y-auto">
+      
+      <!-- Shop Header -->
+      <div class="flex justify-between items-center border-b border-[#4a391e] pb-3">
+        <div class="flex items-center gap-3">
+          <h2 class="font-pixel text-4xl sm:text-5xl text-[#f0ad28] tracking-wider drop-shadow">THE SHOP</h2>
+          <span class="text-xs text-amber-200/80 font-bold hidden sm:inline">Ante <span id="shop-ante-indicator">1</span></span>
+        </div>
+        
+        <div class="flex items-center gap-4">
+          <div class="font-pixel text-4xl text-[#f0ad28] font-bold">
+            $<span id="shop-money">0</span>
+          </div>
+          <!-- Reroll Button (Left Side of controls) -->
+          <button id="reroll-btn" class="px-4 py-2 bg-black/60 hover:bg-black/90 text-amber-400 border-2 border-amber-500/50 rounded-xl text-xs font-black uppercase transition active:scale-95 shadow">
+            Reroll ($<span id="reroll-cost">5</span>)
+          </button>
+        </div>
+      </div>
+
+      <!-- Shop Shelf 1: Top Shelf (2 Buyable Cards: Jokers, Tarots, Planets) -->
+      <div class="flex flex-col gap-2">
+        <div class="flex justify-between items-center">
+          <h3 class="text-xs font-black text-amber-300 uppercase tracking-wider">Card Shelf</h3>
+          <span class="text-[11px] text-slate-400">Jokers, Tarots, and Planets</span>
+        </div>
+        <div id="shop-cards-shelf" class="grid grid-cols-2 gap-4 min-h-[170px]">
+          <!-- Top shelf cards rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Shop Shelf 2 & 3: Bottom Shelves (Left: 2 Booster Packs, Right: 1 Voucher) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+        
+        <!-- Bottom Left: Booster Packs Shelf (Holds 2 Packs) -->
+        <div class="md:col-span-2 flex flex-col gap-2">
+          <h3 class="text-xs font-black text-amber-300 uppercase tracking-wider">Booster Packs</h3>
+          <div id="shop-packs-shelf" class="grid grid-cols-2 gap-3 min-h-[180px]">
+            <!-- Booster packs rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Bottom Right: Voucher Slot (Holds 1 active Voucher per Ante) -->
+        <div class="flex flex-col gap-2">
+          <h3 class="text-xs font-black text-amber-300 uppercase tracking-wider">Voucher</h3>
+          <div id="shop-voucher-slot" class="w-full h-full min-h-[180px] flex items-center justify-center">
+            <!-- Voucher rendered dynamically -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Shop Footer Action (Next Round Button) -->
+      <div class="flex justify-end pt-3 border-t border-[#4a391e]">
+        <button id="next-round-btn" class="px-9 py-3.5 bg-[#009dff] hover:bg-blue-400 text-white rounded-2xl font-black text-sm uppercase tracking-wider shadow-xl active:scale-95 transition border-2 border-blue-200">
+          Next Round ➔
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ZONE C: BOOSTER PACK OPENING OVERLAY SCREEN -->
+  <div id="pack-overlay" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-lg hidden flex flex-col items-center justify-center p-3 sm:p-5 overflow-y-auto">
+    <div class="max-w-5xl w-full flex flex-col items-center gap-5 my-auto">
+      <div class="text-center">
+        <h2 id="pack-overlay-title" class="font-pixel text-4xl sm:text-6xl text-amber-300 tracking-wider drop-shadow">STANDARD PACK</h2>
+        <p id="pack-overlay-subtitle" class="text-amber-200 text-sm font-black mt-1">Choose cards to add to your deck</p>
+      </div>
+
+      <!-- Cards Offered in the Pack (Supports 10 cards displayed face up!) -->
+      <div id="pack-cards-container" class="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4 items-center justify-center w-full min-h-[220px] max-w-4xl p-2">
+        <!-- Pack cards rendered here -->
+      </div>
+
+      <!-- Skip Button -->
+      <button id="skip-pack-btn" class="px-7 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-black text-xs uppercase rounded-xl border border-slate-600 transition active:scale-95 shadow-xl">
+        Skip / Keep Deck
+      </button>
+    </div>
+  </div>
+
+  <!-- Run Info Modal -->
+  <div id="run-info-modal" class="fixed inset-0 z-40 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-[#1b1713] border-4 border-[#009dff] rounded-3xl p-6 max-w-2xl w-full flex flex-col gap-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-[#4a391e] pb-3">
+        <h2 class="font-pixel text-4xl text-[#009dff] tracking-wider">POKER HAND LEVELS</h2>
+        <button id="close-run-info-btn" class="text-slate-400 hover:text-white font-bold text-xl px-2">✕</button>
+      </div>
+      <div id="hand-levels-list" class="flex flex-col gap-2 max-h-[60vh] overflow-y-auto pr-1">
+        <!-- List of hand levels rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Over / Victory Modal -->
+  <div id="game-over-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-lg hidden flex items-center justify-center p-4">
+    <div class="bg-[#1b1713] border-4 border-[#fe5f55] rounded-3xl p-8 max-w-md w-full flex flex-col items-center text-center gap-6 shadow-2xl">
+      <h2 id="game-over-title" class="font-pixel text-6xl text-[#fe5f55] tracking-wider">GAME OVER</h2>
+      <p id="game-over-message" class="text-amber-200/90 text-sm font-bold">You couldn't reach the required chip score.</p>
+      
+      <div class="bg-black/60 p-4 rounded-2xl w-full border border-amber-900/50 flex flex-col gap-2 font-pixel text-2xl">
+        <div class="flex justify-between">
+          <span class="text-slate-400">Ante Reached:</span>
+          <span id="final-ante" class="text-[#f0ad28]">Ante 1</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400">Final Round Score:</span>
+          <span id="final-score" class="text-[#009dff]">0</span>
+        </div>
+      </div>
+
+      <button id="restart-run-btn" class="w-full py-4 bg-[#fe5f55] hover:bg-red-500 text-white rounded-2xl font-black text-lg uppercase tracking-wider shadow-xl active:scale-95 transition border-2 border-red-300">
+        New Run
+      </button>
+    </div>
+  </div>
+
+  <!-- Entry Script -->
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
