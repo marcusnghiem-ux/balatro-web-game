@@ -1,0 +1,1502 @@
+[
+  {
+    "nr": 1,
+    "id": "joker",
+    "name": "Joker",
+    "effect": "+4 Mult",
+    "cost": 2,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Joker.png/80px-Joker.png?7edba"
+  },
+  {
+    "nr": 2,
+    "id": "greedy_joker",
+    "name": "Greedy Joker",
+    "effect": "Played cards with Diamond suit give +3 Mult when scored",
+    "cost": 5,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Greedy_Joker.png/80px-Greedy_Joker.png?68b5e"
+  },
+  {
+    "nr": 3,
+    "id": "lusty_joker",
+    "name": "Lusty Joker",
+    "effect": "Played cards with Heart suit give +3 Mult when scored",
+    "cost": 5,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Lusty_Joker.png/80px-Lusty_Joker.png?76952"
+  },
+  {
+    "nr": 4,
+    "id": "wrathful_joker",
+    "name": "Wrathful Joker",
+    "effect": "Played cards with Spade suit give +3 Mult when scored",
+    "cost": 5,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Wrathful_Joker.png/80px-Wrathful_Joker.png?76952"
+  },
+  {
+    "nr": 5,
+    "id": "gluttonous_joker",
+    "name": "Gluttonous Joker",
+    "effect": "Played cards with Club suit give +3 Mult when scored",
+    "cost": 5,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Gluttonous_Joker.png/80px-Gluttonous_Joker.png?ec8cd"
+  },
+  {
+    "nr": 6,
+    "id": "jolly_joker",
+    "name": "Jolly Joker",
+    "effect": "+8 Mult if played hand contains a Pair",
+    "cost": 3,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Jolly_Joker.png/80px-Jolly_Joker.png?31f87"
+  },
+  {
+    "nr": 7,
+    "id": "zany_joker",
+    "name": "Zany Joker",
+    "effect": "+12 Mult if played hand contains a Three of a Kind",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Zany_Joker.png/80px-Zany_Joker.png?503ea"
+  },
+  {
+    "nr": 8,
+    "id": "mad_joker",
+    "name": "Mad Joker",
+    "effect": "+10 Mult if played hand contains a Two Pair",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Mad_Joker.png/80px-Mad_Joker.png?bc6c9"
+  },
+  {
+    "nr": 9,
+    "id": "crazy_joker",
+    "name": "Crazy Joker",
+    "effect": "+12 Mult if played hand contains a Straight",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Crazy_Joker.png/80px-Crazy_Joker.png?2bb8f"
+  },
+  {
+    "nr": 10,
+    "id": "droll_joker",
+    "name": "Droll Joker",
+    "effect": "+10 Mult if played hand contains a Flush",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Droll_Joker.png/80px-Droll_Joker.png?9dea7"
+  },
+  {
+    "nr": 11,
+    "id": "sly_joker",
+    "name": "Sly Joker",
+    "effect": "+50 Chips if played hand contains a Pair",
+    "cost": 3,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Sly_Joker.png/80px-Sly_Joker.png?785b0"
+  },
+  {
+    "nr": 12,
+    "id": "wily_joker",
+    "name": "Wily Joker",
+    "effect": "+100 Chips if played hand contains a Three of a Kind",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Wily_Joker.png/80px-Wily_Joker.png?59941"
+  },
+  {
+    "nr": 13,
+    "id": "clever_joker",
+    "name": "Clever Joker",
+    "effect": "+80 Chips if played hand contains a Two Pair",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Clever_Joker.png/80px-Clever_Joker.png?c2577"
+  },
+  {
+    "nr": 14,
+    "id": "devious_joker",
+    "name": "Devious Joker",
+    "effect": "+100 Chips if played hand contains a Straight",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Devious_Joker.png/80px-Devious_Joker.png?58028"
+  },
+  {
+    "nr": 15,
+    "id": "crafty_joker",
+    "name": "Crafty Joker",
+    "effect": "+80 Chips if played hand contains a Flush",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Crafty_Joker.png/80px-Crafty_Joker.png?0a8aa"
+  },
+  {
+    "nr": 16,
+    "id": "half_joker",
+    "name": "Half Joker",
+    "effect": "+20 Mult if played hand contains 3 or fewer cards",
+    "cost": 5,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Half_Joker.png/80px-Half_Joker.png?053e7"
+  },
+  {
+    "nr": 17,
+    "id": "stencil",
+    "name": "Joker Stencil",
+    "effect": "X1 Mult for each empty Joker slot Joker Stencil included (Currently X1 )",
+    "cost": 8,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Joker_Stencil.png/80px-Joker_Stencil.png?e908e"
+  },
+  {
+    "nr": 18,
+    "id": "four_fingers",
+    "name": "Four Fingers",
+    "effect": "All Flushes and Straights can be made with 4 cards",
+    "cost": 7,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Four_Fingers.png/80px-Four_Fingers.png?58466"
+  },
+  {
+    "nr": 19,
+    "id": "mime",
+    "name": "Mime",
+    "effect": "Retrigger all card held in hand abilities",
+    "cost": 5,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Mime.png/80px-Mime.png?0b031"
+  },
+  {
+    "nr": 20,
+    "id": "credit_card",
+    "name": "Credit Card",
+    "effect": "Go up to -$20 in debt",
+    "cost": 1,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Credit_Card.png/80px-Credit_Card.png?4a471"
+  },
+  {
+    "nr": 21,
+    "id": "ceremonial_dagger",
+    "name": "Ceremonial Dagger",
+    "effect": "When Blind is selected, destroy Joker to the right and permanently add double its sell value to this Mult (Currently +0 Mult )",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Ceremonial_Dagger.png/80px-Ceremonial_Dagger.png?25d93"
+  },
+  {
+    "nr": 22,
+    "id": "banner",
+    "name": "Banner",
+    "effect": "+30 Chips for each remaining discard",
+    "cost": 5,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Banner.png/80px-Banner.png?dfdcd"
+  },
+  {
+    "nr": 23,
+    "id": "mystic_summit",
+    "name": "Mystic Summit",
+    "effect": "+15 Mult when 0 discards remaining",
+    "cost": 5,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Mystic_Summit.png/80px-Mystic_Summit.png?3671e"
+  },
+  {
+    "nr": 24,
+    "id": "marble_joker",
+    "name": "Marble Joker",
+    "effect": "Adds one Stone card to the deck when Blind is selected",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Marble_Joker.png/80px-Marble_Joker.png?d4382"
+  },
+  {
+    "nr": 25,
+    "id": "loyalty_card",
+    "name": "Loyalty Card",
+    "effect": "X4 Mult every 6 hands played 5 remaining",
+    "cost": 5,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Loyalty_Card.png/80px-Loyalty_Card.png?516db"
+  },
+  {
+    "nr": 26,
+    "id": "8_ball",
+    "name": "8 Ball",
+    "effect": "1 in 4 chance for each played 8 to create a Tarot card when scored (Must have room)",
+    "cost": 5,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/8_Ball.png/80px-8_Ball.png?bfbdc"
+  },
+  {
+    "nr": 27,
+    "id": "misprint",
+    "name": "Misprint",
+    "effect": "+0-23 Mult",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Misprint.png/80px-Misprint.png?a7cb6"
+  },
+  {
+    "nr": 28,
+    "id": "dusk",
+    "name": "Dusk",
+    "effect": "Retrigger all played cards in final hand of the round",
+    "cost": 5,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Dusk.png/80px-Dusk.png?0c00a"
+  },
+  {
+    "nr": 29,
+    "id": "raised_fist",
+    "name": "Raised Fist",
+    "effect": "Adds double the rank of lowest ranked card held in hand to Mult",
+    "cost": 5,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Raised_Fist.png/80px-Raised_Fist.png?a1cd5"
+  },
+  {
+    "nr": 30,
+    "id": "chaos_the_clown",
+    "name": "Chaos the Clown",
+    "effect": "1 free Reroll per shop",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Chaos_the_Clown.png/80px-Chaos_the_Clown.png?35876"
+  },
+  {
+    "nr": 31,
+    "id": "fibonacci",
+    "name": "Fibonacci",
+    "effect": "Each played Ace , 2 , 3 , 5 , or 8 gives +8 Mult when scored",
+    "cost": 8,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Fibonacci.png/80px-Fibonacci.png?287ab"
+  },
+  {
+    "nr": 32,
+    "id": "steel_joker",
+    "name": "Steel Joker",
+    "effect": "Gives X0.2 Mult for each Steel Card in your full deck (Currently X1 Mult )",
+    "cost": 7,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Steel_Joker.png/80px-Steel_Joker.png?91161"
+  },
+  {
+    "nr": 33,
+    "id": "scary_face",
+    "name": "Scary Face",
+    "effect": "Played face cards give +30 Chips when scored",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Scary_Face.png/80px-Scary_Face.png?08486"
+  },
+  {
+    "nr": 34,
+    "id": "abstract_joker",
+    "name": "Abstract Joker",
+    "effect": "+3 Mult for each Joker card (Currently +0 Mult )",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Abstract_Joker.png/80px-Abstract_Joker.png?2a9b3"
+  },
+  {
+    "nr": 35,
+    "id": "delayed_gratification",
+    "name": "Delayed Gratification",
+    "effect": "Earn $2 per discard if no discards are used by end of the round",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Delayed_Gratification.png/80px-Delayed_Gratification.png?ba8a9"
+  },
+  {
+    "nr": 36,
+    "id": "hack",
+    "name": "Hack",
+    "effect": "Retrigger each played 2 , 3 , 4 , or 5",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Hack.png/80px-Hack.png?3c921"
+  },
+  {
+    "nr": 37,
+    "id": "pareidolia",
+    "name": "Pareidolia",
+    "effect": "All cards are considered face cards",
+    "cost": 5,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Pareidolia.png/80px-Pareidolia.png?f3c30"
+  },
+  {
+    "nr": 38,
+    "id": "gros_michel",
+    "name": "Gros Michel",
+    "effect": "+15 Mult 1 in 6 chance this card is destroyed at end of round",
+    "cost": 5,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Gros_Michel.png/80px-Gros_Michel.png?85eae"
+  },
+  {
+    "nr": 39,
+    "id": "even_steven",
+    "name": "Even Steven",
+    "effect": "Played cards with even rank give +4 Mult when scored (10, 8, 6, 4, 2)",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Even_Steven.png/80px-Even_Steven.png?2595d"
+  },
+  {
+    "nr": 40,
+    "id": "odd_todd",
+    "name": "Odd Todd",
+    "effect": "Played cards with odd rank give +31 Chips when scored (A, 9, 7, 5, 3)",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Odd_Todd.png/80px-Odd_Todd.png?6bb7f"
+  },
+  {
+    "nr": 41,
+    "id": "scholar",
+    "name": "Scholar",
+    "effect": "Played Aces give +20 Chips and +4 Mult when scored",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Scholar.png/80px-Scholar.png?303f6"
+  },
+  {
+    "nr": 42,
+    "id": "business_card",
+    "name": "Business Card",
+    "effect": "Played face cards have a 1 in 2 chance to give $2 when scored",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Business_Card.png/80px-Business_Card.png?f91d7"
+  },
+  {
+    "nr": 43,
+    "id": "supernova",
+    "name": "Supernova",
+    "effect": "Adds the number of times poker hand has been played this run to Mult",
+    "cost": 5,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Supernova.png/80px-Supernova.png?0771d"
+  },
+  {
+    "nr": 44,
+    "id": "ride_the_bus",
+    "name": "Ride the Bus",
+    "effect": "This Joker gains +1 Mult per consecutive hand played without a scoring face card (Currently +0 Mult )",
+    "cost": 6,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Ride_the_Bus.png/80px-Ride_the_Bus.png?1c42b"
+  },
+  {
+    "nr": 45,
+    "id": "space_joker",
+    "name": "Space Joker",
+    "effect": "1 in 4 chance to upgrade level of played poker hand",
+    "cost": 5,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Space_Joker.png/80px-Space_Joker.png?255c3"
+  },
+  {
+    "nr": 46,
+    "id": "egg",
+    "name": "Egg",
+    "effect": "Gains $3 of sell value at end of round",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Egg.png/80px-Egg.png?a944d"
+  },
+  {
+    "nr": 47,
+    "id": "burglar",
+    "name": "Burglar",
+    "effect": "When Blind is selected, gain +3 Hands and lose all discards",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Burglar.png/80px-Burglar.png?54fa4"
+  },
+  {
+    "nr": 48,
+    "id": "blackboard",
+    "name": "Blackboard",
+    "effect": "X3 Mult if all cards held in hand are Spades or Clubs",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Blackboard.png/80px-Blackboard.png?cf54d"
+  },
+  {
+    "nr": 49,
+    "id": "runner",
+    "name": "Runner",
+    "effect": "Gains +15 Chips if played hand contains a Straight (Currently +0 Chips )",
+    "cost": 5,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Runner.png/80px-Runner.png?62aad"
+  },
+  {
+    "nr": 50,
+    "id": "ice_cream",
+    "name": "Ice Cream",
+    "effect": "+100 Chips -5 Chips for every hand played",
+    "cost": 5,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Ice_Cream.png/80px-Ice_Cream.png?c0e70"
+  },
+  {
+    "nr": 51,
+    "id": "dna",
+    "name": "DNA",
+    "effect": "If first hand of round has only 1 card, add a permanent copy to deck and draw it to hand",
+    "cost": 8,
+    "rarity": "rare",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/DNA.png/80px-DNA.png?20c90"
+  },
+  {
+    "nr": 52,
+    "id": "splash",
+    "name": "Splash",
+    "effect": "Every played card counts in scoring",
+    "cost": 3,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Splash.png/80px-Splash.png?26f6c"
+  },
+  {
+    "nr": 53,
+    "id": "blue_joker",
+    "name": "Blue Joker",
+    "effect": "+2 Chips for each remaining card in deck (Currently +104 Chips )",
+    "cost": 5,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Blue_Joker.png/80px-Blue_Joker.png?8106c"
+  },
+  {
+    "nr": 54,
+    "id": "sixth_sense",
+    "name": "Sixth Sense",
+    "effect": "If first hand of round is a single 6 , destroy it and create a Spectral card (Must have room)",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Sixth_Sense.png/80px-Sixth_Sense.png?d0e95"
+  },
+  {
+    "nr": 55,
+    "id": "constellation",
+    "name": "Constellation",
+    "effect": "This Joker gains X0.1 Mult every time a Planet card is used (Currently X1 Mult )",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Constellation.png/80px-Constellation.png?24ca0"
+  },
+  {
+    "nr": 56,
+    "id": "hiker",
+    "name": "Hiker",
+    "effect": "Every played card permanently gains +5 Chips when scored",
+    "cost": 5,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Hiker.png/80px-Hiker.png?61ba9"
+  },
+  {
+    "nr": 57,
+    "id": "faceless_joker",
+    "name": "Faceless Joker",
+    "effect": "Earn $5 if 3 or more face cards are discarded at the same time",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Faceless_Joker.png/80px-Faceless_Joker.png?2deac"
+  },
+  {
+    "nr": 58,
+    "id": "green_joker",
+    "name": "Green Joker",
+    "effect": "+1 Mult per hand played -1 Mult per discard (Currently +0 Mult )",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Green_Joker.png/80px-Green_Joker.png?2deac"
+  },
+  {
+    "nr": 59,
+    "id": "superposition",
+    "name": "Superposition",
+    "effect": "Create a Tarot card if poker hand contains an Ace and a Straight (Must have room)",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Superposition.png/80px-Superposition.png?fa5e1"
+  },
+  {
+    "nr": 60,
+    "id": "to_do_list",
+    "name": "To Do List",
+    "effect": "Earn $4 if poker hand is a [Poker Hand] , poker hand changes at end of round",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/To_Do_List.png/80px-To_Do_List.png?e2f47"
+  },
+  {
+    "nr": 61,
+    "id": "cavendish",
+    "name": "Cavendish",
+    "effect": "X3 Mult 1 in 1000 chance this card is destroyed at the end of round",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Cavendish.png/80px-Cavendish.png?a1358"
+  },
+  {
+    "nr": 62,
+    "id": "card_sharp",
+    "name": "Card Sharp",
+    "effect": "X3 Mult if played poker hand has already been played this round",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Card_Sharp.png/80px-Card_Sharp.png?d65e9"
+  },
+  {
+    "nr": 63,
+    "id": "red_card",
+    "name": "Red Card",
+    "effect": "This Joker gains +3 Mult when any Booster Pack is skipped (Currently +0 Mult )",
+    "cost": 5,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Red_Card.png/80px-Red_Card.png?a1358"
+  },
+  {
+    "nr": 64,
+    "id": "madness",
+    "name": "Madness",
+    "effect": "When Small Blind or Big Blind is selected, gain X0.5 Mult and destroy a random Joker (Currently X1 Mult )",
+    "cost": 7,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Madness.png/80px-Madness.png?aca82"
+  },
+  {
+    "nr": 65,
+    "id": "square_joker",
+    "name": "Square Joker",
+    "effect": "This Joker gains +4 Chips if played hand has exactly 4 cards (Currently 0 Chips )",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Square_Joker.png/80px-Square_Joker.png?e63f8"
+  },
+  {
+    "nr": 66,
+    "id": "s_ance",
+    "name": "S\u00e9ance",
+    "effect": "If poker hand is a Straight Flush , create a random Spectral card (Must have room)",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/S%C3%A9ance.png/80px-S%C3%A9ance.png?2fe62"
+  },
+  {
+    "nr": 67,
+    "id": "riff_raff",
+    "name": "Riff-Raff",
+    "effect": "When Blind is selected, create 2 Common Jokers (Must have room)",
+    "cost": 6,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Riff-Raff.png/80px-Riff-Raff.png?9ab59"
+  },
+  {
+    "nr": 68,
+    "id": "vampire",
+    "name": "Vampire",
+    "effect": "This Joker gains X0.1 Mult per scoring Enhanced card played, removes card Enhancement (Currently X1 Mult )",
+    "cost": 7,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Vampire.png/80px-Vampire.png?2fe62"
+  },
+  {
+    "nr": 69,
+    "id": "shortcut",
+    "name": "Shortcut",
+    "effect": "Allows Straights to be made with gaps of 1 rank (ex: 10 8 6 5 3 )",
+    "cost": 7,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Shortcut.png/80px-Shortcut.png?e6a46"
+  },
+  {
+    "nr": 70,
+    "id": "hologram",
+    "name": "Hologram",
+    "effect": "This Joker gains X0.25 Mult every time a playing card is added to your deck (Currently X1 Mult )",
+    "cost": 7,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Hologram.gif/80px-Hologram.gif?9142b"
+  },
+  {
+    "nr": 71,
+    "id": "vagabond",
+    "name": "Vagabond",
+    "effect": "Create a Tarot card if hand is played with $4 or less",
+    "cost": 8,
+    "rarity": "rare",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Vagabond.png/80px-Vagabond.png?bacdb"
+  },
+  {
+    "nr": 72,
+    "id": "baron",
+    "name": "Baron",
+    "effect": "Each King held in hand gives X1.5 Mult",
+    "cost": 8,
+    "rarity": "rare",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Baron.png/80px-Baron.png?300d5"
+  },
+  {
+    "nr": 73,
+    "id": "cloud_9",
+    "name": "Cloud 9",
+    "effect": "Earn $1 for each 9 in your full deck at end of round (Currently $4 )",
+    "cost": 7,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Cloud_9.png/80px-Cloud_9.png?bacdb"
+  },
+  {
+    "nr": 74,
+    "id": "rocket",
+    "name": "Rocket",
+    "effect": "Earn $1 at end of round. Payout increases by $2 when Boss Blind is defeated",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Rocket.png/80px-Rocket.png?5465a"
+  },
+  {
+    "nr": 75,
+    "id": "obelisk",
+    "name": "Obelisk",
+    "effect": "This Joker gains X0.2 Mult per consecutive hand played without playing your most played poker hand (Currently X1 Mult )",
+    "cost": 8,
+    "rarity": "rare",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Obelisk.png/80px-Obelisk.png?5465a"
+  },
+  {
+    "nr": 76,
+    "id": "midas_mask",
+    "name": "Midas Mask",
+    "effect": "All played face cards become Gold cards when scored",
+    "cost": 7,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Midas_Mask.png/80px-Midas_Mask.png?96bfd"
+  },
+  {
+    "nr": 77,
+    "id": "luchador",
+    "name": "Luchador",
+    "effect": "Sell this card to disable the current Boss Blind",
+    "cost": 5,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Luchador.png/80px-Luchador.png?96bfd"
+  },
+  {
+    "nr": 78,
+    "id": "photograph",
+    "name": "Photograph",
+    "effect": "First played face card gives X2 Mult when scored",
+    "cost": 5,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Photograph.png/80px-Photograph.png?b46a7"
+  },
+  {
+    "nr": 79,
+    "id": "gift_card",
+    "name": "Gift Card",
+    "effect": "Add $1 of sell value to every Joker and Consumable card at end of round",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Gift_Card.png/80px-Gift_Card.png?156e2"
+  },
+  {
+    "nr": 80,
+    "id": "turtle_bean",
+    "name": "Turtle Bean",
+    "effect": "+5 hand size, reduces by 1 each round",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Turtle_Bean.png/80px-Turtle_Bean.png?156e2"
+  },
+  {
+    "nr": 81,
+    "id": "erosion",
+    "name": "Erosion",
+    "effect": "+4 Mult for each card below [the deck's starting size] in your full deck (Currently +0 Mult )",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Erosion.png/80px-Erosion.png?af063"
+  },
+  {
+    "nr": 82,
+    "id": "reserved_parking",
+    "name": "Reserved Parking",
+    "effect": "Each face card held in hand has a 1 in 2 chance to give $1",
+    "cost": 6,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Reserved_Parking.png/80px-Reserved_Parking.png?af063"
+  },
+  {
+    "nr": 83,
+    "id": "mail_in_rebate",
+    "name": "Mail-In Rebate",
+    "effect": "Earn $5 for each discarded [rank] , rank changes every round",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Mail-In_Rebate.png/80px-Mail-In_Rebate.png?8a903"
+  },
+  {
+    "nr": 84,
+    "id": "to_the_moon",
+    "name": "To the Moon",
+    "effect": "Earn an extra $1 of interest for every $5 you have at end of round",
+    "cost": 5,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/To_the_Moon.png/80px-To_the_Moon.png?8a903"
+  },
+  {
+    "nr": 85,
+    "id": "hallucination",
+    "name": "Hallucination",
+    "effect": "1 in 2 chance to create a Tarot card when any Booster Pack is opened (Must have room)",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Hallucination.png/80px-Hallucination.png?119bf"
+  },
+  {
+    "nr": 86,
+    "id": "fortune_teller",
+    "name": "Fortune Teller",
+    "effect": "+1 Mult per Tarot card used this run (Currently +0 )",
+    "cost": 6,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Fortune_Teller.png/80px-Fortune_Teller.png?e9294"
+  },
+  {
+    "nr": 87,
+    "id": "juggler",
+    "name": "Juggler",
+    "effect": "+1 hand size",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Juggler.png/80px-Juggler.png?5d094"
+  },
+  {
+    "nr": 88,
+    "id": "drunkard",
+    "name": "Drunkard",
+    "effect": "+1 discard each round",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Drunkard.png/80px-Drunkard.png?c846d"
+  },
+  {
+    "nr": 89,
+    "id": "stone_joker",
+    "name": "Stone Joker",
+    "effect": "Gives +25 Chips for each Stone Card in your full deck (Currently +0 Chips )",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Stone_Joker.png/80px-Stone_Joker.png?0dd82"
+  },
+  {
+    "nr": 90,
+    "id": "golden_joker",
+    "name": "Golden Joker",
+    "effect": "Earn $4 at end of round",
+    "cost": 6,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Golden_Joker.png/80px-Golden_Joker.png?55a9b"
+  },
+  {
+    "nr": 91,
+    "id": "lucky_cat",
+    "name": "Lucky Cat",
+    "effect": "This Joker gains X0.25 Mult every time a Lucky card successfully triggers (Currently X1 Mult )",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Lucky_Cat.png/80px-Lucky_Cat.png?119bf"
+  },
+  {
+    "nr": 92,
+    "id": "baseball_card",
+    "name": "Baseball Card",
+    "effect": "Uncommon Jokers each give X1.5 Mult",
+    "cost": 8,
+    "rarity": "rare",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Baseball_Card.png/80px-Baseball_Card.png?97b3d"
+  },
+  {
+    "nr": 93,
+    "id": "bull",
+    "name": "Bull",
+    "effect": "+2 Chips for each $1 you have (Currently +0 Chips )",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Bull.png/80px-Bull.png?97b3d"
+  },
+  {
+    "nr": 94,
+    "id": "diet_cola",
+    "name": "Diet Cola",
+    "effect": "Sell this card to create a free Double Tag",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Diet_Cola.png/80px-Diet_Cola.png?97b3d"
+  },
+  {
+    "nr": 95,
+    "id": "trading_card",
+    "name": "Trading Card",
+    "effect": "If first discard of round has only 1 card, destroy it and earn $3",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Trading_Card.png/80px-Trading_Card.png?12d13"
+  },
+  {
+    "nr": 96,
+    "id": "flash_card",
+    "name": "Flash Card",
+    "effect": "This Joker gains +2 Mult per reroll in the shop (Currently +0 Mult )",
+    "cost": 5,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Flash_Card.png/80px-Flash_Card.png?12d13"
+  },
+  {
+    "nr": 97,
+    "id": "popcorn",
+    "name": "Popcorn",
+    "effect": "+20 Mult -4 Mult per round played",
+    "cost": 5,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Popcorn.png/80px-Popcorn.png?2d2c2"
+  },
+  {
+    "nr": 98,
+    "id": "spare_trousers",
+    "name": "Spare Trousers",
+    "effect": "This Joker gains +2 Mult if played hand contains a Two Pair (Currently +0 Mult )",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Spare_Trousers.png/80px-Spare_Trousers.png?274c7"
+  },
+  {
+    "nr": 99,
+    "id": "ancient_joker",
+    "name": "Ancient Joker",
+    "effect": "Each played card with [suit] gives X1.5 Mult when scored, suit changes at end of round",
+    "cost": 8,
+    "rarity": "rare",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Ancient_Joker.png/80px-Ancient_Joker.png?274c7"
+  },
+  {
+    "nr": 100,
+    "id": "ramen",
+    "name": "Ramen",
+    "effect": "X2 Mult , loses X0.01 Mult per card discarded",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Ramen.png/80px-Ramen.png?31ec6"
+  },
+  {
+    "nr": 101,
+    "id": "walkie_talkie",
+    "name": "Walkie Talkie",
+    "effect": "Each played 10 or 4 gives +10 Chips and +4 Mult when scored",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Walkie_Talkie.png/80px-Walkie_Talkie.png?31ec6"
+  },
+  {
+    "nr": 102,
+    "id": "seltzer",
+    "name": "Seltzer",
+    "effect": "Retrigger all cards played for the next 10 hands",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Seltzer.png/80px-Seltzer.png?0e998"
+  },
+  {
+    "nr": 103,
+    "id": "castle",
+    "name": "Castle",
+    "effect": "This Joker gains +3 Chips per discarded [suit] card, suit changes every round (Currently +0 Chips )",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Castle.png/80px-Castle.png?0e998"
+  },
+  {
+    "nr": 104,
+    "id": "smiley_face",
+    "name": "Smiley Face",
+    "effect": "Played face cards give +5 Mult when scored",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Smiley_Face.png/80px-Smiley_Face.png?78ae0"
+  },
+  {
+    "nr": 105,
+    "id": "campfire",
+    "name": "Campfire",
+    "effect": "This Joker gains X0.25 Mult for each card sold , resets when Boss Blind is defeated (Currently X1 Mult )",
+    "cost": 9,
+    "rarity": "rare",
+    "unlock": "Available from start.",
+    "img_src": "/images/thumb/Campfire.png/80px-Campfire.png?78ae0"
+  },
+  {
+    "nr": 106,
+    "id": "golden_ticket",
+    "name": "Golden Ticket",
+    "effect": "Played Gold cards earn $4 when scored",
+    "cost": 5,
+    "rarity": "common",
+    "unlock": "Play a 5 card hand that contains only Gold cards",
+    "img_src": "/images/thumb/Golden_Ticket.png/80px-Golden_Ticket.png?a915f"
+  },
+  {
+    "nr": 107,
+    "id": "mr_bones",
+    "name": "Mr. Bones",
+    "effect": "Prevents Death if chips scored are at least 25% of required chips self destructs",
+    "cost": 5,
+    "rarity": "uncommon",
+    "unlock": "Lose 5 runs",
+    "img_src": "/images/thumb/Mr._Bones.png/80px-Mr._Bones.png?80615"
+  },
+  {
+    "nr": 108,
+    "id": "acrobat",
+    "name": "Acrobat",
+    "effect": "X3 Mult on final hand of round",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Play 200 hands",
+    "img_src": "/images/thumb/Acrobat.png/80px-Acrobat.png?78ae0"
+  },
+  {
+    "nr": 109,
+    "id": "sock_and_buskin",
+    "name": "Sock and Buskin",
+    "effect": "Retrigger all played face cards",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Play a total of 300 face cards",
+    "img_src": "/images/thumb/Sock_and_Buskin.png/80px-Sock_and_Buskin.png?bf55f"
+  },
+  {
+    "nr": 110,
+    "id": "swashbuckler",
+    "name": "Swashbuckler",
+    "effect": "Adds the sell value of all other owned Jokers to Mult (Currently +1 Mult )",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Sell a total of 20 Joker cards",
+    "img_src": "/images/thumb/Swashbuckler.png/80px-Swashbuckler.png?98223"
+  },
+  {
+    "nr": 111,
+    "id": "troubadour",
+    "name": "Troubadour",
+    "effect": "+2 hand size, -1 hand each round",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Win 5 consecutive rounds by playing only 1 hand",
+    "img_src": "/images/thumb/Troubadour.png/80px-Troubadour.png?29a95"
+  },
+  {
+    "nr": 112,
+    "id": "certificate",
+    "name": "Certificate",
+    "effect": "When round begins, add a random playing card with a random seal to your hand",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Have a Gold playing card with a Gold Seal",
+    "img_src": "/images/thumb/Certificate.png/80px-Certificate.png?43465"
+  },
+  {
+    "nr": 113,
+    "id": "smeared_joker",
+    "name": "Smeared Joker",
+    "effect": "Hearts and Diamonds count as the same suit, Spades and Clubs count as the same suit",
+    "cost": 7,
+    "rarity": "uncommon",
+    "unlock": "Have at least 3 Wild Card in your deck",
+    "img_src": "/images/thumb/Smeared_Joker.png/80px-Smeared_Joker.png?e3b32"
+  },
+  {
+    "nr": 114,
+    "id": "throwback",
+    "name": "Throwback",
+    "effect": "X0.25 Mult for each Blind skipped this run (Currently X1 Mult )",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Continue a saved run from the main menu",
+    "img_src": "/images/thumb/Throwback.png/80px-Throwback.png?7f7ee"
+  },
+  {
+    "nr": 115,
+    "id": "hanging_chad",
+    "name": "Hanging Chad",
+    "effect": "Retrigger first played card used in scoring 2 additional times",
+    "cost": 4,
+    "rarity": "common",
+    "unlock": "Beat a Boss Blind with a High Card",
+    "img_src": "/images/thumb/Hanging_Chad.png/80px-Hanging_Chad.png?be2e1"
+  },
+  {
+    "nr": 116,
+    "id": "rough_gem",
+    "name": "Rough Gem",
+    "effect": "Played cards with Diamond suit earn $1 when scored",
+    "cost": 7,
+    "rarity": "uncommon",
+    "unlock": "Have at least 30 cards with Diamond suit in your deck",
+    "img_src": "/images/thumb/Rough_Gem.png/80px-Rough_Gem.png?1f9cf"
+  },
+  {
+    "nr": 117,
+    "id": "bloodstone",
+    "name": "Bloodstone",
+    "effect": "1 in 2 chance for played cards with Heart suit to give X1.5 Mult when scored",
+    "cost": 7,
+    "rarity": "uncommon",
+    "unlock": "Have at least 30 cards with Heart suit in your deck",
+    "img_src": "/images/thumb/Bloodstone.png/80px-Bloodstone.png?4d0a0"
+  },
+  {
+    "nr": 118,
+    "id": "arrowhead",
+    "name": "Arrowhead",
+    "effect": "Played cards with Spade suit give +50 Chips when scored",
+    "cost": 7,
+    "rarity": "uncommon",
+    "unlock": "Have at least 30 cards with Spade suit in your deck",
+    "img_src": "/images/thumb/Arrowhead.png/80px-Arrowhead.png?cc01b"
+  },
+  {
+    "nr": 119,
+    "id": "onyx_agate",
+    "name": "Onyx Agate",
+    "effect": "Played cards with Club suit give +7 Mult when scored",
+    "cost": 7,
+    "rarity": "uncommon",
+    "unlock": "Have at least 30 cards with Club suit in your deck",
+    "img_src": "/images/thumb/Onyx_Agate.png/80px-Onyx_Agate.png?f9219"
+  },
+  {
+    "nr": 120,
+    "id": "glass_joker",
+    "name": "Glass Joker",
+    "effect": "This Joker gains X0.75 Mult for every Glass Card that is destroyed (Currently X1 Mult )",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Have at least 5 Glass Cards in your deck",
+    "img_src": "/images/thumb/Glass_Joker.png/80px-Glass_Joker.png?a6916"
+  },
+  {
+    "nr": 121,
+    "id": "showman",
+    "name": "Showman",
+    "effect": "Joker , Tarot , Planet , and Spectral cards may appear multiple times",
+    "cost": 5,
+    "rarity": "uncommon",
+    "unlock": "Reach Ante level 4",
+    "img_src": "/images/thumb/Showman.png/80px-Showman.png?12b50"
+  },
+  {
+    "nr": 122,
+    "id": "flower_pot",
+    "name": "Flower Pot",
+    "effect": "X3 Mult if poker hand contains a Diamond card, Club card, Heart card, and Spade card",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Reach Ante level 8",
+    "img_src": "/images/thumb/Flower_Pot.png/80px-Flower_Pot.png?25ed2"
+  },
+  {
+    "nr": 123,
+    "id": "blueprint",
+    "name": "Blueprint",
+    "effect": "Copies ability of Joker to the right",
+    "cost": 10,
+    "rarity": "rare",
+    "unlock": "Win a run",
+    "img_src": "/images/thumb/Blueprint.png/80px-Blueprint.png?1314d"
+  },
+  {
+    "nr": 124,
+    "id": "wee_joker",
+    "name": "Wee Joker",
+    "effect": "This Joker gains +8 Chips when each played 2 is scored (Currently +0 Chips )",
+    "cost": 8,
+    "rarity": "rare",
+    "unlock": "Win a run in 18 or fewer rounds",
+    "img_src": "/images/thumb/Wee_Joker.png/80px-Wee_Joker.png?c1652"
+  },
+  {
+    "nr": 125,
+    "id": "merry_andy",
+    "name": "Merry Andy",
+    "effect": "+3 discards each round, -1 hand size",
+    "cost": 7,
+    "rarity": "uncommon",
+    "unlock": "Win a run in 12 or fewer rounds",
+    "img_src": "/images/thumb/Merry_Andy.png/80px-Merry_Andy.png?91743"
+  },
+  {
+    "nr": 126,
+    "id": "oops_all_6s",
+    "name": "Oops! All 6s",
+    "effect": "Doubles all listed probabilities (ex: 1 in 3 -> 2 in 3 )",
+    "cost": 4,
+    "rarity": "uncommon",
+    "unlock": "In one hand, earn at least 10,000 chips",
+    "img_src": "/images/thumb/Oops%21_All_6s.png/80px-Oops%21_All_6s.png?54fc7"
+  },
+  {
+    "nr": 127,
+    "id": "the_idol",
+    "name": "The Idol",
+    "effect": "Each played [rank] of [suit] gives X2 Mult when scored Card changes every round",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "In one hand, earn at least 1,000,000 chips",
+    "img_src": "/images/thumb/The_Idol.png/80px-The_Idol.png?e1781"
+  },
+  {
+    "nr": 128,
+    "id": "seeing_double",
+    "name": "Seeing Double",
+    "effect": "X2 Mult if played hand has a scoring Club card and a scoring card of any other suit",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Play a hand that contains four 7 of Clubs",
+    "img_src": "/images/thumb/Seeing_Double.png/80px-Seeing_Double.png?6a93e"
+  },
+  {
+    "nr": 129,
+    "id": "matador",
+    "name": "Matador",
+    "effect": "Earn $8 if played hand triggers the Boss Blind ability",
+    "cost": 7,
+    "rarity": "uncommon",
+    "unlock": "Defeat a Boss Blind in 1 hand without using any discards",
+    "img_src": "/images/thumb/Matador.png/80px-Matador.png?937bc"
+  },
+  {
+    "nr": 130,
+    "id": "hit_the_road",
+    "name": "Hit the Road",
+    "effect": "This Joker gains X0.5 Mult for every Jack discarded this round (Currently X1 Mult )",
+    "cost": 8,
+    "rarity": "rare",
+    "unlock": "Discard 5 Jacks at the same time.",
+    "img_src": "/images/thumb/Hit_the_Road.png/80px-Hit_the_Road.png?e2da5"
+  },
+  {
+    "nr": 131,
+    "id": "the_duo",
+    "name": "The Duo",
+    "effect": "X2 Mult if played hand contains a Pair",
+    "cost": 8,
+    "rarity": "rare",
+    "unlock": "Win a run without playing a Pair .",
+    "img_src": "/images/thumb/The_Duo.png/80px-The_Duo.png?af07c"
+  },
+  {
+    "nr": 132,
+    "id": "the_trio",
+    "name": "The Trio",
+    "effect": "X3 Mult if played hand contains a Three of a Kind",
+    "cost": 8,
+    "rarity": "rare",
+    "unlock": "Win a run without playing a Three of a Kind .",
+    "img_src": "/images/thumb/The_Trio.png/80px-The_Trio.png?90749"
+  },
+  {
+    "nr": 133,
+    "id": "the_family",
+    "name": "The Family",
+    "effect": "X4 Mult if played hand contains a Four of a Kind",
+    "cost": 8,
+    "rarity": "rare",
+    "unlock": "Win a run without playing a Four of a Kind .",
+    "img_src": "/images/thumb/The_Family.png/80px-The_Family.png?2c222"
+  },
+  {
+    "nr": 134,
+    "id": "the_order",
+    "name": "The Order",
+    "effect": "X3 Mult if played hand contains a Straight",
+    "cost": 8,
+    "rarity": "rare",
+    "unlock": "Win a run without playing a Straight .",
+    "img_src": "/images/thumb/The_Order.png/80px-The_Order.png?8f641"
+  },
+  {
+    "nr": 135,
+    "id": "the_tribe",
+    "name": "The Tribe",
+    "effect": "X2 Mult if played hand contains a Flush",
+    "cost": 8,
+    "rarity": "rare",
+    "unlock": "Win a run without playing a Flush .",
+    "img_src": "/images/thumb/The_Tribe.png/80px-The_Tribe.png?a6a44"
+  },
+  {
+    "nr": 136,
+    "id": "stuntman",
+    "name": "Stuntman",
+    "effect": "+250 Chips , -2 hand size",
+    "cost": 7,
+    "rarity": "rare",
+    "unlock": "Earn at least 100 million (100,000,000) Chips in a single hand.",
+    "img_src": "/images/thumb/Stuntman.png/80px-Stuntman.png?84641"
+  },
+  {
+    "nr": 137,
+    "id": "invisible_joker",
+    "name": "Invisible Joker",
+    "effect": "After 2 rounds, sell this card to Duplicate a random Joker (Currently 0 /2) (Removes Negative from copy)",
+    "cost": 8,
+    "rarity": "rare",
+    "unlock": "Win a run without ever having more than 4 Jokers",
+    "img_src": "/images/thumb/Invisible_Joker.png/80px-Invisible_Joker.png?1314d"
+  },
+  {
+    "nr": 138,
+    "id": "brainstorm",
+    "name": "Brainstorm",
+    "effect": "Copies the ability of leftmost Joker",
+    "cost": 10,
+    "rarity": "rare",
+    "unlock": "Discard a Royal Flush .",
+    "img_src": "/images/thumb/Brainstorm.png/80px-Brainstorm.png?82de6"
+  },
+  {
+    "nr": 139,
+    "id": "satellite",
+    "name": "Satellite",
+    "effect": "Earn $1 at end of round per unique Planet card used this run",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Have at least $400 .",
+    "img_src": "/images/thumb/Satellite.png/80px-Satellite.png?20821"
+  },
+  {
+    "nr": 140,
+    "id": "shoot_the_moon",
+    "name": "Shoot the Moon",
+    "effect": "Each Queen held in hand gives +13 Mult",
+    "cost": 5,
+    "rarity": "common",
+    "unlock": "Play every Heart card in your deck in one round.",
+    "img_src": "/images/thumb/Shoot_the_Moon.png/80px-Shoot_the_Moon.png?098c2"
+  },
+  {
+    "nr": 141,
+    "id": "driver_s_license",
+    "name": "Driver's License",
+    "effect": "X3 Mult if you have at least 16 Enhanced cards in your full deck (Currently 0 )",
+    "cost": 7,
+    "rarity": "rare",
+    "unlock": "Enhance 16 cards in your deck",
+    "img_src": "/images/thumb/Driver%27s_License.png/80px-Driver%27s_License.png?04561"
+  },
+  {
+    "nr": 142,
+    "id": "cartomancer",
+    "name": "Cartomancer",
+    "effect": "Create a Tarot card when Blind is selected (Must have room)",
+    "cost": 6,
+    "rarity": "uncommon",
+    "unlock": "Discover every Tarot card.",
+    "img_src": "/images/thumb/Cartomancer.png/80px-Cartomancer.png?e4486"
+  },
+  {
+    "nr": 143,
+    "id": "astronomer",
+    "name": "Astronomer",
+    "effect": "All Planet cards and Celestial Packs in the shop are free",
+    "cost": 8,
+    "rarity": "uncommon",
+    "unlock": "Discover every Planet card",
+    "img_src": "/images/thumb/Astronomer.png/80px-Astronomer.png?0a271"
+  },
+  {
+    "nr": 144,
+    "id": "burnt_joker",
+    "name": "Burnt Joker",
+    "effect": "Upgrade the level of the first discarded poker hand each round",
+    "cost": 8,
+    "rarity": "rare",
+    "unlock": "Sell 50 cards.",
+    "img_src": "/images/thumb/Burnt_Joker.png/80px-Burnt_Joker.png?445f6"
+  },
+  {
+    "nr": 145,
+    "id": "bootstraps",
+    "name": "Bootstraps",
+    "effect": "+2 Mult for every $5 you have (Currently +0 Mult )",
+    "cost": 7,
+    "rarity": "uncommon",
+    "unlock": "Have at least 2 Polychrome Jokers at the same time.",
+    "img_src": "/images/thumb/Bootstraps.png/80px-Bootstraps.png?4fbc6"
+  },
+  {
+    "nr": 146,
+    "id": "canio",
+    "name": "Canio",
+    "effect": "This Joker gains X1 Mult when a face card is destroyed (Currently X1 Mult )",
+    "cost": 4,
+    "rarity": "legendary",
+    "unlock": "Find this Joker from the Soul card.",
+    "img_src": "/images/thumb/Canio.png/80px-Canio.png?afd92"
+  },
+  {
+    "nr": 147,
+    "id": "triboulet",
+    "name": "Triboulet",
+    "effect": "Played Kings and Queens each give X2 Mult when scored",
+    "cost": 4,
+    "rarity": "legendary",
+    "unlock": "Find this Joker from the Soul card.",
+    "img_src": "/images/thumb/Triboulet.png/80px-Triboulet.png?baf0d"
+  },
+  {
+    "nr": 148,
+    "id": "yorick",
+    "name": "Yorick",
+    "effect": "This Joker gains X1 Mult every 23 [23] cards discarded (Currently X1 Mult )",
+    "cost": 4,
+    "rarity": "legendary",
+    "unlock": "Find this Joker from the Soul card.",
+    "img_src": "/images/thumb/Yorick.png/80px-Yorick.png?7e474"
+  },
+  {
+    "nr": 149,
+    "id": "chicot",
+    "name": "Chicot",
+    "effect": "Disables effect of every Boss Blind",
+    "cost": 4,
+    "rarity": "legendary",
+    "unlock": "Find this Joker from the Soul card.",
+    "img_src": "/images/thumb/Chicot.png/80px-Chicot.png?ca9b9"
+  },
+  {
+    "nr": 150,
+    "id": "perkeo",
+    "name": "Perkeo",
+    "effect": "Creates a Negative copy of 1 random consumable card in your possession at the end of the shop",
+    "cost": 4,
+    "rarity": "legendary",
+    "unlock": "Find this Joker from the Soul card.",
+    "img_src": "/images/thumb/Perkeo.png/80px-Perkeo.png?1c007"
+  }
+]

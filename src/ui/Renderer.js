@@ -8,12 +8,29 @@
 import { ScoringEngine } from '../game/ScoringEngine.js';
 import { HAND_DEFINITIONS } from '../game/HandEvaluator.js';
 import { GAME_STATES, BLIND_TYPES } from '../game/GameEngine.js';
-import { CONSUMABLE_TYPES } from '../game/ConsumableSystem.js';
+import { CONSUMABLE_TYPES, TAROT_CARDS, PLANET_CARDS } from '../game/ConsumableSystem.js';
 import { ENHANCEMENT_LABELS, EDITIONS } from '../game/Card.js';
+import { DECKS, STAKES } from '../game/DeckDefinitions.js';
+import { unlockablesManager } from '../game/UnlockablesSystem.js';
+import { ALL_150_JOKERS } from '../game/JokerDatabase.js';
+import { VOUCHER_CATALOG } from '../game/ShopEngine.js';
+import { tooltipRenderer } from './TooltipRenderer.js';
+import { ShopUI } from './ShopUI.js';
+import { saveManager } from '../game/SaveManager.js';
+import { renderJokerCardFace, getJokerIllustrationHtml } from './JokerArtwork.js';
+
+// Swirling red & deep sapphire satin vortex palette for Title Screen (matching Photo 1)
+export const TITLE_COLOR_PALETTE = {
+  dark: [0.20, 0.04, 0.06],
+  mid: [0.55, 0.10, 0.14],
+  gold: [0.12, 0.35, 0.70],
+  high: [0.45, 0.80, 0.98],
+  hue2d: 350
+};
 
 export const ANTE_COLOR_PALETTES = [
-  // Ante 1: Calming Warm Amber / Molten Gold Silk
-  { dark: [0.18, 0.11, 0.02], mid: [0.58, 0.41, 0.08], gold: [0.89, 0.69, 0.16], high: [1.0, 0.95, 0.64], hue2d: 38 },
+  // Ante 1: Calmed Warm Amber Ochre (subdued, not overly bright yellow)
+  { dark: [0.08, 0.05, 0.01], mid: [0.26, 0.18, 0.05], gold: [0.46, 0.33, 0.08], high: [0.65, 0.50, 0.14], hue2d: 36 },
   // Ante 2: Calming Deep Sage / Emerald Green Satin (Exact match to reference photo!)
   { dark: [0.05, 0.14, 0.09], mid: [0.12, 0.32, 0.22], gold: [0.24, 0.58, 0.40], high: [0.58, 0.88, 0.70], hue2d: 145 },
   // Ante 3: Calming Midnight / Sapphire Blue Satin
@@ -166,12 +183,118 @@ export class Renderer {
     this.finalScoreEl = document.getElementById('final-score');
     this.restartRunBtn = document.getElementById('restart-run-btn');
 
+    // Victory Modal Elements (Ante 8 Boss Defeated & Endless Mode Choice)
+    this.victoryModal = document.getElementById('victory-modal');
+    this.victoryDeckName = document.getElementById('victory-deck-name');
+    this.victoryStakeName = document.getElementById('victory-stake-name');
+    this.victoryRoundScore = document.getElementById('victory-round-score');
+    this.victoryCash = document.getElementById('victory-cash');
+    this.victoryEndlessBtn = document.getElementById('victory-endless-btn');
+    this.victoryEndBtn = document.getElementById('victory-end-btn');
+
+    // Title Screen Elements (Matching Photo 1)
+    this.titleScreen = document.getElementById('title-screen');
+    this.appContainer = document.getElementById('app');
+    this.titleContinueBtn = document.getElementById('title-continue-btn');
+    this.titlePlayBtn = document.getElementById('title-play-btn');
+    this.titleOptionsBtn = document.getElementById('title-options-btn');
+    this.titleQuitBtn = document.getElementById('title-quit-btn');
+    this.titleCollectionBtn = document.getElementById('title-collection-btn');
+
+    // In-Run Pause & Options Modal Elements
+    this.runOptionsBtn = document.getElementById('run-options-btn') || document.getElementById('sound-toggle');
+    this.inRunOptionsModal = document.getElementById('in-run-options-modal');
+    this.closeInRunOptionsBtn = document.getElementById('close-in-run-options-btn');
+    this.inRunSaveLeaveBtn = document.getElementById('in-run-save-leave-btn');
+    this.inRunResumeBtn = document.getElementById('in-run-resume-btn');
+    this.inRunSoundBtn = document.getElementById('in-run-sound-btn');
+    this.inRunSoundLabel = document.getElementById('in-run-sound-label');
+    this.inRunCrtBtn = document.getElementById('in-run-crt-btn');
+    this.inRunCrtLabel = document.getElementById('in-run-crt-label');
+    this.inRunParticlesBtn = document.getElementById('in-run-particles-btn');
+    this.inRunParticlesLabel = document.getElementById('in-run-particles-label');
+    this.inRunAbandonBtn = document.getElementById('in-run-abandon-btn');
+
+    // Main Menu Options / Settings Modal Elements
+    this.optionsModal = document.getElementById('options-modal');
+    this.closeOptionsModalBtn = document.getElementById('close-options-modal-btn');
+    this.optSoundToggle = document.getElementById('opt-sound-toggle');
+    this.optSoundLabel = document.getElementById('opt-sound-label');
+    this.optCrtToggle = document.getElementById('opt-crt-toggle');
+    this.optCrtLabel = document.getElementById('opt-crt-label');
+    this.optCurvatureToggle = document.getElementById('opt-curvature-toggle');
+    this.optCurvatureLabel = document.getElementById('opt-curvature-label');
+    this.optParticlesToggle = document.getElementById('opt-particles-toggle');
+    this.optParticlesLabel = document.getElementById('opt-particles-label');
+    this.optContrastToggle = document.getElementById('opt-contrast-toggle');
+    this.optContrastLabel = document.getElementById('opt-contrast-label');
+    this.optWipeProgressBtn = document.getElementById('opt-wipe-progress-btn');
+
+    // Display & Notification Elements
+    this.balatroToast = document.getElementById('balatro-toast');
+    this.crtOverlay = document.querySelector('.crt-overlay');
+    this.vignetteOverlay = document.querySelector('.vignette-overlay');
+    this.ambientParticlesCanvas = document.getElementById('ambient-particles');
+
+    this.crtEnabled = true;
+    this.curvatureEnabled = true;
+    this.particlesEnabled = true;
+    this.contrastEnabled = false;
+
+    // Authentic Shop Screen Elements (Matching sho[.jpg)
+    this.shopSidebarHeader = document.getElementById('shop-sidebar-header');
+    this.shopBoardArena = document.getElementById('shop-board-arena');
+    this.shopUI = new ShopUI(this.game, this);
+
+    // Show Continue button if active save exists
+    if (this.titleContinueBtn && saveManager.hasActiveRun()) {
+      this.titleContinueBtn.classList.remove('hidden');
+    }
+
+    // Deck Select Modal Elements (Matching Photo 2)
+    this.deckSelectModal = document.getElementById('deck-select-modal');
+    this.deckPrevBtn = document.getElementById('deck-prev-btn');
+    this.deckNextBtn = document.getElementById('deck-next-btn');
+    this.deckPreviewStack = document.getElementById('deck-preview-stack');
+    this.deckPreviewPattern = document.getElementById('deck-preview-pattern');
+    this.deckPreviewName = document.getElementById('deck-preview-name');
+    this.deckPreviewDescBox = document.getElementById('deck-preview-desc-box');
+    this.deckPreviewLockBanner = document.getElementById('deck-preview-lock-banner');
+    this.deckDotsContainer = document.getElementById('deck-dots-container');
+    this.deckUnlockCountBadge = document.getElementById('deck-unlock-count-badge');
+    this.stakePrevBtn = document.getElementById('stake-prev-btn');
+    this.stakeNextBtn = document.getElementById('stake-next-btn');
+    this.stakePreviewChip = document.getElementById('stake-preview-chip');
+    this.stakePreviewName = document.getElementById('stake-preview-name');
+    this.stakePreviewDesc = document.getElementById('stake-preview-desc');
+    this.startSelectedRunBtn = document.getElementById('start-selected-run-btn');
+    this.closeDeckSelectBtn = document.getElementById('close-deck-select-btn');
+
+    // Collection Modal Elements
+    this.collectionModal = document.getElementById('collection-modal');
+    this.collectionTotalProgress = document.getElementById('collection-total-progress');
+    this.sandboxToggleBtn = document.getElementById('sandbox-toggle-btn');
+    this.closeCollectionBtn = document.getElementById('close-collection-btn');
+    this.collectionGrid = document.getElementById('collection-grid');
+    this.collectionTabs = {
+      decks: document.getElementById('tab-coll-decks'),
+      jokers: document.getElementById('tab-coll-jokers'),
+      vouchers: document.getElementById('tab-coll-vouchers'),
+      tarots: document.getElementById('tab-coll-tarots')
+    };
+
+    // Modal State
+    this.selectedDeckIndex = 0;
+    this.selectedStakeIndex = 0;
+    this.collectionCurrentTab = 'decks';
+
     // Audio Engine state
     this.audioCtx = null;
     this.soundEnabled = true;
 
-    // Start background spiral shader & event bindings
+    // Start background spiral shader, ambient particles & event bindings
     this.initBgShader();
+    this.initAmbientParticles();
     this.bindEvents();
   }
 
@@ -300,6 +423,64 @@ export class Renderer {
           osc.start(now);
           osc.stop(now + 0.65);
           break;
+
+        case 'mult_chord':
+          // Authentic resonant Balatro mult chord chime
+          [440, 554.37, 659.25, 880].forEach((freq, idx) => {
+            const cOsc = this.audioCtx.createOscillator();
+            const cGain = this.audioCtx.createGain();
+            cOsc.type = 'triangle';
+            cOsc.frequency.setValueAtTime(freq, now + idx * 0.02);
+            cGain.gain.setValueAtTime(0.2, now + idx * 0.02);
+            cGain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.02 + 0.45);
+            cOsc.connect(cGain);
+            cGain.connect(this.audioCtx.destination);
+            cOsc.start(now + idx * 0.02);
+            cOsc.stop(now + idx * 0.02 + 0.45);
+          });
+          break;
+
+        case 'chip_burst':
+          // Rapid sparkling arpeggio for chip-burst spraying into target counter
+          [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((freq, idx) => {
+            const bOsc = this.audioCtx.createOscillator();
+            const bGain = this.audioCtx.createGain();
+            bOsc.type = 'sine';
+            bOsc.frequency.setValueAtTime(freq, now + idx * 0.045);
+            bGain.gain.setValueAtTime(0.16, now + idx * 0.045);
+            bGain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.045 + 0.22);
+            bOsc.connect(bGain);
+            bGain.connect(this.audioCtx.destination);
+            bOsc.start(now + idx * 0.045);
+            bOsc.stop(now + idx * 0.045 + 0.22);
+          });
+          break;
+
+        case 'reroll_shuffle':
+          // Tactile card-flip/shuffle whoosh
+          [220, 330, 440, 330].forEach((freq, idx) => {
+            const sOsc = this.audioCtx.createOscillator();
+            const sGain = this.audioCtx.createGain();
+            sOsc.type = 'sawtooth';
+            sOsc.frequency.setValueAtTime(freq, now + idx * 0.035);
+            sGain.gain.setValueAtTime(0.12, now + idx * 0.035);
+            sGain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.035 + 0.12);
+            sOsc.connect(sGain);
+            sGain.connect(this.audioCtx.destination);
+            sOsc.start(now + idx * 0.035);
+            sOsc.stop(now + idx * 0.035 + 0.12);
+          });
+          break;
+
+        case 'card_flip':
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(420, now);
+          osc.frequency.exponentialRampToValueAtTime(840, now + 0.08);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+          break;
       }
     } catch (err) {
       // AudioContext policy
@@ -424,9 +605,14 @@ export class Renderer {
           gl.uniform2f(resUniform, width, height);
           gl.uniform1f(timeUniform, elapsed);
 
-          // Get calm color palette based on current Ante level
-          const anteIdx = Math.max(0, Math.min(ANTE_COLOR_PALETTES.length - 1, (this.game.ante || 1) - 1));
-          const target = ANTE_COLOR_PALETTES[anteIdx];
+          // Get calm color palette based on current Ante level or Title Screen
+          let target;
+          if (this.game.state === GAME_STATES.TITLE) {
+            target = TITLE_COLOR_PALETTE;
+          } else {
+            const anteIdx = Math.max(0, Math.min(ANTE_COLOR_PALETTES.length - 1, (this.game.ante || 1) - 1));
+            target = ANTE_COLOR_PALETTES[anteIdx];
+          }
 
           // Smooth lerp transition
           for (let c = 0; c < 3; c++) {
@@ -460,8 +646,13 @@ export class Renderer {
     const renderGoldLiquid = () => {
       time += 0.015;
 
-      const anteIdx = Math.max(0, Math.min(ANTE_COLOR_PALETTES.length - 1, (this.game.ante || 1) - 1));
-      const target = ANTE_COLOR_PALETTES[anteIdx];
+      let target;
+      if (this.game.state === GAME_STATES.TITLE) {
+        target = TITLE_COLOR_PALETTE;
+      } else {
+        const anteIdx = Math.max(0, Math.min(ANTE_COLOR_PALETTES.length - 1, (this.game.ante || 1) - 1));
+        target = ANTE_COLOR_PALETTES[anteIdx];
+      }
       const baseHue = target.hue2d;
 
       const bgGrad = ctx.createRadialGradient(width * 0.5, height * 0.5, 50, width * 0.5, height * 0.5, Math.hypot(width, height) * 0.75);
@@ -527,6 +718,64 @@ export class Renderer {
   }
 
   /**
+   * Ambient Floating Dust Motes & Shimmering Ambient Particles
+   * Matches the tactile atmospheric ambient feel of authentic Balatro
+   */
+  initAmbientParticles() {
+    const canvas = document.getElementById('ambient-particles');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    const particles = Array.from({ length: 48 }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      size: 1.2 + Math.random() * 2.8,
+      speedY: 0.18 + Math.random() * 0.42,
+      speedX: (Math.random() - 0.5) * 0.35,
+      alpha: 0.15 + Math.random() * 0.35,
+      pulse: Math.random() * Math.PI * 2,
+      pulseSpeed: 0.02 + Math.random() * 0.03
+    }));
+
+    const renderParticles = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      for (const p of particles) {
+        p.y -= p.speedY;
+        p.x += p.speedX + Math.sin(p.pulse) * 0.3;
+        p.pulse += p.pulseSpeed;
+
+        if (p.y < -10) {
+          p.y = height + 10;
+          p.x = Math.random() * width;
+        }
+        if (p.x < -10) p.x = width + 10;
+        if (p.x > width + 10) p.x = -10;
+
+        const currentAlpha = p.alpha * (0.65 + 0.35 * Math.sin(p.pulse));
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 235, 170, ${currentAlpha})`;
+        ctx.shadowBlur = 6;
+        ctx.shadowColor = 'rgba(255, 210, 90, 0.55)';
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+
+      requestAnimationFrame(renderParticles);
+    };
+
+    requestAnimationFrame(renderParticles);
+  }
+
+  /**
    * Bind DOM Events
    */
   bindEvents() {
@@ -562,10 +811,11 @@ export class Renderer {
       });
     }
 
-    this.soundToggleBtn.addEventListener('click', () => {
-      this.soundEnabled = !this.soundEnabled;
-      this.soundStateLabel.textContent = this.soundEnabled ? 'ON 🔊' : 'OFF 🔇';
-    });
+    if (this.soundToggleBtn) {
+      this.soundToggleBtn.addEventListener('click', () => {
+        this.toggleSound();
+      });
+    }
 
     this.runInfoBtn.addEventListener('click', () => {
       this.showRunInfo();
@@ -576,10 +826,19 @@ export class Renderer {
     });
 
     this.rerollBtn.addEventListener('click', () => {
+      const prevCost = this.game.shopEngine.rerollCost;
       const res = this.game.rerollShop();
       if (res.success) {
-        this.playSound('card_slide');
-        this.renderShop();
+        this.playSound('reroll_shuffle');
+        this.spawnCashPop(this.rerollCostEl, prevCost);
+        // Card shuffle flip animation
+        Array.from(this.shopCardsShelf.children).forEach(c => c.classList.add('card-reroll-anim'));
+        setTimeout(() => {
+          this.renderShop();
+          Array.from(this.shopCardsShelf.children).forEach(c => c.classList.add('card-reroll-anim'));
+        }, 150);
+      } else {
+        this.playSound('card_deselect');
       }
     });
 
@@ -629,12 +888,704 @@ export class Renderer {
         });
       }
     });
+
+    // ==========================================
+    // TITLE SCREEN & MODAL EVENT BINDINGS
+    // ==========================================
+    if (this.titleContinueBtn) {
+      this.titleContinueBtn.addEventListener('click', () => {
+        const success = this.game.continueSavedRun();
+        if (success) {
+          this.playSound('win');
+          if (this.titleScreen) this.titleScreen.classList.add('hidden');
+          if (this.appContainer) this.appContainer.classList.remove('hidden');
+          this.render();
+          if (this.game.state === GAME_STATES.SHOP) {
+            this.renderShop();
+          }
+        }
+      });
+    }
+
+    if (this.titlePlayBtn) {
+      this.titlePlayBtn.addEventListener('click', () => {
+        this.openDeckSelectModal();
+      });
+    }
+
+    if (this.titleCollectionBtn) {
+      this.titleCollectionBtn.addEventListener('click', () => {
+        this.openCollectionModal();
+      });
+    }
+
+    if (this.titleOptionsBtn) {
+      this.titleOptionsBtn.addEventListener('click', () => {
+        if (this.optionsModal) this.optionsModal.classList.remove('hidden');
+        this.playSound('card_slide');
+      });
+    }
+
+    if (this.closeOptionsModalBtn) {
+      this.closeOptionsModalBtn.addEventListener('click', () => {
+        if (this.optionsModal) this.optionsModal.classList.add('hidden');
+        this.playSound('card_slide');
+      });
+    }
+
+    if (this.optSoundToggle) {
+      this.optSoundToggle.addEventListener('click', () => {
+        this.toggleSound();
+      });
+    }
+
+    if (this.optCrtToggle) {
+      this.optCrtToggle.addEventListener('click', () => {
+        this.toggleCrt();
+      });
+    }
+
+    if (this.optCurvatureToggle) {
+      this.optCurvatureToggle.addEventListener('click', () => {
+        this.toggleCurvature();
+      });
+    }
+
+    if (this.optParticlesToggle) {
+      this.optParticlesToggle.addEventListener('click', () => {
+        this.toggleParticles();
+      });
+    }
+
+    if (this.optContrastToggle) {
+      this.optContrastToggle.addEventListener('click', () => {
+        this.toggleContrast();
+      });
+    }
+
+    if (this.optWipeProgressBtn) {
+      this.optWipeProgressBtn.addEventListener('click', () => {
+        this.permanentlyDeleteProgress();
+      });
+    }
+
+    // In-Run Pause & Options Modal Event Listeners
+    if (this.runOptionsBtn) {
+      this.runOptionsBtn.addEventListener('click', () => {
+        this.openInRunOptionsModal();
+      });
+    }
+
+    if (this.inRunSaveLeaveBtn) {
+      this.inRunSaveLeaveBtn.addEventListener('click', () => {
+        this.saveAndLeaveRun();
+      });
+    }
+
+    if (this.inRunResumeBtn) {
+      this.inRunResumeBtn.addEventListener('click', () => {
+        if (this.inRunOptionsModal) this.inRunOptionsModal.classList.add('hidden');
+        this.playSound('card_slide');
+      });
+    }
+
+    if (this.closeInRunOptionsBtn) {
+      this.closeInRunOptionsBtn.addEventListener('click', () => {
+        if (this.inRunOptionsModal) this.inRunOptionsModal.classList.add('hidden');
+        this.playSound('card_slide');
+      });
+    }
+
+    if (this.inRunSoundBtn) {
+      this.inRunSoundBtn.addEventListener('click', () => {
+        this.toggleSound();
+      });
+    }
+
+    if (this.inRunCrtBtn) {
+      this.inRunCrtBtn.addEventListener('click', () => {
+        this.toggleCrt();
+      });
+    }
+
+    if (this.inRunParticlesBtn) {
+      this.inRunParticlesBtn.addEventListener('click', () => {
+        this.toggleParticles();
+      });
+    }
+
+    if (this.inRunAbandonBtn) {
+      this.inRunAbandonBtn.addEventListener('click', () => {
+        const confirmAbandon = confirm('⚠️ Abandon this run?\nYour current run progress will be lost.');
+        if (!confirmAbandon) return;
+        saveManager.clearActiveRun();
+        this.playSound('card_deselect');
+        this.showToast('RUN ABANDONED');
+        if (this.inRunOptionsModal) this.inRunOptionsModal.classList.add('hidden');
+        if (this.appContainer) this.appContainer.classList.add('hidden');
+        if (this.titleScreen) this.titleScreen.classList.remove('hidden');
+        if (this.titleContinueBtn) this.titleContinueBtn.classList.add('hidden');
+      });
+    }
+
+    if (this.titleQuitBtn) {
+      this.titleQuitBtn.addEventListener('click', () => {
+        this.playSound('card_deselect');
+        alert('Balatro Roguelike Card Game\nClose tab or continue playing anytime!');
+      });
+    }
+
+    // Deck Select Modal (Photo 2)
+    if (this.deckPrevBtn) {
+      this.deckPrevBtn.addEventListener('click', () => {
+        this.selectedDeckIndex = (this.selectedDeckIndex - 1 + DECKS.length) % DECKS.length;
+        this.renderDeckCarousel();
+        this.playSound('card_slide');
+      });
+    }
+
+    if (this.deckNextBtn) {
+      this.deckNextBtn.addEventListener('click', () => {
+        this.selectedDeckIndex = (this.selectedDeckIndex + 1) % DECKS.length;
+        this.renderDeckCarousel();
+        this.playSound('card_slide');
+      });
+    }
+
+    if (this.stakePrevBtn) {
+      this.stakePrevBtn.addEventListener('click', () => {
+        this.selectedStakeIndex = (this.selectedStakeIndex - 1 + STAKES.length) % STAKES.length;
+        this.renderStakeCarousel();
+        this.playSound('card_slide');
+      });
+    }
+
+    if (this.stakeNextBtn) {
+      this.stakeNextBtn.addEventListener('click', () => {
+        this.selectedStakeIndex = (this.selectedStakeIndex + 1) % STAKES.length;
+        this.renderStakeCarousel();
+        this.playSound('card_slide');
+      });
+    }
+
+    if (this.startSelectedRunBtn) {
+      this.startSelectedRunBtn.addEventListener('click', () => {
+        const deck = DECKS[this.selectedDeckIndex];
+        const stake = STAKES[this.selectedStakeIndex];
+        if (!unlockablesManager.isDeckUnlocked(deck.id)) {
+          this.playSound('card_deselect');
+          return;
+        }
+
+        if (this.deckSelectModal) this.deckSelectModal.classList.add('hidden');
+        if (this.titleScreen) this.titleScreen.classList.add('hidden');
+        if (this.appContainer) this.appContainer.classList.remove('hidden');
+
+        this.game.startNewRun(deck.id, stake.id);
+        this.playSound('win');
+        this.render();
+      });
+    }
+
+    if (this.closeDeckSelectBtn) {
+      this.closeDeckSelectBtn.addEventListener('click', () => {
+        if (this.deckSelectModal) this.deckSelectModal.classList.add('hidden');
+        this.playSound('card_deselect');
+      });
+    }
+
+    // Collection Modal
+    if (this.closeCollectionBtn) {
+      this.closeCollectionBtn.addEventListener('click', () => {
+        if (this.collectionModal) this.collectionModal.classList.add('hidden');
+        this.playSound('card_deselect');
+      });
+    }
+
+    if (this.sandboxToggleBtn) {
+      this.sandboxToggleBtn.addEventListener('click', () => {
+        unlockablesManager.toggleSandboxAllUnlocked();
+        this.renderCollectionModal(this.collectionCurrentTab);
+        this.renderDeckCarousel();
+        this.playSound('cash');
+      });
+    }
+
+    Object.keys(this.collectionTabs).forEach(tabKey => {
+      const btn = this.collectionTabs[tabKey];
+      if (btn) {
+        btn.addEventListener('click', () => {
+          this.renderCollectionModal(tabKey);
+          this.playSound('card_slide');
+        });
+      }
+    });
+
+    // Options Modal
+    if (this.closeOptionsModalBtn) {
+      this.closeOptionsModalBtn.addEventListener('click', () => {
+        if (this.optionsModal) this.optionsModal.classList.add('hidden');
+        this.playSound('card_deselect');
+      });
+    }
+
+    if (this.optSoundToggle) {
+      this.optSoundToggle.addEventListener('click', () => {
+        this.soundEnabled = !this.soundEnabled;
+        if (this.optSoundLabel) this.optSoundLabel.textContent = this.soundEnabled ? 'ON 🔊' : 'OFF 🔇';
+        if (this.soundStateLabel) this.soundStateLabel.textContent = this.soundEnabled ? 'ON 🔊' : 'OFF 🔇';
+      });
+    }
+
+    if (this.optTitleReturnBtn) {
+      this.optTitleReturnBtn.addEventListener('click', () => {
+        if (this.optionsModal) this.optionsModal.classList.add('hidden');
+        if (this.appContainer) this.appContainer.classList.add('hidden');
+        if (this.titleScreen) this.titleScreen.classList.remove('hidden');
+        this.game.state = GAME_STATES.TITLE;
+        this.playSound('card_slide');
+      });
+    }
+
+    if (this.optResetProfileBtn) {
+      this.optResetProfileBtn.addEventListener('click', () => {
+        if (confirm('Reset all unlockables, stakes, and discoveries back to default?')) {
+          unlockablesManager.resetProfile();
+          this.renderCollectionModal(this.collectionCurrentTab);
+          this.renderDeckCarousel();
+          alert('Profile reset successfully.');
+        }
+      });
+    }
+
+    // Victory Modal Choices (Part 4: Endless Mode vs End Run)
+    if (this.victoryEndlessBtn) {
+      this.victoryEndlessBtn.addEventListener('click', () => {
+        if (this.victoryModal) this.victoryModal.classList.add('hidden');
+        this.game.continueEndlessMode();
+        this.playSound('win');
+      });
+    }
+
+    if (this.victoryEndBtn) {
+      this.victoryEndBtn.addEventListener('click', () => {
+        if (this.victoryModal) this.victoryModal.classList.add('hidden');
+        if (this.appContainer) this.appContainer.classList.add('hidden');
+        if (this.titleScreen) this.titleScreen.classList.remove('hidden');
+        this.game.state = GAME_STATES.TITLE;
+        this.playSound('card_slide');
+        this.render();
+      });
+    }
+  }
+
+  showToast(message, durationMs = 2400) {
+    if (!this.balatroToast) return;
+    this.balatroToast.textContent = message;
+    this.balatroToast.classList.add('toast-visible');
+    clearTimeout(this._toastTimer);
+    this._toastTimer = setTimeout(() => {
+      if (this.balatroToast) this.balatroToast.classList.remove('toast-visible');
+    }, durationMs);
+  }
+
+  openInRunOptionsModal() {
+    if (!this.inRunOptionsModal) return;
+    this.inRunOptionsModal.classList.remove('hidden');
+    this.playSound('card_slide');
+    if (this.inRunSoundLabel) {
+      this.inRunSoundLabel.textContent = this.soundEnabled ? 'ON 🔊' : 'OFF 🔇';
+    }
+    if (this.inRunCrtLabel) {
+      this.inRunCrtLabel.textContent = this.crtEnabled ? 'ON' : 'OFF';
+      this.inRunCrtLabel.className = this.crtEnabled ? 'text-emerald-400 font-sans text-xs font-bold' : 'text-slate-400 font-sans text-xs font-bold';
+    }
+    if (this.inRunParticlesLabel) {
+      this.inRunParticlesLabel.textContent = this.particlesEnabled ? 'ON' : 'OFF';
+      this.inRunParticlesLabel.className = this.particlesEnabled ? 'text-emerald-400 font-sans text-xs font-bold' : 'text-slate-400 font-sans text-xs font-bold';
+    }
+  }
+
+  saveAndLeaveRun() {
+    const saved = saveManager.saveCurrentRun(this.game);
+    if (saved) {
+      this.playSound('win');
+      this.showToast('💾 RUN SAVED!');
+      if (this.inRunOptionsModal) this.inRunOptionsModal.classList.add('hidden');
+      if (this.appContainer) this.appContainer.classList.add('hidden');
+      if (this.titleScreen) this.titleScreen.classList.remove('hidden');
+      if (this.titleContinueBtn) {
+        this.titleContinueBtn.classList.remove('hidden');
+        this.titleContinueBtn.innerHTML = `CONTINUE (Ante ${this.game.ante})`;
+      }
+      this.game.state = GAME_STATES.TITLE;
+    } else {
+      this.showToast('Failed to save run');
+    }
+  }
+
+  permanentlyDeleteProgress() {
+    const confirmed = confirm(
+      '⚠️ DANGER ZONE: PERMANENT WIPE\\n\\n' +
+      'Are you sure you want to PERMANENTLY DELETE ALL PROGRESS?\\n\\n' +
+      'This will permanently erase:\\n' +
+      '• All Unlocked Decks\\n' +
+      '• All Discovered Jokers\\n' +
+      '• High Scores & Stakes\\n' +
+      '• Active Mid-Run Saves\\n\\n' +
+      'This action cannot be undone!'
+    );
+    if (!confirmed) return;
+
+    saveManager.wipeAllData();
+    unlockablesManager.resetProfile();
+
+    if (this.titleContinueBtn) {
+      this.titleContinueBtn.classList.add('hidden');
+    }
+    this.playSound('cash');
+    this.showToast('🗑️ ALL PROGRESS PERMANENTLY WIPED!');
+    if (this.optionsModal) {
+      this.optionsModal.classList.add('hidden');
+    }
+
+    // Reset local selections
+    this.selectedDeckIndex = 0;
+    this.selectedStakeIndex = 0;
+    this.renderDeckCarousel();
+    this.renderStakeCarousel();
+    if (this.deckUnlockCountBadge) {
+      this.deckUnlockCountBadge.textContent = 'Decks: 1 / 15 Unlocked';
+    }
+  }
+
+  toggleSound() {
+    this.soundEnabled = !this.soundEnabled;
+    const labelText = this.soundEnabled ? 'ON 🔊' : 'OFF 🔇';
+    if (this.soundStateLabel) this.soundStateLabel.textContent = labelText;
+    if (this.optSoundLabel) this.optSoundLabel.textContent = labelText;
+    if (this.inRunSoundLabel) this.inRunSoundLabel.textContent = labelText;
+    if (this.soundEnabled) this.playSound('card_select');
+  }
+
+  toggleCrt() {
+    this.crtEnabled = !this.crtEnabled;
+    const overlays = document.querySelectorAll('.crt-overlay');
+    overlays.forEach(el => {
+      el.style.display = this.crtEnabled ? 'block' : 'none';
+    });
+    const labelText = this.crtEnabled ? 'ON' : 'OFF';
+    const cls = this.crtEnabled ? 'text-emerald-400 font-sans text-sm font-bold' : 'text-slate-400 font-sans text-sm font-bold';
+    if (this.optCrtLabel) {
+      this.optCrtLabel.textContent = labelText;
+      this.optCrtLabel.className = cls;
+    }
+    if (this.inRunCrtLabel) {
+      this.inRunCrtLabel.textContent = labelText;
+      this.inRunCrtLabel.className = this.crtEnabled ? 'text-emerald-400 font-sans text-xs font-bold' : 'text-slate-400 font-sans text-xs font-bold';
+    }
+    this.playSound('card_slide');
+  }
+
+  toggleCurvature() {
+    this.curvatureEnabled = !this.curvatureEnabled;
+    if (this.vignetteOverlay) {
+      this.vignetteOverlay.style.display = this.curvatureEnabled ? 'block' : 'none';
+    }
+    const labelText = this.curvatureEnabled ? 'ON' : 'OFF';
+    const cls = this.curvatureEnabled ? 'text-emerald-400 font-sans text-sm font-bold' : 'text-slate-400 font-sans text-sm font-bold';
+    if (this.optCurvatureLabel) {
+      this.optCurvatureLabel.textContent = labelText;
+      this.optCurvatureLabel.className = cls;
+    }
+    this.playSound('card_slide');
+  }
+
+  toggleParticles() {
+    this.particlesEnabled = !this.particlesEnabled;
+    if (this.ambientParticlesCanvas) {
+      this.ambientParticlesCanvas.style.display = this.particlesEnabled ? 'block' : 'none';
+    }
+    const labelText = this.particlesEnabled ? 'ON' : 'OFF';
+    const cls = this.particlesEnabled ? 'text-emerald-400 font-sans text-sm font-bold' : 'text-slate-400 font-sans text-sm font-bold';
+    if (this.optParticlesLabel) {
+      this.optParticlesLabel.textContent = labelText;
+      this.optParticlesLabel.className = cls;
+    }
+    if (this.inRunParticlesLabel) {
+      this.inRunParticlesLabel.textContent = labelText;
+      this.inRunParticlesLabel.className = this.particlesEnabled ? 'text-emerald-400 font-sans text-xs font-bold' : 'text-slate-400 font-sans text-xs font-bold';
+    }
+    this.playSound('card_slide');
+  }
+
+  toggleContrast() {
+    this.contrastEnabled = !this.contrastEnabled;
+    const labelText = this.contrastEnabled ? 'ON' : 'OFF';
+    const cls = this.contrastEnabled ? 'text-emerald-400 font-sans text-sm font-bold' : 'text-slate-400 font-sans text-sm font-bold';
+    if (this.optContrastLabel) {
+      this.optContrastLabel.textContent = labelText;
+      this.optContrastLabel.className = cls;
+    }
+    document.body.classList.toggle('high-contrast-mode', this.contrastEnabled);
+    this.playSound('card_slide');
+  }
+
+  /**
+   * Opens the Deck Select Modal (Photo 2)
+   */
+  openDeckSelectModal() {
+    this.renderDeckCarousel();
+    this.renderStakeCarousel();
+    if (this.deckSelectModal) this.deckSelectModal.classList.remove('hidden');
+    this.playSound('card_slide');
+  }
+
+  /**
+   * Renders the 3D Deck Stack Carousel and rule description (Photo 2)
+   */
+  renderDeckCarousel() {
+    const deck = DECKS[this.selectedDeckIndex];
+    if (!deck) return;
+
+    const isUnlocked = unlockablesManager.isDeckUnlocked(deck.id);
+
+    if (this.deckPreviewName) {
+      this.deckPreviewName.textContent = isUnlocked ? deck.name : `${deck.name} 🔒`;
+    }
+
+    if (this.deckPreviewPattern) {
+      this.deckPreviewPattern.style.background = isUnlocked ? deck.bgPattern : 'repeating-linear-gradient(45deg, #2c3e50, #2c3e50 10px, #1a252f 10px, #1a252f 20px)';
+    }
+
+    if (this.deckPreviewStack) {
+      this.deckPreviewStack.style.borderColor = isUnlocked ? deck.color : '#7f8c8d';
+      this.deckPreviewStack.style.boxShadow = isUnlocked ? `0 12px 28px ${deck.color}66` : 'none';
+    }
+
+    if (this.deckPreviewDescBox) {
+      if (isUnlocked) {
+        this.deckPreviewDescBox.innerHTML = `${deck.descriptionHtml || deck.description}<div class="absolute bottom-1 right-2 text-xs text-slate-400">🎴</div>`;
+        this.deckPreviewDescBox.className = 'deck-rule-box w-full';
+      } else {
+        this.deckPreviewDescBox.innerHTML = '🔒 Locked Deck';
+        this.deckPreviewDescBox.className = 'deck-rule-box w-full bg-slate-900 text-slate-400 border-slate-700';
+      }
+    }
+
+    if (this.deckPreviewLockBanner) {
+      if (isUnlocked) {
+        this.deckPreviewLockBanner.classList.add('hidden');
+      } else {
+        this.deckPreviewLockBanner.classList.remove('hidden');
+        this.deckPreviewLockBanner.innerHTML = `🔒 Unlock: <span class="text-white">${deck.unlockDesc || 'Complete requirement'}</span>`;
+      }
+    }
+
+    if (this.startSelectedRunBtn) {
+      if (isUnlocked) {
+        this.startSelectedRunBtn.disabled = false;
+        this.startSelectedRunBtn.innerHTML = 'PLAY <span class="btn-prompt-badge btn-prompt-x">ⓧ</span>';
+        this.startSelectedRunBtn.className = 'deck-play-btn';
+      } else {
+        this.startSelectedRunBtn.disabled = true;
+        this.startSelectedRunBtn.innerHTML = 'LOCKED 🔒';
+        this.startSelectedRunBtn.className = 'deck-play-btn opacity-50 cursor-not-allowed bg-slate-800 border-slate-700';
+      }
+    }
+
+    // Dynamic 15 Pagination dots
+    if (this.deckDotsContainer) {
+      this.deckDotsContainer.innerHTML = '';
+      DECKS.forEach((d, idx) => {
+        const dot = document.createElement('div');
+        const isCurrent = idx === this.selectedDeckIndex;
+        const dUnlocked = unlockablesManager.isDeckUnlocked(d.id);
+        dot.className = `deck-dot ${isCurrent ? 'active' : ''}`;
+        if (!isCurrent) {
+          dot.style.backgroundColor = dUnlocked ? '#64748b' : '#334155';
+        }
+        dot.title = d.name;
+        dot.addEventListener('click', () => {
+          this.selectedDeckIndex = idx;
+          this.renderDeckCarousel();
+          this.playSound('card_slide');
+        });
+        this.deckDotsContainer.appendChild(dot);
+      });
+    }
+
+    if (this.deckUnlockCountBadge) {
+      const unlockedCount = DECKS.filter(d => unlockablesManager.isDeckUnlocked(d.id)).length;
+      this.deckUnlockCountBadge.textContent = `Decks: ${unlockedCount} / ${DECKS.length} Unlocked`;
+    }
+  }
+
+  /**
+   * Renders the Stake (difficulty) Carousel
+   */
+  renderStakeCarousel() {
+    const stake = STAKES[this.selectedStakeIndex];
+    if (!stake) return;
+
+    if (this.stakePreviewName) {
+      this.stakePreviewName.textContent = stake.name;
+      this.stakePreviewName.style.color = '#1e293b';
+    }
+
+    if (this.stakePreviewDesc) {
+      this.stakePreviewDesc.textContent = stake.description;
+    }
+
+    if (this.stakePreviewChip) {
+      this.stakePreviewChip.textContent = stake.icon || '❂';
+      this.stakePreviewChip.style.borderColor = stake.color || '#cbd5e1';
+      this.stakePreviewChip.style.boxShadow = `0 4px 14px ${stake.color || '#cbd5e1'}55`;
+    }
+  }
+
+  /**
+   * Opens the Collection & Unlockables Modal
+   */
+  openCollectionModal() {
+    this.renderCollectionModal(this.collectionCurrentTab || 'decks');
+    if (this.collectionModal) this.collectionModal.classList.remove('hidden');
+    this.playSound('card_slide');
+  }
+
+  /**
+   * Populates the Collection categories (Decks, Jokers, Vouchers, Tarots)
+   */
+  renderCollectionModal(tab = 'decks') {
+    this.collectionCurrentTab = tab;
+
+    // Update tab active states
+    Object.keys(this.collectionTabs).forEach(k => {
+      const btn = this.collectionTabs[k];
+      if (btn) {
+        if (k === tab) {
+          btn.className = 'collection-tab-btn px-4 py-1.5 bg-[#2ecc71] text-slate-950 font-pixel text-lg rounded-xl font-black cursor-pointer shadow-md';
+        } else {
+          btn.className = 'collection-tab-btn px-4 py-1.5 bg-slate-800 text-slate-300 font-pixel text-lg rounded-xl font-black cursor-pointer hover:bg-slate-700';
+        }
+      }
+    });
+
+    if (this.sandboxToggleBtn) {
+      this.sandboxToggleBtn.textContent = unlockablesManager.profile.sandboxAllUnlocked ? '🔓 Sandbox: ALL UNLOCKED' : 'Unlock All (Sandbox)';
+      this.sandboxToggleBtn.className = unlockablesManager.profile.sandboxAllUnlocked ? 'px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg border border-emerald-300 shadow cursor-pointer' : 'px-3 py-1.5 bg-purple-700 hover:bg-purple-600 text-white text-xs font-bold rounded-lg border border-purple-400 shadow cursor-pointer';
+    }
+
+    if (!this.collectionGrid) return;
+    this.collectionGrid.innerHTML = '';
+
+    if (tab === 'decks') {
+      const unlockedCount = DECKS.filter(d => unlockablesManager.isDeckUnlocked(d.id)).length;
+      if (this.collectionTotalProgress) {
+        this.collectionTotalProgress.textContent = `Unlocked: ${unlockedCount} / ${DECKS.length} Decks`;
+      }
+
+      DECKS.forEach(deck => {
+        const isUnlocked = unlockablesManager.isDeckUnlocked(deck.id);
+        const card = document.createElement('div');
+        card.className = `collection-card bg-[#141d22] border-2 rounded-2xl p-3 flex flex-col justify-between items-center text-center shadow-lg transition-all ${isUnlocked ? 'border-slate-500 hover:border-amber-400' : 'border-slate-700 is-locked opacity-70'}`;
+        
+        card.innerHTML = `
+          <div class="w-12 h-16 rounded-lg mb-2 shadow-md flex items-center justify-center font-pixel text-2xl border border-white/20" style="background: ${isUnlocked ? deck.bgPattern : '#1e293b'}">
+            ${isUnlocked ? deck.icon : '🔒'}
+          </div>
+          <span class="font-pixel text-lg text-white font-bold leading-tight">${deck.name}</span>
+          <div class="text-[10px] text-slate-300 my-1 line-clamp-3 leading-snug">
+            ${isUnlocked ? deck.description : `Unlock: ${deck.unlockDesc || 'Hidden'}`}
+          </div>
+          <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${isUnlocked ? 'bg-emerald-900/60 text-emerald-300 border border-emerald-500/40' : 'bg-red-950/60 text-red-400 border border-red-500/40'}">
+            ${isUnlocked ? 'UNLOCKED' : 'LOCKED'}
+          </span>
+        `;
+        this.collectionGrid.appendChild(card);
+      });
+    } else if (tab === 'jokers') {
+      const discoveredCount = unlockablesManager.profile.discoveredItems.filter(id => id.startsWith('joker_') || ALL_150_JOKERS.some(j => j.id === id)).length;
+      if (this.collectionTotalProgress) {
+        this.collectionTotalProgress.textContent = `Discovered: ${discoveredCount} / ${ALL_150_JOKERS.length} Jokers`;
+      }
+
+      ALL_150_JOKERS.forEach(joker => {
+        const isDiscovered = unlockablesManager.profile.sandboxAllUnlocked || unlockablesManager.profile.discoveredItems.includes(joker.id) || joker.id === 'joker';
+        const card = document.createElement('div');
+        const rarityColor = joker.rarity === 'legendary' ? '#9b59b6' : (joker.rarity === 'rare' ? '#fe5f55' : (joker.rarity === 'uncommon' ? '#009dff' : '#2ecc71'));
+        card.className = `collection-card bg-[#141d22] border-2 rounded-2xl p-2.5 flex flex-col justify-between items-center text-center shadow-lg transition-all ${isDiscovered ? 'border-amber-500/50 hover:border-amber-300' : 'border-slate-800 is-locked opacity-60'}`;
+
+        card.innerHTML = `
+          <div class="w-12 h-16 rounded-xl mb-1.5 shadow flex items-center justify-center border-2 overflow-hidden p-0.5 relative" style="border-color: ${isDiscovered ? rarityColor : '#334155'}; background: ${isDiscovered ? '#ffffff' : '#0f172a'};">
+            ${isDiscovered ? getJokerIllustrationHtml(joker) : '<span class="text-2xl">🔒</span>'}
+          </div>
+          <span class="font-pixel text-base text-white font-bold leading-tight truncate w-full" title="${joker.name}">${isDiscovered ? joker.name : '?????'}</span>
+          <div class="text-[10px] text-slate-300 my-1 line-clamp-3 leading-snug">
+            ${isDiscovered ? (joker.description || 'Special joker effect') : 'Undiscovered Joker'}
+          </div>
+          <span class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase" style="background-color: ${isDiscovered ? rarityColor + '33' : '#1e293b'}; color: ${isDiscovered ? rarityColor : '#64748b'}; border: 1px solid ${isDiscovered ? rarityColor : '#334155'}">
+            ${isDiscovered ? (joker.rarity || 'Common') : 'Locked'}
+          </span>
+        `;
+        this.collectionGrid.appendChild(card);
+      });
+    } else if (tab === 'vouchers') {
+      if (this.collectionTotalProgress) {
+        this.collectionTotalProgress.textContent = `Vouchers: ${VOUCHER_CATALOG.length} Available`;
+      }
+
+      VOUCHER_CATALOG.forEach(v => {
+        const card = document.createElement('div');
+        card.className = 'collection-card bg-[#141d22] border-2 border-amber-600/60 rounded-2xl p-3 flex flex-col justify-between items-center text-center shadow-lg';
+        card.innerHTML = `
+          <div class="w-12 h-14 bg-amber-950/40 rounded-xl mb-2 shadow flex items-center justify-center text-3xl border border-amber-500/50">
+            ${v.icon || '📦'}
+          </div>
+          <span class="font-pixel text-lg text-amber-300 font-bold leading-tight">${v.name}</span>
+          <div class="text-[10px] text-slate-300 my-1 leading-snug">${v.description}</div>
+          <span class="text-[10px] font-bold text-amber-400">$${v.cost}</span>
+        `;
+        this.collectionGrid.appendChild(card);
+      });
+    } else if (tab === 'tarots') {
+      const allTarotsAndPlanets = [...TAROT_CARDS, ...PLANET_CARDS];
+      if (this.collectionTotalProgress) {
+        this.collectionTotalProgress.textContent = `Tarots & Planets: ${allTarotsAndPlanets.length} Available`;
+      }
+
+      allTarotsAndPlanets.forEach(c => {
+        const isTarot = c.type === 'Tarot';
+        const card = document.createElement('div');
+        card.className = `collection-card bg-[#141d22] border-2 rounded-2xl p-2.5 flex flex-col justify-between items-center text-center shadow-lg ${isTarot ? 'border-purple-600/60' : 'border-cyan-600/60'}`;
+        card.innerHTML = `
+          <div class="w-11 h-14 rounded-xl mb-1.5 shadow flex items-center justify-center text-2xl border" style="background: ${isTarot ? '#3b1d54' : '#103947'}; border-color: ${isTarot ? '#a855f7' : '#06b6d4'}">
+            ${c.icon || '🃏'}
+          </div>
+          <span class="font-pixel text-base text-white font-bold leading-tight truncate w-full">${c.name}</span>
+          <div class="text-[10px] text-slate-300 my-1 line-clamp-3 leading-snug">${c.description}</div>
+          <span class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase" style="color: ${isTarot ? '#c084fc' : '#22d3ee'}; background: rgba(0,0,0,0.4)">
+            ${c.type}
+          </span>
+        `;
+        this.collectionGrid.appendChild(card);
+      });
+    }
   }
 
   /**
    * Full game HUD & Card layout update
    */
   render() {
+    if (this.game.state === GAME_STATES.TITLE) {
+      if (this.titleScreen) this.titleScreen.classList.remove('hidden');
+      if (this.appContainer) this.appContainer.classList.add('hidden');
+      return;
+    }
+
+    if (this.titleScreen) this.titleScreen.classList.add('hidden');
+    if (this.appContainer) this.appContainer.classList.remove('hidden');
+
     this.renderHUD();
     this.renderJokers();
     this.renderConsumables();
@@ -642,13 +1593,25 @@ export class Renderer {
     if (this.game.state === GAME_STATES.BLIND_SELECT) {
       if (this.blindSelectStage) this.blindSelectStage.classList.remove('hidden');
       if (this.playArena) this.playArena.classList.add('hidden');
+      if (this.shopBoardArena) this.shopBoardArena.classList.add('hidden');
       if (this.blindSelectSidebarTitle) this.blindSelectSidebarTitle.classList.remove('hidden');
+      if (this.shopSidebarHeader) this.shopSidebarHeader.classList.add('hidden');
       if (this.blindCardEl) this.blindCardEl.classList.add('hidden');
       this.renderBlindSelectStage();
+    } else if (this.game.state === GAME_STATES.SHOP) {
+      if (this.blindSelectStage) this.blindSelectStage.classList.add('hidden');
+      if (this.playArena) this.playArena.classList.add('hidden');
+      if (this.shopBoardArena) this.shopBoardArena.classList.remove('hidden');
+      if (this.blindSelectSidebarTitle) this.blindSelectSidebarTitle.classList.add('hidden');
+      if (this.shopSidebarHeader) this.shopSidebarHeader.classList.remove('hidden');
+      if (this.blindCardEl) this.blindCardEl.classList.add('hidden');
+      if (this.shopUI) this.shopUI.render();
     } else {
       if (this.blindSelectStage) this.blindSelectStage.classList.add('hidden');
+      if (this.shopBoardArena) this.shopBoardArena.classList.add('hidden');
       if (this.playArena) this.playArena.classList.remove('hidden');
       if (this.blindSelectSidebarTitle) this.blindSelectSidebarTitle.classList.add('hidden');
+      if (this.shopSidebarHeader) this.shopSidebarHeader.classList.add('hidden');
       if (this.blindCardEl) this.blindCardEl.classList.remove('hidden');
       this.renderHand();
       this.renderPreviewBanner();
@@ -656,6 +1619,9 @@ export class Renderer {
     }
   }
 
+  /**
+   * Renders the 3-column Blind Select Stage with individual colors per Blind and Boss!
+   */
   renderBlindSelectStage() {
     if (!this.game.anteBlinds || this.game.anteBlinds.length < 3) return;
 
@@ -670,10 +1636,36 @@ export class Renderer {
       const scoreTarget = this.blindScoreTargets[i];
       const rewardLabel = this.blindRewardLabels[i];
       const titleEl = this.blindTitles[i];
+      const badgeEl = this.blindBadges[i];
+
+      const blindColor = blind.color || '#0072b2';
+      const blindBorder = blind.border || '#009dff';
 
       if (scoreTarget) scoreTarget.textContent = blind.target.toLocaleString();
       if (rewardLabel) rewardLabel.textContent = blind.reward;
-      if (titleEl) titleEl.textContent = blind.name;
+
+      // Unique title & individual colors
+      if (titleEl) {
+        titleEl.textContent = blind.name;
+        titleEl.style.backgroundColor = blindColor;
+        titleEl.style.borderColor = blindBorder;
+      }
+
+      // Unique badge & individual colors
+      if (badgeEl) {
+        badgeEl.style.backgroundColor = blindColor;
+        badgeEl.style.borderColor = blindBorder;
+        if (i === 2) {
+          badgeEl.textContent = blind.icon || '⚓';
+          badgeEl.style.fontSize = '2.4rem';
+        } else if (i === 0) {
+          badgeEl.innerHTML = '<span class="text-xs">SMALL</span><span class="text-xs">BLIND</span>';
+          badgeEl.style.fontSize = '';
+        } else if (i === 1) {
+          badgeEl.innerHTML = '<span class="text-xs">BIG</span><span class="text-xs">BLIND</span>';
+          badgeEl.style.fontSize = '';
+        }
+      }
 
       if (i === 2 && this.blindBossDesc && blind.desc) {
         this.blindBossDesc.textContent = blind.desc;
@@ -717,30 +1709,47 @@ export class Renderer {
       if (col) {
         if (isActive) {
           col.style.opacity = '1';
-          if (i === 0) col.style.borderColor = '#009dff';
-          else if (i === 1) col.style.borderColor = '#f39c12';
-          else col.style.borderColor = '#fe5f55';
+          col.style.borderColor = blindBorder;
+          col.style.boxShadow = `0 0 24px ${blindColor}aa`;
         } else if (isPast) {
           col.style.opacity = '0.45';
           col.style.borderColor = '#334155';
+          col.style.boxShadow = 'none';
         } else {
-          col.style.opacity = '0.75';
-          col.style.borderColor = '#475569';
+          col.style.opacity = '0.85';
+          col.style.borderColor = `${blindColor}88`;
+          col.style.boxShadow = 'none';
         }
       }
     });
   }
 
   renderHUD() {
-    // Blind card
+    // Blind card & individual colors
     const isBoss = this.game.blindType === BLIND_TYPES.BOSS;
+    const curBlind = (this.game.anteBlinds && this.game.anteBlinds[this.game.blindIndex]) ? this.game.anteBlinds[this.game.blindIndex] : null;
+    const curColor = curBlind?.color || (isBoss ? '#8b2626' : (this.game.blindIndex === 1 ? '#8c6d1f' : '#0072b2'));
+    const curBorder = curBlind?.border || (isBoss ? '#e74c3c' : (this.game.blindIndex === 1 ? '#f39c12' : '#009dff'));
+
+    if (this.blindCardEl) {
+      this.blindCardEl.style.borderColor = curBorder;
+      this.blindCardEl.style.boxShadow = `0 4px 18px ${curColor}55`;
+    }
+
+    const blindCoin = document.getElementById('blind-coin');
+    if (blindCoin) {
+      blindCoin.style.backgroundColor = curColor;
+      blindCoin.style.borderColor = curBorder;
+      blindCoin.textContent = isBoss && this.game.activeBoss ? (this.game.activeBoss.icon || '⚓') : '❂';
+    }
+
     this.blindNameEl.textContent = isBoss && this.game.activeBoss ? this.game.activeBoss.name : this.game.blindType;
     this.blindConditionEl.textContent = isBoss && this.game.activeBoss ? this.game.activeBoss.desc : 'Score to beat this blind';
     this.blindRewardEl.textContent = isBoss ? '$$$$$' : (this.game.blindIndex === 1 ? '$$$$' : '$$$');
     this.anteCounterEl.textContent = `Ante ${this.game.ante}/${this.game.maxAnte}`;
 
     this.targetScoreEl.textContent = this.game.roundTarget.toLocaleString();
-    this.currentScoreEl.textContent = this.game.roundScore.toLocaleString();
+    this.currentScoreEl.textContent = this.game.state === GAME_STATES.SHOP ? '0' : this.game.roundScore.toLocaleString();
     this.handsLeftEl.textContent = this.game.handsLeft;
     this.discardsLeftEl.textContent = this.game.discardsLeft;
     this.moneyDisplayEl.textContent = this.game.money;
@@ -749,6 +1758,18 @@ export class Renderer {
 
     const totalDeckCards = this.game.deck.length + this.game.discardPile.length + this.game.hand.length;
     this.deckCounterEl.textContent = `${this.game.deck.length}/${totalDeckCards}`;
+
+    // Shop HUD alignment matching reference screenshot sho[.jpg
+    const interestCard = document.getElementById('interest-card');
+    if (this.game.state === GAME_STATES.SHOP) {
+      if (this.previewChipsBox) this.previewChipsBox.textContent = '0';
+      if (this.previewMultBox) this.previewMultBox.textContent = '0';
+      if (this.previewHandName) this.previewHandName.textContent = 'SHOP';
+      if (this.previewHandLevel) this.previewHandLevel.textContent = '';
+      if (interestCard) interestCard.classList.add('hidden');
+    } else {
+      if (interestCard) interestCard.classList.remove('hidden');
+    }
 
     // Interest Bar logic: +1 per $5 held, capping at $50 (max +$10 interest)
     const interestInfo = this.game.getInterestInfo();
@@ -767,7 +1788,6 @@ export class Renderer {
 
     // Skip Blind Button (disabled on Boss Blinds or outside selecting phase)
     if (this.skipBlindBtn) {
-      const isBoss = this.game.blindType === BLIND_TYPES.BOSS;
       this.skipBlindBtn.disabled = isBoss || this.game.state !== GAME_STATES.SELECTING;
       this.skipBlindBtn.textContent = isBoss ? 'Boss Blind (Cannot Skip)' : 'Skip Blind (Earn $0)';
     }
@@ -783,27 +1803,67 @@ export class Renderer {
 
     jokers.forEach((joker, index) => {
       const card = document.createElement('div');
-      card.className = `joker-card joker-rarity-${joker.rarity} ${joker.edition && joker.edition !== 'normal' ? 'edition-' + joker.edition : ''}`;
+      const rarityClass = joker.rarity ? `rarity-${joker.rarity.toLowerCase()}` : 'rarity-common';
+      card.className = `joker-card ${rarityClass} ${joker.edition && joker.edition !== 'normal' ? 'edition-' + joker.edition : ''}`;
+      if (joker.debuffed) card.classList.add('card-debuffed');
       card.id = `joker-dom-${joker.instanceId || joker.id}`;
+      card.dataset.index = index;
       card.title = `${joker.name}: ${joker.description} (Sell: $${joker.sellValue})`;
 
+      // Stickers (Part 5)
+      let stickerHtml = '';
+      if (joker.isEternal) {
+        stickerHtml = '<span class="joker-sticker sticker-eternal">ETERNAL</span>';
+      } else if (joker.isPerishable) {
+        stickerHtml = `<span class="joker-sticker sticker-perishable">${joker.perishableRoundsLeft !== undefined ? joker.perishableRoundsLeft : 5} RND</span>`;
+      }
+      if (joker.isRental) {
+        stickerHtml += '<span class="joker-sticker sticker-rental" style="top:auto; bottom:-6px; right:-6px;">RENTAL</span>';
+      }
+
+      // Loyalty Card Persistent Live Countdown Badge (Part 3)
+      let dynamicBadgeHtml = '';
+      if (joker.id === 'loyalty_card') {
+        const remaining = joker.handsRemaining !== undefined ? joker.handsRemaining : 5;
+        if (remaining === 0) {
+          dynamicBadgeHtml = '<div class="loyalty-badge active-glow">ACTIVE! ×4</div>';
+        } else {
+          dynamicBadgeHtml = `<div class="loyalty-badge">${remaining} hands left</div>`;
+        }
+      }
+
+      // Blueprint / Brainstorm target badge (Part 1.2)
+      let copyTargetHtml = '';
+      if (joker.id === 'blueprint' || joker.id === 'brainstorm') {
+        if (joker.hasTarget && joker.targetName) {
+          copyTargetHtml = `<div class="blueprint-badge blueprint-active">Copying: ${joker.targetName}</div>`;
+        } else {
+          copyTargetHtml = `<div class="blueprint-badge blueprint-no-target">No target!</div>`;
+        }
+      }
+
       card.innerHTML = `
-        <div class="text-[9px] font-black uppercase text-amber-200 tracking-wider truncate w-full text-center">
-          ${joker.name}
-        </div>
-        <div class="text-3xl sm:text-4xl my-auto">${joker.icon}</div>
-        <div class="w-full flex justify-between items-center text-[10px] px-1 font-bold">
-          <span class="text-amber-400 font-pixel text-sm">$${joker.sellValue}</span>
-          <button class="sell-joker-btn text-red-400 hover:text-red-200 font-black px-1" data-index="${index}">Sell</button>
-        </div>
+        ${stickerHtml}
+        ${renderJokerCardFace(joker, {
+          showSell: true,
+          sellIndex: index,
+          badgeHtml: dynamicBadgeHtml,
+          copyTargetHtml: copyTargetHtml
+        })}
       `;
 
-      card.querySelector('.sell-joker-btn').addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.game.sellJoker(index);
-        this.playSound('cash');
-        this.render();
-      });
+      // Attach floating inspection tooltip
+      tooltipRenderer.attach(card, joker);
+
+      const sellBtn = card.querySelector('.sell-joker-btn');
+      if (sellBtn) {
+        sellBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.game.sellJoker(index);
+          this.playSound('cash');
+          this.render();
+        });
+      }
 
       this.jokersContainer.appendChild(card);
     });
@@ -820,6 +1880,8 @@ export class Renderer {
     items.forEach((item, index) => {
       const card = document.createElement('div');
       card.className = `consumable-card consumable-type-${item.type.toLowerCase()}`;
+      card.dataset.index = index;
+      card.id = `consumable-dom-${item.instanceId || item.id}`;
       card.title = `${item.name} (${item.type}): ${item.description}`;
 
       card.innerHTML = `
@@ -832,6 +1894,9 @@ export class Renderer {
           <button class="sell-consumable-btn text-amber-400 hover:text-amber-200 text-[8px] font-black">$${item.sellValue || 1}</button>
         </div>
       `;
+
+      // Attach floating inspection tooltip
+      tooltipRenderer.attach(card, item);
 
       card.querySelector('.use-consumable-btn').addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1077,12 +2142,29 @@ export class Renderer {
       }
     }
 
-    this.playSound('cash');
-    document.body.classList.add('screen-shake');
-    setTimeout(() => document.body.classList.remove('screen-shake'), 320);
+    // Pacing: Dramatic pause before multiplication (Part 1)
+    await this.wait(450);
 
-    // Final pause period before board dissolves
-    await this.wait(750);
+    // Multiplication: Play mult_chord chime and flash tally total
+    this.playSound('mult_chord');
+    this.tallyTotal.textContent = (tallyChipsVal * tallyMultVal).toLocaleString();
+    this.tallyTotal.style.transform = 'scale(1.25)';
+    this.tallyTotal.style.color = '#f1c40f';
+    document.body.classList.add('screen-shake');
+    setTimeout(() => {
+      this.tallyTotal.style.transform = '';
+      this.tallyTotal.style.color = '';
+      document.body.classList.remove('screen-shake');
+    }, 320);
+
+    await this.wait(400);
+
+    // Final chip-burst animation spraying across screen into target counter
+    this.playSound('chip_burst');
+    this.spawnChipBurst(this.tallyTotal, this.currentScoreEl, 16);
+
+    // Wait for chip burst to land
+    await this.wait(800);
 
     this.scoringBoard.classList.remove('opacity-100', 'scale-100');
     this.scoringBoard.classList.add('opacity-0', 'scale-95');
@@ -1104,6 +2186,47 @@ export class Renderer {
 
     document.body.appendChild(particle);
     setTimeout(() => particle.remove(), 850);
+  }
+
+  /**
+   * Spawns golden chip-burst particles spraying into the target counter
+   */
+  spawnChipBurst(sourceEl, targetEl, count = 16) {
+    if (!sourceEl || !targetEl) return;
+    const sRect = sourceEl.getBoundingClientRect();
+    const tRect = targetEl.getBoundingClientRect();
+    const sX = sRect.left + sRect.width / 2;
+    const sY = sRect.top + sRect.height / 2;
+    const targetDeltaX = (tRect.left + tRect.width / 2) - sX;
+    const targetDeltaY = (tRect.top + tRect.height / 2) - sY;
+
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.className = 'chip-burst-particle';
+      p.style.left = `${sX}px`;
+      p.style.top = `${sY}px`;
+      const spreadX = (Math.random() - 0.5) * 80;
+      const spreadY = (Math.random() - 0.5) * 80;
+      p.style.setProperty('--burst-target', `translate(${targetDeltaX + spreadX}px, ${targetDeltaY + spreadY}px)`);
+      p.style.animationDelay = `${i * 0.03}s`;
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 850 + i * 30);
+    }
+  }
+
+  /**
+   * Floating cash spending pop (-$X)
+   */
+  spawnCashPop(targetEl, amount) {
+    if (!targetEl) return;
+    const rect = targetEl.getBoundingClientRect();
+    const p = document.createElement('div');
+    p.className = 'cash-pop-particle';
+    p.textContent = `-$${amount}`;
+    p.style.left = `${rect.left + rect.width / 2 - 20}px`;
+    p.style.top = `${rect.top - 12}px`;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 850);
   }
 
   showRunInfo() {
@@ -1136,129 +2259,19 @@ export class Renderer {
   }
 
   /**
-   * ZONE B: Main Shop Area Rendering (Exact Balatro Look)
+   * ZONE B: Main Shop Area Rendering (Exact Balatro Look from sho[.jpg)
    */
   renderShop() {
-    this.shopMoneyEl.textContent = this.game.money;
-    this.shopAnteIndicator.textContent = this.game.ante;
-    this.rerollCostEl.textContent = this.game.shopEngine.rerollCost;
-
-    // 1. Top Shelf: Card Shelf (2 buyable cards: Jokers, Tarots, Planets)
-    this.shopCardsShelf.innerHTML = '';
-    this.game.shopEngine.shopCards.forEach((item, index) => {
-      const cardEl = document.createElement('div');
-      const cost = item.finalCost || item.cost;
-      const canAfford = this.game.money >= cost;
-      const isJoker = item.category === 'joker';
-      const isFull = isJoker
-        ? this.game.jokerSystem.count >= this.game.jokerSystem.maxJokers
-        : this.game.consumableSystem.count >= this.game.consumableSystem.maxSlots;
-
-      cardEl.className = 'bg-black/75 border-2 border-[#524128] hover:border-amber-400 p-3 rounded-2xl flex flex-col justify-between items-center text-center transition shadow-lg relative';
-      
-      cardEl.innerHTML = `
-        <div class="flex justify-between w-full items-center text-[10px] font-black uppercase text-amber-300">
-          <span>${item.type || item.rarity}</span>
-          ${item.edition && item.edition !== 'normal' ? `<span class="text-purple-400">${item.edition}</span>` : ''}
-        </div>
-        <div class="text-4xl my-1">${item.icon}</div>
-        <div class="font-bold text-sm text-slate-100">${item.name}</div>
-        <p class="text-[11px] text-amber-200/80 leading-tight my-1 font-medium">${item.description}</p>
-        <button class="buy-card-btn w-full py-2 bg-[#f0ad28] hover:bg-amber-300 disabled:opacity-40 disabled:cursor-not-allowed text-slate-950 font-black text-xs uppercase rounded-xl transition active:scale-95" ${!canAfford || isFull ? 'disabled' : ''}>
-          Buy ($${cost})
-        </button>
-      `;
-
-      cardEl.querySelector('.buy-card-btn').addEventListener('click', () => {
-        const res = this.game.buyShopCard(index);
-        if (res.success) {
-          this.playSound('cash');
-          this.render();
-          this.renderShop();
-        } else {
-          alert(res.message);
-        }
-      });
-
-      this.shopCardsShelf.appendChild(cardEl);
-    });
-
-    // 2. Bottom Left Shelf: Booster Packs (2 Booster Packs)
-    this.shopPacksShelf.innerHTML = '';
-    this.game.shopEngine.boosterPacks.forEach((pack, index) => {
-      const packEl = document.createElement('div');
-      const cost = pack.finalCost || pack.cost;
-      const canAfford = this.game.money >= cost;
-
-      packEl.className = 'booster-pack-card';
-      packEl.innerHTML = `
-        <span class="text-[10px] font-black uppercase tracking-wider text-amber-300">Booster Pack</span>
-        <div class="text-4xl my-1">${pack.icon}</div>
-        <div class="font-bold text-sm text-amber-100 text-center">${pack.name}</div>
-        <p class="text-[10px] text-amber-200/80 text-center leading-tight">${pack.description}</p>
-        <button class="buy-pack-btn w-full py-2 bg-[#009dff] hover:bg-blue-400 disabled:opacity-40 disabled:cursor-not-allowed text-white font-black text-xs uppercase rounded-xl transition active:scale-95 border border-blue-200" ${!canAfford ? 'disabled' : ''}>
-          Open ($${cost})
-        </button>
-      `;
-
-      packEl.querySelector('.buy-pack-btn').addEventListener('click', () => {
-        const res = this.game.buyBoosterPack(index);
-        if (res.success) {
-          this.playSound('win');
-          this.render();
-          this.renderShop();
-          this.showPackOpeningOverlay(res);
-        }
-      });
-
-      this.shopPacksShelf.appendChild(packEl);
-    });
-
-    // 3. Bottom Right Shelf: Voucher Slot (1 active Voucher per Ante)
-    this.shopVoucherSlot.innerHTML = '';
-    const voucher = this.game.shopEngine.currentVoucher;
-    if (voucher) {
-      const cost = voucher.finalCost || voucher.cost;
-      const canAfford = this.game.money >= cost;
-
-      const voucherEl = document.createElement('div');
-      voucherEl.className = 'bg-black/80 border-2 border-amber-500 rounded-2xl p-3 flex flex-col justify-between items-center text-center shadow-lg w-full h-full';
-      voucherEl.innerHTML = `
-        <span class="text-[10px] font-black uppercase text-amber-300">Voucher</span>
-        <div class="text-4xl my-1">${voucher.icon}</div>
-        <div class="font-bold text-sm text-slate-100">${voucher.name}</div>
-        <p class="text-[11px] text-amber-200/80 leading-tight">${voucher.description}</p>
-        <button class="buy-voucher-btn w-full py-2 bg-[#f0ad28] hover:bg-amber-300 disabled:opacity-40 disabled:cursor-not-allowed text-slate-950 font-black text-xs uppercase rounded-xl transition active:scale-95" ${!canAfford ? 'disabled' : ''}>
-          Buy ($${cost})
-        </button>
-      `;
-
-      voucherEl.querySelector('.buy-voucher-btn').addEventListener('click', () => {
-        const res = this.game.buyVoucher();
-        if (res.success) {
-          this.playSound('cash');
-          this.render();
-          this.renderShop();
-        }
-      });
-
-      this.shopVoucherSlot.appendChild(voucherEl);
-    } else {
-      const emptyEl = document.createElement('div');
-      emptyEl.className = 'bg-black/40 border-2 border-dashed border-[#4a391e] rounded-2xl p-4 flex flex-col items-center justify-center text-center text-slate-500 w-full h-full';
-      emptyEl.innerHTML = `
-        <span class="font-pixel text-2xl text-slate-600">SOLD OUT</span>
-        <span class="text-[10px] font-bold text-slate-600 mt-1">Available next Ante</span>
-      `;
-      this.shopVoucherSlot.appendChild(emptyEl);
+    this.game.state = GAME_STATES.SHOP;
+    this.render();
+    if (this.shopUI) {
+      this.shopUI.render();
     }
-
-    this.shopModal.classList.remove('hidden');
   }
 
   /**
    * ZONE C: Interactive Booster Pack Opening Overlay
-   * Displays 10 cards face up to choose from with visible mutations, editions, and keep buttons!
+   * Displays cards face up to choose from with visible mutations, editions, and keep buttons!
    */
   showPackOpeningOverlay(packData) {
     this.packOverlayTitle.textContent = packData.pack.name.toUpperCase();
@@ -1329,23 +2342,34 @@ export class Renderer {
         keepBtn.textContent = 'Keep Card';
         cardSlot.appendChild(keepBtn);
       } else if (item.category === 'consumable') {
+        const isSpectral = item.type === 'Spectral';
+        const isPlanet = item.type === 'Planet';
+        const typeLabel = isSpectral ? 'Spectral' : (isPlanet ? 'Planet' : 'Tarot');
+        const themeBtn = isSpectral ? 'bg-[#06b6d4] hover:bg-cyan-400 text-slate-950 border-cyan-200' : (isPlanet ? 'bg-[#2563eb] hover:bg-blue-500 text-white border-blue-300' : 'bg-[#9333ea] hover:bg-purple-500 text-white border-purple-300');
+        const themeBadge = isSpectral ? 'text-cyan-300' : (isPlanet ? 'text-blue-300' : 'text-purple-300');
+        const themeCard = isSpectral ? 'consumable-type-spectral' : (isPlanet ? 'consumable-type-planet' : 'consumable-type-tarot');
+
         cardSlot.innerHTML = `
-          <div class="text-[10px] font-black uppercase text-purple-300">${item.type || 'Tarot'} Mutation</div>
-          <div class="consumable-card consumable-type-${item.type ? item.type.toLowerCase() : 'tarot'} my-1 pointer-events-none">
+          <div class="text-[10px] font-black uppercase ${themeBadge}">${typeLabel} Card</div>
+          <div class="consumable-card ${themeCard} my-1 pointer-events-none">
             <div class="text-[9px] font-black uppercase text-cyan-200 tracking-wider truncate w-full text-center">${item.name}</div>
             <div class="text-4xl my-auto">${item.icon}</div>
           </div>
           <div class="font-bold text-xs text-slate-100 text-center leading-tight">${item.name}</div>
           <p class="text-[10px] text-amber-200/90 leading-tight text-center px-1 my-0.5 min-h-[28px]">${item.description}</p>
-          <button class="w-full py-2 bg-[#9333ea] hover:bg-purple-500 text-white font-black text-xs uppercase rounded-xl border border-purple-300 shadow-lg active:scale-95 transition">Keep Tarot</button>
+          <button class="w-full py-2 ${themeBtn} font-black text-xs uppercase rounded-xl border shadow-lg active:scale-95 transition">Keep ${typeLabel}</button>
         `;
       } else {
+        // Joker from Buffoon Pack
+        const rarityClass = item.rarity ? `rarity-${item.rarity.toLowerCase()}` : 'rarity-common';
+        const edClass = item.edition && item.edition !== 'normal' ? `edition-${item.edition}` : '';
         cardSlot.innerHTML = `
-          <div class="text-[10px] font-black uppercase text-amber-300">${item.rarity || 'Item'}</div>
-          <div class="text-4xl my-2">${item.icon}</div>
-          <div class="font-bold text-xs text-slate-100 text-center leading-tight">${item.name}</div>
+          <div class="text-[10px] font-black uppercase text-amber-300">Joker</div>
+          <div class="joker-card ${rarityClass} ${edClass} my-1 pointer-events-none shadow-xl">
+            ${renderJokerCardFace(item)}
+          </div>
           <p class="text-[10px] text-amber-200/90 leading-tight text-center px-1 my-0.5 min-h-[28px]">${item.description}</p>
-          <button class="w-full py-2 bg-[#f0ad28] hover:bg-amber-400 text-slate-950 font-black text-xs uppercase rounded-xl border border-amber-200 shadow-lg active:scale-95 transition">Pick Item</button>
+          <button class="w-full py-2 bg-[#f0ad28] hover:bg-amber-400 text-slate-950 font-black text-xs uppercase rounded-xl border border-amber-200 shadow-lg active:scale-95 transition">Pick Joker</button>
         `;
       }
 
@@ -1386,13 +2410,23 @@ export class Renderer {
     this.playSound('game_over');
   }
 
-  showVictory() {
-    this.gameOverTitle.textContent = 'VICTORY!';
-    this.gameOverTitle.className = 'font-pixel text-6xl text-amber-400 tracking-wider';
-    this.gameOverMessage.textContent = 'You conquered Ante 8 and defeated the Boss Blind!';
-    this.finalAnteEl.textContent = 'Ante 8 Cleared!';
-    this.finalScoreEl.textContent = this.game.roundScore.toLocaleString();
-    this.gameOverModal.classList.remove('hidden');
+  showVictory(data = {}) {
+    if (this.victoryDeckName) {
+      this.victoryDeckName.textContent = this.game.selectedDeck ? this.game.selectedDeck.name : 'Red Deck';
+    }
+    if (this.victoryStakeName) {
+      this.victoryStakeName.textContent = this.game.selectedStake ? this.game.selectedStake.name : 'White Stake';
+    }
+    if (this.victoryRoundScore) {
+      const score = (data && data.roundScore !== undefined) ? data.roundScore : (this.game.roundScore || 0);
+      this.victoryRoundScore.textContent = score.toLocaleString();
+    }
+    if (this.victoryCash) {
+      this.victoryCash.textContent = `$${this.game.money}`;
+    }
+    if (this.victoryModal) {
+      this.victoryModal.classList.remove('hidden');
+    }
     this.playSound('win');
   }
 

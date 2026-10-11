@@ -40,8 +40,9 @@ export class ScoringEngine {
 
       // Card-specific jokers
       for (const joker of activeJokers) {
+        if (joker.debuffed) continue;
         if (typeof joker.calculateCard === 'function') {
-          const mod = joker.calculateCard(card, context);
+          const mod = joker.calculateCard(card, context, joker);
           if (mod) {
             if (mod.chips) chips += mod.chips;
             if (mod.mult) mult += mod.mult;
@@ -53,8 +54,9 @@ export class ScoringEngine {
 
     // Jokers general and hand calculations
     for (const joker of activeJokers) {
+      if (joker.debuffed) continue;
       if (typeof joker.calculateHand === 'function') {
-        const mod = joker.calculateHand(evalResult, context);
+        const mod = joker.calculateHand(evalResult, context, joker);
         if (mod) {
           if (mod.chips) chips += mod.chips;
           if (mod.mult) mult += mod.mult;
@@ -63,7 +65,7 @@ export class ScoringEngine {
       }
 
       if (typeof joker.calculateGeneral === 'function') {
-        const mod = joker.calculateGeneral(context);
+        const mod = joker.calculateGeneral(context, joker);
         if (mod) {
           if (mod.chips) chips += mod.chips;
           if (mod.mult) mult += mod.mult;
@@ -237,8 +239,9 @@ export class ScoringEngine {
 
       // Card-specific jokers
       for (const joker of activeJokers) {
+        if (joker.debuffed) continue;
         if (typeof joker.calculateCard === 'function') {
-          const mod = joker.calculateCard(card, context);
+          const mod = joker.calculateCard(card, context, joker);
           if (mod) {
             if (mod.chips) currentChips += mod.chips;
             if (mod.mult) currentMult += mod.mult;
@@ -276,9 +279,10 @@ export class ScoringEngine {
 
     // Step 4: Joker Hand & General Hooks (left to right)
     for (const joker of activeJokers) {
+      if (joker.debuffed) continue;
       // Hand synergy
       if (typeof joker.calculateHand === 'function') {
-        const mod = joker.calculateHand(evalResult, context);
+        const mod = joker.calculateHand(evalResult, context, joker);
         if (mod) {
           if (mod.chips) currentChips += mod.chips;
           if (mod.mult) currentMult += mod.mult;
@@ -298,7 +302,7 @@ export class ScoringEngine {
 
       // General synergy
       if (typeof joker.calculateGeneral === 'function') {
-        const mod = joker.calculateGeneral(context);
+        const mod = joker.calculateGeneral(context, joker);
         if (mod) {
           if (mod.chips) currentChips += mod.chips;
           if (mod.mult) currentMult += mod.mult;
@@ -318,14 +322,26 @@ export class ScoringEngine {
     }
 
     // Final total
-    const finalScore = currentChips * currentMult;
-    steps.push({
-      type: 'FINAL_SCORE',
-      chips: currentChips,
-      mult: currentMult,
-      finalScore,
-      message: `${currentChips} × ${currentMult} = ${finalScore.toLocaleString()}`
-    });
+    let finalScore = currentChips * currentMult;
+    if (context && context.plasmaDeckActive) {
+      const balanced = Math.floor((currentChips + currentMult) / 2);
+      finalScore = balanced * balanced;
+      steps.push({
+        type: 'PLASMA_BALANCE',
+        chips: balanced,
+        mult: balanced,
+        finalScore,
+        message: `Plasma Deck: Balanced to ${balanced} × ${balanced} = ${finalScore.toLocaleString()}`
+      });
+    } else {
+      steps.push({
+        type: 'FINAL_SCORE',
+        chips: currentChips,
+        mult: currentMult,
+        finalScore,
+        message: `${currentChips} × ${currentMult} = ${finalScore.toLocaleString()}`
+      });
+    }
 
     return {
       evaluation: evalResult,

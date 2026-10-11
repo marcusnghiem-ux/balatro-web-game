@@ -1,7 +1,8 @@
 /**
  * JokerDatabase.js
  * Complete roster of all 150 official Balatro Jokers (Commons, Uncommons, Rares, Legendaries)
- * directly sourced from the official Balatro Wiki (https://balatrowiki.org/w/Jokers).
+ * directly sourced word-for-word from the official Balatro Wiki (https://balatrowiki.org/w/Jokers).
+ * All 150 official pixel-art assets linked via assets/jokers/<id>.png.
  */
 
 export const ALL_150_JOKERS = [
@@ -12,6 +13,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🃏',
     description: "+4 Mult",
+    unlock: "Available from start.",
+    image: 'assets/jokers/joker.png',
     sellValue: 1
   },
   {
@@ -21,6 +24,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '♦️',
     description: "Played cards with Diamond suit give +3 Mult when scored",
+    unlock: "Available from start.",
+    image: 'assets/jokers/greedy_joker.png',
     sellValue: 2
   },
   {
@@ -30,6 +35,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '♥️',
     description: "Played cards with Heart suit give +3 Mult when scored",
+    unlock: "Available from start.",
+    image: 'assets/jokers/lusty_joker.png',
     sellValue: 2
   },
   {
@@ -39,6 +46,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '♠️',
     description: "Played cards with Spade suit give +3 Mult when scored",
+    unlock: "Available from start.",
+    image: 'assets/jokers/wrathful_joker.png',
     sellValue: 2
   },
   {
@@ -48,6 +57,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '♣️',
     description: "Played cards with Club suit give +3 Mult when scored",
+    unlock: "Available from start.",
+    image: 'assets/jokers/gluttonous_joker.png',
     sellValue: 2
   },
   {
@@ -57,6 +68,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '😄',
     description: "+8 Mult if played hand contains a Pair",
+    unlock: "Available from start.",
+    image: 'assets/jokers/jolly_joker.png',
     sellValue: 1
   },
   {
@@ -66,6 +79,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🤪',
     description: "+12 Mult if played hand contains a Three of a Kind",
+    unlock: "Available from start.",
+    image: 'assets/jokers/zany_joker.png',
     sellValue: 2
   },
   {
@@ -75,6 +90,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '😡',
     description: "+10 Mult if played hand contains a Two Pair",
+    unlock: "Available from start.",
+    image: 'assets/jokers/mad_joker.png',
     sellValue: 2
   },
   {
@@ -84,6 +101,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🌀',
     description: "+12 Mult if played hand contains a Straight",
+    unlock: "Available from start.",
+    image: 'assets/jokers/crazy_joker.png',
     sellValue: 2
   },
   {
@@ -93,6 +112,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🎭',
     description: "+10 Mult if played hand contains a Flush",
+    unlock: "Available from start.",
+    image: 'assets/jokers/droll_joker.png',
     sellValue: 2
   },
   {
@@ -102,6 +123,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🦊',
     description: "+50 Chips if played hand contains a Pair",
+    unlock: "Available from start.",
+    image: 'assets/jokers/sly_joker.png',
     sellValue: 1
   },
   {
@@ -111,6 +134,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '😼',
     description: "+100 Chips if played hand contains a Three of a Kind",
+    unlock: "Available from start.",
+    image: 'assets/jokers/wily_joker.png',
     sellValue: 2
   },
   {
@@ -120,6 +145,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '💡',
     description: "+80 Chips if played hand contains a Two Pair",
+    unlock: "Available from start.",
+    image: 'assets/jokers/clever_joker.png',
     sellValue: 2
   },
   {
@@ -129,6 +156,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '😈',
     description: "+100 Chips if played hand contains a Straight",
+    unlock: "Available from start.",
+    image: 'assets/jokers/devious_joker.png',
     sellValue: 2
   },
   {
@@ -138,6 +167,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🎩',
     description: "+80 Chips if played hand contains a Flush",
+    unlock: "Available from start.",
+    image: 'assets/jokers/crafty_joker.png',
     sellValue: 2
   },
   {
@@ -147,15 +178,19 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🌗',
     description: "+20 Mult if played hand contains 3 or fewer cards",
+    unlock: "Available from start.",
+    image: 'assets/jokers/half_joker.png',
     sellValue: 2
   },
   {
-    id: 'joker_stencil',
+    id: 'stencil',
     name: "Joker Stencil",
     cost: 8,
     rarity: 'uncommon',
     icon: '📐',
     description: "X1 Mult for each empty Joker slot Joker Stencil included (Currently X1 )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/stencil.png',
     sellValue: 4
   },
   {
@@ -165,6 +200,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🖐️',
     description: "All Flushes and Straights can be made with 4 cards",
+    unlock: "Available from start.",
+    image: 'assets/jokers/four_fingers.png',
     sellValue: 3
   },
   {
@@ -174,6 +211,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🤫',
     description: "Retrigger all card held in hand abilities",
+    unlock: "Available from start.",
+    image: 'assets/jokers/mime.png',
     sellValue: 2
   },
   {
@@ -183,6 +222,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '💳',
     description: "Go up to -$20 in debt",
+    unlock: "Available from start.",
+    image: 'assets/jokers/credit_card.png',
     sellValue: 1
   },
   {
@@ -192,6 +233,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🗡️',
     description: "When Blind is selected, destroy Joker to the right and permanently add double its sell value to this Mult (Currently +0 Mult )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/ceremonial_dagger.png',
     sellValue: 3
   },
   {
@@ -201,6 +244,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🚩',
     description: "+30 Chips for each remaining discard",
+    unlock: "Available from start.",
+    image: 'assets/jokers/banner.png',
     sellValue: 2
   },
   {
@@ -210,6 +255,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🏔️',
     description: "+15 Mult when 0 discards remaining",
+    unlock: "Available from start.",
+    image: 'assets/jokers/mystic_summit.png',
     sellValue: 2
   },
   {
@@ -219,6 +266,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🏛️',
     description: "Adds one Stone card to the deck when Blind is selected",
+    unlock: "Available from start.",
+    image: 'assets/jokers/marble_joker.png',
     sellValue: 3
   },
   {
@@ -228,6 +277,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🎟️',
     description: "X4 Mult every 6 hands played 5 remaining",
+    unlock: "Available from start.",
+    image: 'assets/jokers/loyalty_card.png',
     sellValue: 2
   },
   {
@@ -237,6 +288,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🎱',
     description: "1 in 4 chance for each played 8 to create a Tarot card when scored (Must have room)",
+    unlock: "Available from start.",
+    image: 'assets/jokers/8_ball.png',
     sellValue: 2
   },
   {
@@ -246,6 +299,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🖨️',
     description: "+0-23 Mult",
+    unlock: "Available from start.",
+    image: 'assets/jokers/misprint.png',
     sellValue: 2
   },
   {
@@ -255,6 +310,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🌇',
     description: "Retrigger all played cards in final hand of the round",
+    unlock: "Available from start.",
+    image: 'assets/jokers/dusk.png',
     sellValue: 2
   },
   {
@@ -264,6 +321,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '✊',
     description: "Adds double the rank of lowest ranked card held in hand to Mult",
+    unlock: "Available from start.",
+    image: 'assets/jokers/raised_fist.png',
     sellValue: 2
   },
   {
@@ -273,6 +332,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🤡',
     description: "1 free Reroll per shop",
+    unlock: "Available from start.",
+    image: 'assets/jokers/chaos_the_clown.png',
     sellValue: 2
   },
   {
@@ -282,6 +343,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🐚',
     description: "Each played Ace , 2 , 3 , 5 , or 8 gives +8 Mult when scored",
+    unlock: "Available from start.",
+    image: 'assets/jokers/fibonacci.png',
     sellValue: 4
   },
   {
@@ -291,6 +354,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🔩',
     description: "Gives X0.2 Mult for each Steel Card in your full deck (Currently X1 Mult )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/steel_joker.png',
     sellValue: 3
   },
   {
@@ -300,6 +365,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '👹',
     description: "Played face cards give +30 Chips when scored",
+    unlock: "Available from start.",
+    image: 'assets/jokers/scary_face.png',
     sellValue: 2
   },
   {
@@ -309,6 +376,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🎨',
     description: "+3 Mult for each Joker card (Currently +0 Mult )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/abstract_joker.png',
     sellValue: 2
   },
   {
@@ -318,6 +387,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '⏳',
     description: "Earn $2 per discard if no discards are used by end of the round",
+    unlock: "Available from start.",
+    image: 'assets/jokers/delayed_gratification.png',
     sellValue: 2
   },
   {
@@ -327,6 +398,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🪓',
     description: "Retrigger each played 2 , 3 , 4 , or 5",
+    unlock: "Available from start.",
+    image: 'assets/jokers/hack.png',
     sellValue: 3
   },
   {
@@ -336,6 +409,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🗿',
     description: "All cards are considered face cards",
+    unlock: "Available from start.",
+    image: 'assets/jokers/pareidolia.png',
     sellValue: 2
   },
   {
@@ -345,6 +420,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🍌',
     description: "+15 Mult 1 in 6 chance this card is destroyed at end of round",
+    unlock: "Available from start.",
+    image: 'assets/jokers/gros_michel.png',
     sellValue: 2
   },
   {
@@ -354,6 +431,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '⚖️',
     description: "Played cards with even rank give +4 Mult when scored (10, 8, 6, 4, 2)",
+    unlock: "Available from start.",
+    image: 'assets/jokers/even_steven.png',
     sellValue: 2
   },
   {
@@ -363,6 +442,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🎯',
     description: "Played cards with odd rank give +31 Chips when scored (A, 9, 7, 5, 3)",
+    unlock: "Available from start.",
+    image: 'assets/jokers/odd_todd.png',
     sellValue: 2
   },
   {
@@ -372,6 +453,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🎓',
     description: "Played Aces give +20 Chips and +4 Mult when scored",
+    unlock: "Available from start.",
+    image: 'assets/jokers/scholar.png',
     sellValue: 2
   },
   {
@@ -381,6 +464,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '💼',
     description: "Played face cards have a 1 in 2 chance to give $2 when scored",
+    unlock: "Available from start.",
+    image: 'assets/jokers/business_card.png',
     sellValue: 2
   },
   {
@@ -390,6 +475,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🌟',
     description: "Adds the number of times poker hand has been played this run to Mult",
+    unlock: "Available from start.",
+    image: 'assets/jokers/supernova.png',
     sellValue: 2
   },
   {
@@ -399,6 +486,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🚌',
     description: "This Joker gains +1 Mult per consecutive hand played without a scoring face card (Currently +0 Mult )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/ride_the_bus.png',
     sellValue: 3
   },
   {
@@ -408,6 +497,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🚀',
     description: "1 in 4 chance to upgrade level of played poker hand",
+    unlock: "Available from start.",
+    image: 'assets/jokers/space_joker.png',
     sellValue: 2
   },
   {
@@ -417,6 +508,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🥚',
     description: "Gains $3 of sell value at end of round",
+    unlock: "Available from start.",
+    image: 'assets/jokers/egg.png',
     sellValue: 2
   },
   {
@@ -426,6 +519,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🦹',
     description: "When Blind is selected, gain +3 Hands and lose all discards",
+    unlock: "Available from start.",
+    image: 'assets/jokers/burglar.png',
     sellValue: 3
   },
   {
@@ -435,6 +530,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '⬛',
     description: "X3 Mult if all cards held in hand are Spades or Clubs",
+    unlock: "Available from start.",
+    image: 'assets/jokers/blackboard.png',
     sellValue: 3
   },
   {
@@ -444,6 +541,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🃏',
     description: "Gains +15 Chips if played hand contains a Straight (Currently +0 Chips )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/runner.png',
     sellValue: 2
   },
   {
@@ -453,6 +552,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🃏',
     description: "+100 Chips -5 Chips for every hand played",
+    unlock: "Available from start.",
+    image: 'assets/jokers/ice_cream.png',
     sellValue: 2
   },
   {
@@ -462,6 +563,8 @@ export const ALL_150_JOKERS = [
     rarity: 'rare',
     icon: '🃏',
     description: "If first hand of round has only 1 card, add a permanent copy to deck and draw it to hand",
+    unlock: "Available from start.",
+    image: 'assets/jokers/dna.png',
     sellValue: 4
   },
   {
@@ -471,6 +574,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🃏',
     description: "Every played card counts in scoring",
+    unlock: "Available from start.",
+    image: 'assets/jokers/splash.png',
     sellValue: 1
   },
   {
@@ -480,6 +585,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🃏',
     description: "+2 Chips for each remaining card in deck (Currently +104 Chips )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/blue_joker.png',
     sellValue: 2
   },
   {
@@ -489,6 +596,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🃏',
     description: "If first hand of round is a single 6 , destroy it and create a Spectral card (Must have room)",
+    unlock: "Available from start.",
+    image: 'assets/jokers/sixth_sense.png',
     sellValue: 3
   },
   {
@@ -498,6 +607,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🌌',
     description: "This Joker gains X0.1 Mult every time a Planet card is used (Currently X1 Mult )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/constellation.png',
     sellValue: 3
   },
   {
@@ -507,6 +618,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🥾',
     description: "Every played card permanently gains +5 Chips when scored",
+    unlock: "Available from start.",
+    image: 'assets/jokers/hiker.png',
     sellValue: 2
   },
   {
@@ -516,6 +629,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '👤',
     description: "Earn $5 if 3 or more face cards are discarded at the same time",
+    unlock: "Available from start.",
+    image: 'assets/jokers/faceless_joker.png',
     sellValue: 2
   },
   {
@@ -525,6 +640,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🍏',
     description: "+1 Mult per hand played -1 Mult per discard (Currently +0 Mult )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/green_joker.png',
     sellValue: 2
   },
   {
@@ -534,6 +651,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '⚛️',
     description: "Create a Tarot card if poker hand contains an Ace and a Straight (Must have room)",
+    unlock: "Available from start.",
+    image: 'assets/jokers/superposition.png',
     sellValue: 2
   },
   {
@@ -543,6 +662,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '📋',
     description: "Earn $4 if poker hand is a [Poker Hand] , poker hand changes at end of round",
+    unlock: "Available from start.",
+    image: 'assets/jokers/to_do_list.png',
     sellValue: 2
   },
   {
@@ -552,6 +673,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🍌',
     description: "X3 Mult 1 in 1000 chance this card is destroyed at the end of round",
+    unlock: "Available from start.",
+    image: 'assets/jokers/cavendish.png',
     sellValue: 2
   },
   {
@@ -561,6 +684,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🃏',
     description: "X3 Mult if played poker hand has already been played this round",
+    unlock: "Available from start.",
+    image: 'assets/jokers/card_sharp.png',
     sellValue: 3
   },
   {
@@ -570,6 +695,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🟥',
     description: "This Joker gains +3 Mult when any Booster Pack is skipped (Currently +0 Mult )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/red_card.png',
     sellValue: 2
   },
   {
@@ -579,6 +706,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🌪️',
     description: "When Small Blind or Big Blind is selected, gain X0.5 Mult and destroy a random Joker (Currently X1 Mult )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/madness.png',
     sellValue: 3
   },
   {
@@ -588,6 +717,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '⬛',
     description: "This Joker gains +4 Chips if played hand has exactly 4 cards (Currently 0 Chips )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/square_joker.png',
     sellValue: 2
   },
   {
@@ -597,6 +728,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🃏',
     description: "If poker hand is a Straight Flush , create a random Spectral card (Must have room)",
+    unlock: "Available from start.",
+    image: 'assets/jokers/s_ance.png',
     sellValue: 3
   },
   {
@@ -606,6 +739,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '👥',
     description: "When Blind is selected, create 2 Common Jokers (Must have room)",
+    unlock: "Available from start.",
+    image: 'assets/jokers/riff_raff.png',
     sellValue: 3
   },
   {
@@ -615,6 +750,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🧛',
     description: "This Joker gains X0.1 Mult per scoring Enhanced card played, removes card Enhancement (Currently X1 Mult )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/vampire.png',
     sellValue: 3
   },
   {
@@ -624,6 +761,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '⚡',
     description: "Allows Straights to be made with gaps of 1 rank (ex: 10 8 6 5 3 )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/shortcut.png',
     sellValue: 3
   },
   {
@@ -633,6 +772,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '💿',
     description: "This Joker gains X0.25 Mult every time a playing card is added to your deck (Currently X1 Mult )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/hologram.png',
     sellValue: 3
   },
   {
@@ -642,6 +783,8 @@ export const ALL_150_JOKERS = [
     rarity: 'rare',
     icon: '🎒',
     description: "Create a Tarot card if hand is played with $4 or less",
+    unlock: "Available from start.",
+    image: 'assets/jokers/vagabond.png',
     sellValue: 4
   },
   {
@@ -651,6 +794,8 @@ export const ALL_150_JOKERS = [
     rarity: 'rare',
     icon: '🤴',
     description: "Each King held in hand gives X1.5 Mult",
+    unlock: "Available from start.",
+    image: 'assets/jokers/baron.png',
     sellValue: 4
   },
   {
@@ -660,6 +805,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '☁️',
     description: "Earn $1 for each 9 in your full deck at end of round (Currently $4 )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/cloud_9.png',
     sellValue: 3
   },
   {
@@ -669,6 +816,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🚀',
     description: "Earn $1 at end of round. Payout increases by $2 when Boss Blind is defeated",
+    unlock: "Available from start.",
+    image: 'assets/jokers/rocket.png',
     sellValue: 3
   },
   {
@@ -678,6 +827,8 @@ export const ALL_150_JOKERS = [
     rarity: 'rare',
     icon: '🗿',
     description: "This Joker gains X0.2 Mult per consecutive hand played without playing your most played poker hand (Currently X1 Mult )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/obelisk.png',
     sellValue: 4
   },
   {
@@ -687,6 +838,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🎭',
     description: "All played face cards become Gold cards when scored",
+    unlock: "Available from start.",
+    image: 'assets/jokers/midas_mask.png',
     sellValue: 3
   },
   {
@@ -696,6 +849,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🤼',
     description: "Sell this card to disable the current Boss Blind",
+    unlock: "Available from start.",
+    image: 'assets/jokers/luchador.png',
     sellValue: 2
   },
   {
@@ -705,6 +860,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '📷',
     description: "First played face card gives X2 Mult when scored",
+    unlock: "Available from start.",
+    image: 'assets/jokers/photograph.png',
     sellValue: 2
   },
   {
@@ -714,6 +871,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🎁',
     description: "Add $1 of sell value to every Joker and Consumable card at end of round",
+    unlock: "Available from start.",
+    image: 'assets/jokers/gift_card.png',
     sellValue: 3
   },
   {
@@ -723,6 +882,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🐢',
     description: "+5 hand size, reduces by 1 each round",
+    unlock: "Available from start.",
+    image: 'assets/jokers/turtle_bean.png',
     sellValue: 3
   },
   {
@@ -732,6 +893,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🌊',
     description: "+4 Mult for each card below [the deck's starting size] in your full deck (Currently +0 Mult )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/erosion.png',
     sellValue: 3
   },
   {
@@ -741,6 +904,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🅿️',
     description: "Each face card held in hand has a 1 in 2 chance to give $1",
+    unlock: "Available from start.",
+    image: 'assets/jokers/reserved_parking.png',
     sellValue: 3
   },
   {
@@ -750,6 +915,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '✉️',
     description: "Earn $5 for each discarded [rank] , rank changes every round",
+    unlock: "Available from start.",
+    image: 'assets/jokers/mail_in_rebate.png',
     sellValue: 2
   },
   {
@@ -759,6 +926,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🌕',
     description: "Earn an extra $1 of interest for every $5 you have at end of round",
+    unlock: "Available from start.",
+    image: 'assets/jokers/to_the_moon.png',
     sellValue: 2
   },
   {
@@ -768,6 +937,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🍄',
     description: "1 in 2 chance to create a Tarot card when any Booster Pack is opened (Must have room)",
+    unlock: "Available from start.",
+    image: 'assets/jokers/hallucination.png',
     sellValue: 2
   },
   {
@@ -777,6 +948,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🔮',
     description: "+1 Mult per Tarot card used this run (Currently +0 )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/fortune_teller.png',
     sellValue: 3
   },
   {
@@ -786,6 +959,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🤹',
     description: "+1 hand size",
+    unlock: "Available from start.",
+    image: 'assets/jokers/juggler.png',
     sellValue: 2
   },
   {
@@ -795,6 +970,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🍺',
     description: "+1 discard each round",
+    unlock: "Available from start.",
+    image: 'assets/jokers/drunkard.png',
     sellValue: 2
   },
   {
@@ -804,6 +981,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🪨',
     description: "Gives +25 Chips for each Stone Card in your full deck (Currently +0 Chips )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/stone_joker.png',
     sellValue: 3
   },
   {
@@ -813,6 +992,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '💰',
     description: "Earn $4 at end of round",
+    unlock: "Available from start.",
+    image: 'assets/jokers/golden_joker.png',
     sellValue: 3
   },
   {
@@ -822,6 +1003,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🐱',
     description: "This Joker gains X0.25 Mult every time a Lucky card successfully triggers (Currently X1 Mult )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/lucky_cat.png',
     sellValue: 3
   },
   {
@@ -831,6 +1014,8 @@ export const ALL_150_JOKERS = [
     rarity: 'rare',
     icon: '⚾',
     description: "Uncommon Jokers each give X1.5 Mult",
+    unlock: "Available from start.",
+    image: 'assets/jokers/baseball_card.png',
     sellValue: 4
   },
   {
@@ -840,6 +1025,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🐂',
     description: "+2 Chips for each $1 you have (Currently +0 Chips )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/bull.png',
     sellValue: 3
   },
   {
@@ -849,6 +1036,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🥤',
     description: "Sell this card to create a free Double Tag",
+    unlock: "Available from start.",
+    image: 'assets/jokers/diet_cola.png',
     sellValue: 3
   },
   {
@@ -858,6 +1047,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🎴',
     description: "If first discard of round has only 1 card, destroy it and earn $3",
+    unlock: "Available from start.",
+    image: 'assets/jokers/trading_card.png',
     sellValue: 3
   },
   {
@@ -867,6 +1058,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '📑',
     description: "This Joker gains +2 Mult per reroll in the shop (Currently +0 Mult )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/flash_card.png',
     sellValue: 2
   },
   {
@@ -876,6 +1069,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🍿',
     description: "+20 Mult -4 Mult per round played",
+    unlock: "Available from start.",
+    image: 'assets/jokers/popcorn.png',
     sellValue: 2
   },
   {
@@ -885,6 +1080,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '👖',
     description: "This Joker gains +2 Mult if played hand contains a Two Pair (Currently +0 Mult )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/spare_trousers.png',
     sellValue: 3
   },
   {
@@ -894,6 +1091,8 @@ export const ALL_150_JOKERS = [
     rarity: 'rare',
     icon: '🏺',
     description: "Each played card with [suit] gives X1.5 Mult when scored, suit changes at end of round",
+    unlock: "Available from start.",
+    image: 'assets/jokers/ancient_joker.png',
     sellValue: 4
   },
   {
@@ -903,6 +1102,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🍜',
     description: "X2 Mult , loses X0.01 Mult per card discarded",
+    unlock: "Available from start.",
+    image: 'assets/jokers/ramen.png',
     sellValue: 3
   },
   {
@@ -912,6 +1113,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '📻',
     description: "Each played 10 or 4 gives +10 Chips and +4 Mult when scored",
+    unlock: "Available from start.",
+    image: 'assets/jokers/walkie_talkie.png',
     sellValue: 2
   },
   {
@@ -921,6 +1124,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🫧',
     description: "Retrigger all cards played for the next 10 hands",
+    unlock: "Available from start.",
+    image: 'assets/jokers/seltzer.png',
     sellValue: 3
   },
   {
@@ -930,6 +1135,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🏰',
     description: "This Joker gains +3 Chips per discarded [suit] card, suit changes every round (Currently +0 Chips )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/castle.png',
     sellValue: 3
   },
   {
@@ -939,6 +1146,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '😃',
     description: "Played face cards give +5 Mult when scored",
+    unlock: "Available from start.",
+    image: 'assets/jokers/smiley_face.png',
     sellValue: 2
   },
   {
@@ -948,6 +1157,8 @@ export const ALL_150_JOKERS = [
     rarity: 'rare',
     icon: '🔥',
     description: "This Joker gains X0.25 Mult for each card sold , resets when Boss Blind is defeated (Currently X1 Mult )",
+    unlock: "Available from start.",
+    image: 'assets/jokers/campfire.png',
     sellValue: 4
   },
   {
@@ -957,6 +1168,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🎫',
     description: "Played Gold cards earn $4 when scored",
+    unlock: "Play a 5 card hand that contains only Gold cards",
+    image: 'assets/jokers/golden_ticket.png',
     sellValue: 2
   },
   {
@@ -966,6 +1179,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '💀',
     description: "Prevents Death if chips scored are at least 25% of required chips self destructs",
+    unlock: "Lose 5 runs",
+    image: 'assets/jokers/mr_bones.png',
     sellValue: 2
   },
   {
@@ -975,6 +1190,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🎪',
     description: "X3 Mult on final hand of round",
+    unlock: "Play 200 hands",
+    image: 'assets/jokers/acrobat.png',
     sellValue: 3
   },
   {
@@ -984,6 +1201,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🎭',
     description: "Retrigger all played face cards",
+    unlock: "Play a total of 300 face cards",
+    image: 'assets/jokers/sock_and_buskin.png',
     sellValue: 3
   },
   {
@@ -993,6 +1212,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '⚔️',
     description: "Adds the sell value of all other owned Jokers to Mult (Currently +1 Mult )",
+    unlock: "Sell a total of 20 Joker cards",
+    image: 'assets/jokers/swashbuckler.png',
     sellValue: 2
   },
   {
@@ -1002,6 +1223,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🎵',
     description: "+2 hand size, -1 hand each round",
+    unlock: "Win 5 consecutive rounds by playing only 1 hand",
+    image: 'assets/jokers/troubadour.png',
     sellValue: 3
   },
   {
@@ -1011,6 +1234,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '📜',
     description: "When round begins, add a random playing card with a random seal to your hand",
+    unlock: "Have a Gold playing card with a Gold Seal",
+    image: 'assets/jokers/certificate.png',
     sellValue: 3
   },
   {
@@ -1020,6 +1245,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🖌️',
     description: "Hearts and Diamonds count as the same suit, Spades and Clubs count as the same suit",
+    unlock: "Have at least 3 Wild Card in your deck",
+    image: 'assets/jokers/smeared_joker.png',
     sellValue: 3
   },
   {
@@ -1029,6 +1256,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '⏪',
     description: "X0.25 Mult for each Blind skipped this run (Currently X1 Mult )",
+    unlock: "Continue a saved run from the main menu",
+    image: 'assets/jokers/throwback.png',
     sellValue: 3
   },
   {
@@ -1038,6 +1267,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🗳️',
     description: "Retrigger first played card used in scoring 2 additional times",
+    unlock: "Beat a Boss Blind with a High Card",
+    image: 'assets/jokers/hanging_chad.png',
     sellValue: 2
   },
   {
@@ -1047,6 +1278,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '💎',
     description: "Played cards with Diamond suit earn $1 when scored",
+    unlock: "Have at least 30 cards with Diamond suit in your deck",
+    image: 'assets/jokers/rough_gem.png',
     sellValue: 3
   },
   {
@@ -1056,6 +1289,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🩸',
     description: "1 in 2 chance for played cards with Heart suit to give X1.5 Mult when scored",
+    unlock: "Have at least 30 cards with Heart suit in your deck",
+    image: 'assets/jokers/bloodstone.png',
     sellValue: 3
   },
   {
@@ -1065,6 +1300,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🏹',
     description: "Played cards with Spade suit give +50 Chips when scored",
+    unlock: "Have at least 30 cards with Spade suit in your deck",
+    image: 'assets/jokers/arrowhead.png',
     sellValue: 3
   },
   {
@@ -1074,6 +1311,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🖤',
     description: "Played cards with Club suit give +7 Mult when scored",
+    unlock: "Have at least 30 cards with Club suit in your deck",
+    image: 'assets/jokers/onyx_agate.png',
     sellValue: 3
   },
   {
@@ -1083,6 +1322,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🥛',
     description: "This Joker gains X0.75 Mult for every Glass Card that is destroyed (Currently X1 Mult )",
+    unlock: "Have at least 5 Glass Cards in your deck",
+    image: 'assets/jokers/glass_joker.png',
     sellValue: 3
   },
   {
@@ -1092,6 +1333,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🎪',
     description: "Joker , Tarot , Planet , and Spectral cards may appear multiple times",
+    unlock: "Reach Ante level 4",
+    image: 'assets/jokers/showman.png',
     sellValue: 2
   },
   {
@@ -1101,6 +1344,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🪴',
     description: "X3 Mult if poker hand contains a Diamond card, Club card, Heart card, and Spade card",
+    unlock: "Reach Ante level 8",
+    image: 'assets/jokers/flower_pot.png',
     sellValue: 3
   },
   {
@@ -1110,6 +1355,8 @@ export const ALL_150_JOKERS = [
     rarity: 'rare',
     icon: '📐',
     description: "Copies ability of Joker to the right",
+    unlock: "Win a run",
+    image: 'assets/jokers/blueprint.png',
     sellValue: 5
   },
   {
@@ -1119,6 +1366,8 @@ export const ALL_150_JOKERS = [
     rarity: 'rare',
     icon: '👶',
     description: "This Joker gains +8 Chips when each played 2 is scored (Currently +0 Chips )",
+    unlock: "Win a run in 18 or fewer rounds",
+    image: 'assets/jokers/wee_joker.png',
     sellValue: 4
   },
   {
@@ -1128,6 +1377,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🎠',
     description: "+3 discards each round, -1 hand size",
+    unlock: "Win a run in 12 or fewer rounds",
+    image: 'assets/jokers/merry_andy.png',
     sellValue: 3
   },
   {
@@ -1136,7 +1387,9 @@ export const ALL_150_JOKERS = [
     cost: 4,
     rarity: 'uncommon',
     icon: '🎲',
-    description: "Doubles all listed probabilities (ex: 1 in 3 -&gt; 2 in 3 )",
+    description: "Doubles all listed probabilities (ex: 1 in 3 -> 2 in 3 )",
+    unlock: "In one hand, earn at least 10,000 chips",
+    image: 'assets/jokers/oops_all_6s.png',
     sellValue: 2
   },
   {
@@ -1146,6 +1399,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🗿',
     description: "Each played [rank] of [suit] gives X2 Mult when scored Card changes every round",
+    unlock: "In one hand, earn at least 1,000,000 chips",
+    image: 'assets/jokers/the_idol.png',
     sellValue: 3
   },
   {
@@ -1155,6 +1410,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '👀',
     description: "X2 Mult if played hand has a scoring Club card and a scoring card of any other suit",
+    unlock: "Play a hand that contains four 7 of Clubs",
+    image: 'assets/jokers/seeing_double.png',
     sellValue: 3
   },
   {
@@ -1164,6 +1421,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🐂',
     description: "Earn $8 if played hand triggers the Boss Blind ability",
+    unlock: "Defeat a Boss Blind in 1 hand without using any discards",
+    image: 'assets/jokers/matador.png',
     sellValue: 3
   },
   {
@@ -1173,6 +1432,8 @@ export const ALL_150_JOKERS = [
     rarity: 'rare',
     icon: '🛣️',
     description: "This Joker gains X0.5 Mult for every Jack discarded this round (Currently X1 Mult )",
+    unlock: "Discard 5 Jacks at the same time.",
+    image: 'assets/jokers/hit_the_road.png',
     sellValue: 4
   },
   {
@@ -1182,6 +1443,8 @@ export const ALL_150_JOKERS = [
     rarity: 'rare',
     icon: '👥',
     description: "X2 Mult if played hand contains a Pair",
+    unlock: "Win a run without playing a Pair .",
+    image: 'assets/jokers/the_duo.png',
     sellValue: 4
   },
   {
@@ -1191,6 +1454,8 @@ export const ALL_150_JOKERS = [
     rarity: 'rare',
     icon: '🔱',
     description: "X3 Mult if played hand contains a Three of a Kind",
+    unlock: "Win a run without playing a Three of a Kind .",
+    image: 'assets/jokers/the_trio.png',
     sellValue: 4
   },
   {
@@ -1200,6 +1465,8 @@ export const ALL_150_JOKERS = [
     rarity: 'rare',
     icon: '👨‍👩‍👧',
     description: "X4 Mult if played hand contains a Four of a Kind",
+    unlock: "Win a run without playing a Four of a Kind .",
+    image: 'assets/jokers/the_family.png',
     sellValue: 4
   },
   {
@@ -1209,6 +1476,8 @@ export const ALL_150_JOKERS = [
     rarity: 'rare',
     icon: '🎖️',
     description: "X3 Mult if played hand contains a Straight",
+    unlock: "Win a run without playing a Straight .",
+    image: 'assets/jokers/the_order.png',
     sellValue: 4
   },
   {
@@ -1218,6 +1487,8 @@ export const ALL_150_JOKERS = [
     rarity: 'rare',
     icon: '⛺',
     description: "X2 Mult if played hand contains a Flush",
+    unlock: "Win a run without playing a Flush .",
+    image: 'assets/jokers/the_tribe.png',
     sellValue: 4
   },
   {
@@ -1227,6 +1498,8 @@ export const ALL_150_JOKERS = [
     rarity: 'rare',
     icon: '🤸',
     description: "+250 Chips , -2 hand size",
+    unlock: "Earn at least 100 million (100,000,000) Chips in a single hand.",
+    image: 'assets/jokers/stuntman.png',
     sellValue: 3
   },
   {
@@ -1236,6 +1509,8 @@ export const ALL_150_JOKERS = [
     rarity: 'rare',
     icon: '👻',
     description: "After 2 rounds, sell this card to Duplicate a random Joker (Currently 0 /2) (Removes Negative from copy)",
+    unlock: "Win a run without ever having more than 4 Jokers",
+    image: 'assets/jokers/invisible_joker.png',
     sellValue: 4
   },
   {
@@ -1245,6 +1520,8 @@ export const ALL_150_JOKERS = [
     rarity: 'rare',
     icon: '🧠',
     description: "Copies the ability of leftmost Joker",
+    unlock: "Discard a Royal Flush .",
+    image: 'assets/jokers/brainstorm.png',
     sellValue: 5
   },
   {
@@ -1254,6 +1531,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🛰️',
     description: "Earn $1 at end of round per unique Planet card used this run",
+    unlock: "Have at least $400 .",
+    image: 'assets/jokers/satellite.png',
     sellValue: 3
   },
   {
@@ -1263,6 +1542,8 @@ export const ALL_150_JOKERS = [
     rarity: 'common',
     icon: '🌙',
     description: "Each Queen held in hand gives +13 Mult",
+    unlock: "Play every Heart card in your deck in one round.",
+    image: 'assets/jokers/shoot_the_moon.png',
     sellValue: 2
   },
   {
@@ -1272,6 +1553,8 @@ export const ALL_150_JOKERS = [
     rarity: 'rare',
     icon: '🪪',
     description: "X3 Mult if you have at least 16 Enhanced cards in your full deck (Currently 0 )",
+    unlock: "Enhance 16 cards in your deck",
+    image: 'assets/jokers/driver_s_license.png',
     sellValue: 3
   },
   {
@@ -1281,6 +1564,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🃏',
     description: "Create a Tarot card when Blind is selected (Must have room)",
+    unlock: "Discover every Tarot card.",
+    image: 'assets/jokers/cartomancer.png',
     sellValue: 3
   },
   {
@@ -1290,6 +1575,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '🔭',
     description: "All Planet cards and Celestial Packs in the shop are free",
+    unlock: "Discover every Planet card",
+    image: 'assets/jokers/astronomer.png',
     sellValue: 4
   },
   {
@@ -1299,6 +1586,8 @@ export const ALL_150_JOKERS = [
     rarity: 'rare',
     icon: '🔥',
     description: "Upgrade the level of the first discarded poker hand each round",
+    unlock: "Sell 50 cards.",
+    image: 'assets/jokers/burnt_joker.png',
     sellValue: 4
   },
   {
@@ -1308,6 +1597,8 @@ export const ALL_150_JOKERS = [
     rarity: 'uncommon',
     icon: '👢',
     description: "+2 Mult for every $5 you have (Currently +0 Mult )",
+    unlock: "Have at least 2 Polychrome Jokers at the same time.",
+    image: 'assets/jokers/bootstraps.png',
     sellValue: 3
   },
   {
@@ -1315,8 +1606,10 @@ export const ALL_150_JOKERS = [
     name: "Canio",
     cost: 20,
     rarity: 'legendary',
-    icon: '🃏',
+    icon: '👑',
     description: "This Joker gains X1 Mult when a face card is destroyed (Currently X1 Mult )",
+    unlock: "Find this Joker from the Soul card.",
+    image: 'assets/jokers/canio.png',
     sellValue: 10
   },
   {
@@ -1326,6 +1619,8 @@ export const ALL_150_JOKERS = [
     rarity: 'legendary',
     icon: '🃏',
     description: "Played Kings and Queens each give X2 Mult when scored",
+    unlock: "Find this Joker from the Soul card.",
+    image: 'assets/jokers/triboulet.png',
     sellValue: 10
   },
   {
@@ -1335,6 +1630,8 @@ export const ALL_150_JOKERS = [
     rarity: 'legendary',
     icon: '💀',
     description: "This Joker gains X1 Mult every 23 [23] cards discarded (Currently X1 Mult )",
+    unlock: "Find this Joker from the Soul card.",
+    image: 'assets/jokers/yorick.png',
     sellValue: 10
   },
   {
@@ -1344,6 +1641,8 @@ export const ALL_150_JOKERS = [
     rarity: 'legendary',
     icon: '🤡',
     description: "Disables effect of every Boss Blind",
+    unlock: "Find this Joker from the Soul card.",
+    image: 'assets/jokers/chicot.png',
     sellValue: 10
   },
   {
@@ -1353,6 +1652,8 @@ export const ALL_150_JOKERS = [
     rarity: 'legendary',
     icon: '✨',
     description: "Creates a Negative copy of 1 random consumable card in your possession at the end of the shop",
+    unlock: "Find this Joker from the Soul card.",
+    image: 'assets/jokers/perkeo.png',
     sellValue: 10
   },
 ];

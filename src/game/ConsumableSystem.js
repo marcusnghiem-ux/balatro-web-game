@@ -4,13 +4,38 @@
  * consumable slot management (default: 2), and immediate active execution logic.
  */
 
-import { ENHANCEMENTS, EDITIONS, RANKS } from './Card.js';
+import { Card, ENHANCEMENTS, EDITIONS, RANKS } from './Card.js';
 
 export const CONSUMABLE_TYPES = {
   TAROT: 'Tarot',
   PLANET: 'Planet',
   SPECTRAL: 'Spectral'
 };
+
+/**
+ * Helper to resolve target cards whether inside Blind or inside Shop
+ */
+function resolveTarotTargetCards(gameState, minCount = 1, maxCount = 2) {
+  let selected = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
+  if (selected.length >= minCount && selected.length <= maxCount) {
+    return selected;
+  }
+  // In shop or when no hand cards are selected: target cards from deck
+  if (gameState.state === 'SHOP' || !gameState.hand || gameState.hand.length === 0) {
+    if (gameState.deck && gameState.deck.length >= minCount) {
+      return gameState.deck.slice(0, Math.min(maxCount, gameState.deck.length));
+    }
+  }
+  return selected;
+}
+
+function canUseTarotOnCards(gameState, minCount = 1, maxCount = 2) {
+  if (gameState.state === 'SHOP' || !gameState.hand || gameState.hand.length === 0) {
+    return Boolean(gameState.deck && gameState.deck.length >= minCount);
+  }
+  const selected = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
+  return selected.length >= minCount && selected.length <= maxCount;
+}
 
 export const TAROT_CARDS = [
   {
@@ -21,7 +46,7 @@ export const TAROT_CARDS = [
     sellValue: 1,
     icon: '🧙‍♂️',
     description: 'Doubles money (Max +$20)',
-    canUse: (gameState) => true,
+    canUse: () => true,
     execute: (gameState) => {
       const gain = Math.min(20, Math.max(0, gameState.money));
       gameState.money += gain;
@@ -36,14 +61,11 @@ export const TAROT_CARDS = [
     sellValue: 1,
     icon: '☀️',
     description: 'Converts up to 3 selected cards to Hearts',
-    canUse: (gameState) => {
-      const selected = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
-      return selected.length >= 1 && selected.length <= 3;
-    },
+    canUse: (gameState) => canUseTarotOnCards(gameState, 1, 3),
     execute: (gameState) => {
-      const selected = gameState.getSelectedCards();
-      selected.forEach(c => { c.suit = 'hearts'; });
-      return { success: true, message: `Converted ${selected.length} cards to Hearts!` };
+      const targetCards = resolveTarotTargetCards(gameState, 1, 3);
+      targetCards.forEach(c => { c.suit = 'hearts'; });
+      return { success: true, message: `Converted ${targetCards.length} card(s) to Hearts!` };
     }
   },
   {
@@ -54,14 +76,11 @@ export const TAROT_CARDS = [
     sellValue: 1,
     icon: '🌙',
     description: 'Converts up to 3 selected cards to Clubs',
-    canUse: (gameState) => {
-      const selected = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
-      return selected.length >= 1 && selected.length <= 3;
-    },
+    canUse: (gameState) => canUseTarotOnCards(gameState, 1, 3),
     execute: (gameState) => {
-      const selected = gameState.getSelectedCards();
-      selected.forEach(c => { c.suit = 'clubs'; });
-      return { success: true, message: `Converted ${selected.length} cards to Clubs!` };
+      const targetCards = resolveTarotTargetCards(gameState, 1, 3);
+      targetCards.forEach(c => { c.suit = 'clubs'; });
+      return { success: true, message: `Converted ${targetCards.length} card(s) to Clubs!` };
     }
   },
   {
@@ -72,14 +91,11 @@ export const TAROT_CARDS = [
     sellValue: 1,
     icon: '⭐',
     description: 'Converts up to 3 selected cards to Diamonds',
-    canUse: (gameState) => {
-      const selected = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
-      return selected.length >= 1 && selected.length <= 3;
-    },
+    canUse: (gameState) => canUseTarotOnCards(gameState, 1, 3),
     execute: (gameState) => {
-      const selected = gameState.getSelectedCards();
-      selected.forEach(c => { c.suit = 'diamonds'; });
-      return { success: true, message: `Converted ${selected.length} cards to Diamonds!` };
+      const targetCards = resolveTarotTargetCards(gameState, 1, 3);
+      targetCards.forEach(c => { c.suit = 'diamonds'; });
+      return { success: true, message: `Converted ${targetCards.length} card(s) to Diamonds!` };
     }
   },
   {
@@ -90,14 +106,11 @@ export const TAROT_CARDS = [
     sellValue: 1,
     icon: '🌍',
     description: 'Converts up to 3 selected cards to Spades',
-    canUse: (gameState) => {
-      const selected = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
-      return selected.length >= 1 && selected.length <= 3;
-    },
+    canUse: (gameState) => canUseTarotOnCards(gameState, 1, 3),
     execute: (gameState) => {
-      const selected = gameState.getSelectedCards();
-      selected.forEach(c => { c.suit = 'spades'; });
-      return { success: true, message: `Converted ${selected.length} cards to Spades!` };
+      const targetCards = resolveTarotTargetCards(gameState, 1, 3);
+      targetCards.forEach(c => { c.suit = 'spades'; });
+      return { success: true, message: `Converted ${targetCards.length} card(s) to Spades!` };
     }
   },
   {
@@ -108,20 +121,17 @@ export const TAROT_CARDS = [
     sellValue: 1,
     icon: '🦁',
     description: 'Increases rank of up to 2 selected cards by 1',
-    canUse: (gameState) => {
-      const selected = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
-      return selected.length >= 1 && selected.length <= 2;
-    },
+    canUse: (gameState) => canUseTarotOnCards(gameState, 1, 2),
     execute: (gameState) => {
-      const selected = gameState.getSelectedCards();
-      selected.forEach(card => {
+      const targetCards = resolveTarotTargetCards(gameState, 1, 2);
+      targetCards.forEach(card => {
         const curIdx = RANKS.indexOf(card.rank);
         if (curIdx !== -1 && curIdx < RANKS.length - 1) {
           card.rank = RANKS[curIdx + 1];
           card.order = card.order + 1;
         }
       });
-      return { success: true, message: `Strength: Upgraded ${selected.length} cards!` };
+      return { success: true, message: `Strength: Upgraded ${targetCards.length} card(s)!` };
     }
   },
   {
@@ -132,14 +142,11 @@ export const TAROT_CARDS = [
     sellValue: 1,
     icon: '👑',
     description: 'Enhances up to 2 selected cards to Mult cards (+4 Mult)',
-    canUse: (gameState) => {
-      const selected = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
-      return selected.length >= 1 && selected.length <= 2;
-    },
+    canUse: (gameState) => canUseTarotOnCards(gameState, 1, 2),
     execute: (gameState) => {
-      const selected = gameState.getSelectedCards();
-      selected.forEach(c => { c.enhancement = ENHANCEMENTS.MULT; });
-      return { success: true, message: `The Empress: Enhanced ${selected.length} cards to Mult!` };
+      const targetCards = resolveTarotTargetCards(gameState, 1, 2);
+      targetCards.forEach(c => { c.enhancement = ENHANCEMENTS.MULT; });
+      return { success: true, message: `The Empress: Enhanced ${targetCards.length} card(s) to Mult!` };
     }
   },
   {
@@ -150,14 +157,11 @@ export const TAROT_CARDS = [
     sellValue: 1,
     icon: '📜',
     description: 'Enhances up to 2 selected cards to Bonus cards (+30 Chips)',
-    canUse: (gameState) => {
-      const selected = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
-      return selected.length >= 1 && selected.length <= 2;
-    },
+    canUse: (gameState) => canUseTarotOnCards(gameState, 1, 2),
     execute: (gameState) => {
-      const selected = gameState.getSelectedCards();
-      selected.forEach(c => { c.enhancement = ENHANCEMENTS.BONUS; });
-      return { success: true, message: `The Hierophant: Enhanced ${selected.length} cards to Bonus Chips!` };
+      const targetCards = resolveTarotTargetCards(gameState, 1, 2);
+      targetCards.forEach(c => { c.enhancement = ENHANCEMENTS.BONUS; });
+      return { success: true, message: `The Hierophant: Enhanced ${targetCards.length} card(s) to Bonus Chips!` };
     }
   },
   {
@@ -168,14 +172,14 @@ export const TAROT_CARDS = [
     sellValue: 1,
     icon: '🛡️',
     description: 'Enhances 1 selected card into a Steel card (×1.5 Mult in hand)',
-    canUse: (gameState) => {
-      const selected = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
-      return selected.length === 1;
-    },
+    canUse: (gameState) => canUseTarotOnCards(gameState, 1, 1),
     execute: (gameState) => {
-      const selected = gameState.getSelectedCards();
-      selected[0].enhancement = ENHANCEMENTS.STEEL;
-      return { success: true, message: `The Chariot: Card enhanced to Steel!` };
+      const targetCards = resolveTarotTargetCards(gameState, 1, 1);
+      if (targetCards.length > 0) {
+        targetCards[0].enhancement = ENHANCEMENTS.STEEL;
+        return { success: true, message: `The Chariot: Enhanced card to Steel (×1.5 Mult)!` };
+      }
+      return { success: false, message: 'No card selected' };
     }
   },
   {
@@ -186,14 +190,14 @@ export const TAROT_CARDS = [
     sellValue: 1,
     icon: '❤️',
     description: 'Enhances 1 selected card into a Wild card',
-    canUse: (gameState) => {
-      const selected = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
-      return selected.length === 1;
-    },
+    canUse: (gameState) => canUseTarotOnCards(gameState, 1, 1),
     execute: (gameState) => {
-      const selected = gameState.getSelectedCards();
-      selected[0].enhancement = ENHANCEMENTS.WILD;
-      return { success: true, message: `The Lovers: Card enhanced to Wild!` };
+      const targetCards = resolveTarotTargetCards(gameState, 1, 1);
+      if (targetCards.length > 0) {
+        targetCards[0].enhancement = ENHANCEMENTS.WILD;
+        return { success: true, message: `The Lovers: Enhanced card to Wild!` };
+      }
+      return { success: false, message: 'No card selected' };
     }
   },
   {
@@ -204,14 +208,14 @@ export const TAROT_CARDS = [
     sellValue: 1,
     icon: '⚖️',
     description: 'Enhances 1 selected card into a Glass card (×2 Mult)',
-    canUse: (gameState) => {
-      const selected = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
-      return selected.length === 1;
-    },
+    canUse: (gameState) => canUseTarotOnCards(gameState, 1, 1),
     execute: (gameState) => {
-      const selected = gameState.getSelectedCards();
-      selected[0].enhancement = ENHANCEMENTS.GLASS;
-      return { success: true, message: `Justice: Card mutated into Glass Card (×2 Mult)!` };
+      const targetCards = resolveTarotTargetCards(gameState, 1, 1);
+      if (targetCards.length > 0) {
+        targetCards[0].enhancement = ENHANCEMENTS.GLASS;
+        return { success: true, message: `Justice: Mutated card into Glass Card (×2 Mult)!` };
+      }
+      return { success: false, message: 'No card selected' };
     }
   },
   {
@@ -222,14 +226,14 @@ export const TAROT_CARDS = [
     sellValue: 1,
     icon: '🗼',
     description: 'Enhances 1 selected card into a Stone card (+50 Chips, no rank/suit)',
-    canUse: (gameState) => {
-      const selected = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
-      return selected.length === 1;
-    },
+    canUse: (gameState) => canUseTarotOnCards(gameState, 1, 1),
     execute: (gameState) => {
-      const selected = gameState.getSelectedCards();
-      selected[0].enhancement = ENHANCEMENTS.STONE;
-      return { success: true, message: `The Tower: Card mutated into Stone Card (+50 Chips)!` };
+      const targetCards = resolveTarotTargetCards(gameState, 1, 1);
+      if (targetCards.length > 0) {
+        targetCards[0].enhancement = ENHANCEMENTS.STONE;
+        return { success: true, message: `The Tower: Mutated card into Stone Card (+50 Chips)!` };
+      }
+      return { success: false, message: 'No card selected' };
     }
   },
   {
@@ -240,14 +244,14 @@ export const TAROT_CARDS = [
     sellValue: 1,
     icon: '😈',
     description: 'Enhances 1 selected card into a Gold card (+$3 if held at end of round)',
-    canUse: (gameState) => {
-      const selected = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
-      return selected.length === 1;
-    },
+    canUse: (gameState) => canUseTarotOnCards(gameState, 1, 1),
     execute: (gameState) => {
-      const selected = gameState.getSelectedCards();
-      selected[0].enhancement = ENHANCEMENTS.GOLD;
-      return { success: true, message: `The Devil: Card mutated into Gold Card (+$3 Cash)!` };
+      const targetCards = resolveTarotTargetCards(gameState, 1, 1);
+      if (targetCards.length > 0) {
+        targetCards[0].enhancement = ENHANCEMENTS.GOLD;
+        return { success: true, message: `The Devil: Mutated card into Gold Card (+$3 Cash)!` };
+      }
+      return { success: false, message: 'No card selected' };
     }
   },
   {
@@ -258,14 +262,11 @@ export const TAROT_CARDS = [
     sellValue: 1,
     icon: '🪄',
     description: 'Enhances up to 2 selected cards into Lucky cards',
-    canUse: (gameState) => {
-      const selected = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
-      return selected.length >= 1 && selected.length <= 2;
-    },
+    canUse: (gameState) => canUseTarotOnCards(gameState, 1, 2),
     execute: (gameState) => {
-      const selected = gameState.getSelectedCards();
-      selected.forEach(c => { c.enhancement = ENHANCEMENTS.LUCKY; });
-      return { success: true, message: `The Magician: Mutated ${selected.length} card(s) into Lucky Cards!` };
+      const targetCards = resolveTarotTargetCards(gameState, 1, 2);
+      targetCards.forEach(c => { c.enhancement = ENHANCEMENTS.LUCKY; });
+      return { success: true, message: `The Magician: Mutated ${targetCards.length} card(s) into Lucky Cards!` };
     }
   },
   {
@@ -276,21 +277,21 @@ export const TAROT_CARDS = [
     sellValue: 1,
     icon: '💀',
     description: 'Select 2 cards: converts the left card into a copy of the right card',
-    canUse: (gameState) => {
-      const selected = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
-      return selected.length === 2;
-    },
+    canUse: (gameState) => canUseTarotOnCards(gameState, 2, 2),
     execute: (gameState) => {
-      const selected = gameState.getSelectedCards();
-      const target = selected[0];
-      const source = selected[1];
-      target.rank = source.rank;
-      target.suit = source.suit;
-      target.order = source.order;
-      target.baseChips = source.baseChips;
-      target.enhancement = source.enhancement;
-      target.edition = source.edition;
-      return { success: true, message: `Death: Converted left card into copy of right card!` };
+      const targetCards = resolveTarotTargetCards(gameState, 2, 2);
+      if (targetCards.length >= 2) {
+        const target = targetCards[0];
+        const source = targetCards[1];
+        target.rank = source.rank;
+        target.suit = source.suit;
+        target.order = source.order;
+        target.baseChips = source.baseChips;
+        target.enhancement = source.enhancement;
+        target.edition = source.edition;
+        return { success: true, message: `Death: Converted card into copy of adjacent card!` };
+      }
+      return { success: false, message: 'Select 2 cards for Death!' };
     }
   },
   {
@@ -301,17 +302,14 @@ export const TAROT_CARDS = [
     sellValue: 1,
     icon: '🪢',
     description: 'Destroys up to 2 selected cards permanently from your deck',
-    canUse: (gameState) => {
-      const selected = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
-      return selected.length >= 1 && selected.length <= 2;
-    },
+    canUse: (gameState) => canUseTarotOnCards(gameState, 1, 2),
     execute: (gameState) => {
-      const selected = gameState.getSelectedCards();
-      const idsToRemove = selected.map(c => c.id);
-      gameState.hand = gameState.hand.filter(c => !idsToRemove.includes(c.id));
-      gameState.deck = gameState.deck.filter(c => !idsToRemove.includes(c.id));
-      gameState.discardPile = gameState.discardPile.filter(c => !idsToRemove.includes(c.id));
-      return { success: true, message: `The Hanged Man: Destroyed ${selected.length} card(s) from deck!` };
+      const targetCards = resolveTarotTargetCards(gameState, 1, 2);
+      const idsToRemove = targetCards.map(c => c.id);
+      gameState.hand = (gameState.hand || []).filter(c => !idsToRemove.includes(c.id));
+      gameState.deck = (gameState.deck || []).filter(c => !idsToRemove.includes(c.id));
+      gameState.discardPile = (gameState.discardPile || []).filter(c => !idsToRemove.includes(c.id));
+      return { success: true, message: `The Hanged Man: Destroyed ${targetCards.length} card(s) from deck!` };
     }
   },
   {
@@ -397,6 +395,184 @@ export const PLANET_CARDS = [
   }
 }));
 
+export const SPECTRAL_CARDS = [
+  {
+    id: 'spectral_familiar',
+    name: 'Familiar',
+    type: CONSUMABLE_TYPES.SPECTRAL,
+    cost: 4,
+    sellValue: 2,
+    icon: '🦉',
+    description: 'Destroy 1 random card in hand, add 3 random Enhanced face cards',
+    canUse: (gameState) => gameState.hand && gameState.hand.length >= 1,
+    execute: (gameState) => {
+      if (gameState.hand.length > 0) {
+        const removed = gameState.hand.splice(Math.floor(Math.random() * gameState.hand.length), 1)[0];
+        const suits = ['spades', 'hearts', 'clubs', 'diamonds'];
+        const faceRanks = ['J', 'Q', 'K'];
+        const enhs = ['bonus', 'mult', 'wild', 'glass', 'steel', 'gold', 'lucky'];
+        for (let i = 0; i < 3; i++) {
+          const s = suits[Math.floor(Math.random() * 4)];
+          const r = faceRanks[Math.floor(Math.random() * 3)];
+          const e = enhs[Math.floor(Math.random() * enhs.length)];
+          const card = new Card(s, r, { enhancement: e });
+          gameState.hand.push(card);
+        }
+        return { success: true, message: `Familiar: Destroyed ${removed.rank}${removed.getSuitSymbol()} and drew 3 face cards!` };
+      }
+      return { success: false, message: 'No cards in hand' };
+    }
+  },
+  {
+    id: 'spectral_grim',
+    name: 'Grim',
+    type: CONSUMABLE_TYPES.SPECTRAL,
+    cost: 4,
+    sellValue: 2,
+    icon: '💀',
+    description: 'Destroy 1 random card in hand, add 2 random Enhanced Aces',
+    canUse: (gameState) => gameState.hand && gameState.hand.length >= 1,
+    execute: (gameState) => {
+      if (gameState.hand.length > 0) {
+        const removed = gameState.hand.splice(Math.floor(Math.random() * gameState.hand.length), 1)[0];
+        const suits = ['spades', 'hearts', 'clubs', 'diamonds'];
+        const enhs = ['bonus', 'mult', 'wild', 'glass', 'steel', 'gold', 'lucky'];
+        for (let i = 0; i < 2; i++) {
+          const s = suits[Math.floor(Math.random() * 4)];
+          const e = enhs[Math.floor(Math.random() * enhs.length)];
+          const card = new Card(s, 'A', { enhancement: e });
+          gameState.hand.push(card);
+        }
+        return { success: true, message: `Grim: Destroyed ${removed.rank}${removed.getSuitSymbol()} and added 2 Enhanced Aces!` };
+      }
+      return { success: false, message: 'No cards in hand' };
+    }
+  },
+  {
+    id: 'spectral_aura',
+    name: 'Aura',
+    type: CONSUMABLE_TYPES.SPECTRAL,
+    cost: 4,
+    sellValue: 2,
+    icon: '✨',
+    description: 'Add Foil, Holographic, or Polychrome effect to 1 selected card',
+    canUse: (gameState) => {
+      const sel = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
+      return sel.length === 1;
+    },
+    execute: (gameState) => {
+      const sel = gameState.getSelectedCards()[0];
+      const eds = [EDITIONS.FOIL, EDITIONS.HOLO, EDITIONS.POLYCHROME];
+      sel.edition = eds[Math.floor(Math.random() * eds.length)];
+      return { success: true, message: `Aura: Added ${sel.edition.toUpperCase()} to ${sel.rank}${sel.getSuitSymbol()}!` };
+    }
+  },
+  {
+    id: 'spectral_wraith',
+    name: 'Wraith',
+    type: CONSUMABLE_TYPES.SPECTRAL,
+    cost: 4,
+    sellValue: 2,
+    icon: '👻',
+    description: 'Creates a random Rare or Legendary Joker, sets money to $0',
+    canUse: (gameState) => gameState.jokerSystem.count < gameState.jokerSystem.maxJokers,
+    execute: (gameState) => {
+      const pool = gameState.shopEngine.getRandomJoker();
+      gameState.jokerSystem.addJoker(pool);
+      gameState.money = 0;
+      return { success: true, message: `Wraith: Summoned ${pool.name} and set money to $0!` };
+    }
+  },
+  {
+    id: 'spectral_sigil',
+    name: 'Sigil',
+    type: CONSUMABLE_TYPES.SPECTRAL,
+    cost: 4,
+    sellValue: 2,
+    icon: '🔮',
+    description: 'Converts all cards in hand to a single random suit',
+    canUse: (gameState) => gameState.hand && gameState.hand.length > 0,
+    execute: (gameState) => {
+      const suits = ['spades', 'hearts', 'clubs', 'diamonds'];
+      const chosenSuit = suits[Math.floor(Math.random() * 4)];
+      gameState.hand.forEach(c => { c.suit = chosenSuit; });
+      return { success: true, message: `Sigil: Transmuted all hand cards to ${chosenSuit.toUpperCase()}!` };
+    }
+  },
+  {
+    id: 'spectral_ouija',
+    name: 'Ouija',
+    type: CONSUMABLE_TYPES.SPECTRAL,
+    cost: 4,
+    sellValue: 2,
+    icon: '👁️',
+    description: 'Converts all cards in hand to a single random rank, -1 hand size',
+    canUse: (gameState) => gameState.hand && gameState.hand.length > 0,
+    execute: (gameState) => {
+      const chosenRank = RANKS[Math.floor(Math.random() * RANKS.length)];
+      gameState.hand.forEach(c => { c.rank = chosenRank; });
+      gameState.maxHandSize = Math.max(4, gameState.maxHandSize - 1);
+      return { success: true, message: `Ouija: Transmuted all hand cards to rank ${chosenRank}! (-1 Hand Size)` };
+    }
+  },
+  {
+    id: 'spectral_immolate',
+    name: 'Immolate',
+    type: CONSUMABLE_TYPES.SPECTRAL,
+    cost: 4,
+    sellValue: 2,
+    icon: '🔥',
+    description: 'Destroys 5 random cards in hand, gain +$20',
+    canUse: (gameState) => gameState.hand && gameState.hand.length >= 5,
+    execute: (gameState) => {
+      for (let i = 0; i < 5; i++) {
+        if (gameState.hand.length > 0) {
+          gameState.hand.splice(Math.floor(Math.random() * gameState.hand.length), 1);
+        }
+      }
+      gameState.money += 20;
+      return { success: true, message: 'Immolate: Destroyed 5 cards and gained +$20!' };
+    }
+  },
+  {
+    id: 'spectral_black_hole',
+    name: 'Black Hole',
+    type: CONSUMABLE_TYPES.SPECTRAL,
+    cost: 4,
+    sellValue: 2,
+    icon: '🕳️',
+    description: 'Upgrades EVERY poker hand by 1 level',
+    canUse: () => true,
+    execute: (gameState) => {
+      for (const handName of Object.keys(gameState.handLevels)) {
+        gameState.handLevels[handName] = (gameState.handLevels[handName] || 1) + 1;
+      }
+      return { success: true, message: 'Black Hole: Upgraded ALL poker hands by +1 Level!' };
+    }
+  },
+  {
+    id: 'spectral_cryptid',
+    name: 'Cryptid',
+    type: CONSUMABLE_TYPES.SPECTRAL,
+    cost: 4,
+    sellValue: 2,
+    icon: '🦕',
+    description: 'Create 2 copies of 1 selected card in hand',
+    canUse: (gameState) => {
+      const sel = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
+      return sel.length === 1;
+    },
+    execute: (gameState) => {
+      const sel = gameState.getSelectedCards()[0];
+      for (let i = 0; i < 2; i++) {
+        const copy = new Card(sel.suit, sel.rank, { enhancement: sel.enhancement, edition: sel.edition });
+        gameState.hand.push(copy);
+      }
+      return { success: true, message: `Cryptid: Created 2 copies of ${sel.rank}${sel.getSuitSymbol()}!` };
+    }
+  }
+];
+
 export class ConsumableSystem {
   constructor(maxSlots = 2) {
     this.maxSlots = maxSlots;
@@ -442,6 +618,19 @@ export class ConsumableSystem {
       this.slots.splice(index, 1);
     }
     return result;
+  }
+
+  reorderConsumables(fromIndex, toIndex) {
+    if (
+      fromIndex < 0 || fromIndex >= this.slots.length ||
+      toIndex < 0 || toIndex >= this.slots.length ||
+      fromIndex === toIndex
+    ) {
+      return false;
+    }
+    const [moved] = this.slots.splice(fromIndex, 1);
+    this.slots.splice(toIndex, 0, moved);
+    return true;
   }
 
   getItems() {

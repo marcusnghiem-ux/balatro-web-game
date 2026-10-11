@@ -6,7 +6,7 @@
  */
 
 import { JOKER_CATALOG } from './JokerSystem.js';
-import { TAROT_CARDS, PLANET_CARDS, CONSUMABLE_TYPES } from './ConsumableSystem.js';
+import { TAROT_CARDS, PLANET_CARDS, SPECTRAL_CARDS, CONSUMABLE_TYPES } from './ConsumableSystem.js';
 import { Card, SUITS, RANKS, EDITIONS, ENHANCEMENTS } from './Card.js';
 
 export const VOUCHER_CATALOG = [
@@ -53,14 +53,30 @@ export const VOUCHER_CATALOG = [
 ];
 
 export const BOOSTER_PACK_TEMPLATES = [
-  { id: 'pack_arcana', name: 'Arcana Pack', cost: 4, size: 3, choices: 1, type: 'tarot', icon: '🃏', description: 'Choose 1 of 3 Tarot cards to mutate cards or use' },
-  { id: 'pack_arcana_mega', name: 'Mega Arcana Pack', cost: 8, size: 5, choices: 2, type: 'tarot', icon: '✨', description: 'Choose 2 of 5 Tarot cards to mutate cards or use' },
-  { id: 'pack_celestial', name: 'Celestial Pack', cost: 4, size: 3, choices: 1, type: 'planet', icon: '🪐', description: 'Choose 1 of 3 Planet cards to level up a hand' },
-  { id: 'pack_celestial_mega', name: 'Mega Celestial Pack', cost: 8, size: 5, choices: 2, type: 'planet', icon: '🌌', description: 'Choose 2 of 5 Planet cards to level up hands' },
-  { id: 'pack_buffoon', name: 'Buffoon Pack', cost: 4, size: 2, choices: 1, type: 'joker', icon: '🎭', description: 'Choose 1 of 2 Jokers to add to your build' },
-  { id: 'pack_buffoon_mega', name: 'Mega Buffoon Pack', cost: 8, size: 4, choices: 2, type: 'joker', icon: '🎪', description: 'Choose 2 of 4 Jokers to add to your build' },
-  { id: 'pack_standard', name: 'Standard Pack', cost: 4, size: 10, choices: 2, type: 'playing_card', icon: '🎴', description: 'Choose 2 of 10 enhanced playing cards to add to your deck' },
-  { id: 'pack_standard_jumbo', name: 'Jumbo Standard Pack', cost: 6, size: 10, choices: 3, type: 'playing_card', icon: '🃏', description: 'Choose 3 of 10 mutated playing cards to add to your deck' }
+  // Arcana
+  { id: 'pack_arcana', name: 'Arcana Pack', cost: 4, size: 3, choices: 1, type: 'tarot', icon: '🃏', description: 'Choose 1 of 3 Tarot cards' },
+  { id: 'pack_arcana_jumbo', name: 'Jumbo Arcana Pack', cost: 6, size: 5, choices: 1, type: 'tarot', icon: '✨', description: 'Choose 1 of 5 Tarot cards' },
+  { id: 'pack_arcana_mega', name: 'Mega Arcana Pack', cost: 8, size: 5, choices: 2, type: 'tarot', icon: '🌟', description: 'Choose 2 of 5 Tarot cards' },
+  
+  // Celestial
+  { id: 'pack_celestial', name: 'Celestial Pack', cost: 4, size: 3, choices: 1, type: 'planet', icon: '🪐', description: 'Choose 1 of 3 Planet cards' },
+  { id: 'pack_celestial_jumbo', name: 'Jumbo Celestial Pack', cost: 6, size: 5, choices: 1, type: 'planet', icon: '🌌', description: 'Choose 1 of 5 Planet cards' },
+  { id: 'pack_celestial_mega', name: 'Mega Celestial Pack', cost: 8, size: 5, choices: 2, type: 'planet', icon: '🌠', description: 'Choose 2 of 5 Planet cards' },
+
+  // Buffoon
+  { id: 'pack_buffoon', name: 'Buffoon Pack', cost: 4, size: 2, choices: 1, type: 'joker', icon: '🎭', description: 'Choose 1 of 2 Jokers' },
+  { id: 'pack_buffoon_jumbo', name: 'Jumbo Buffoon Pack', cost: 6, size: 4, choices: 1, type: 'joker', icon: '🎪', description: 'Choose 1 of 4 Jokers' },
+  { id: 'pack_buffoon_mega', name: 'Mega Buffoon Pack', cost: 8, size: 4, choices: 2, type: 'joker', icon: '🎟️', description: 'Choose 2 of 4 Jokers' },
+
+  // Standard
+  { id: 'pack_standard', name: 'Standard Pack', cost: 4, size: 3, choices: 1, type: 'playing_card', icon: '🎴', description: 'Choose 1 of 3 Enhanced cards' },
+  { id: 'pack_standard_jumbo', name: 'Jumbo Standard Pack', cost: 6, size: 5, choices: 1, type: 'playing_card', icon: '🃏', description: 'Choose 1 of 5 Enhanced cards' },
+  { id: 'pack_standard_mega', name: 'Mega Standard Pack', cost: 8, size: 5, choices: 2, type: 'playing_card', icon: '👑', description: 'Choose 2 of 5 Enhanced cards' },
+
+  // Spectral
+  { id: 'pack_spectral', name: 'Spectral Pack', cost: 4, size: 2, choices: 1, type: 'spectral', icon: '👻', description: 'Choose 1 of 2 Spectral cards' },
+  { id: 'pack_spectral_jumbo', name: 'Jumbo Spectral Pack', cost: 6, size: 4, choices: 1, type: 'spectral', icon: '🌀', description: 'Choose 1 of 4 Spectral cards' },
+  { id: 'pack_spectral_mega', name: 'Mega Spectral Pack', cost: 8, size: 4, choices: 2, type: 'spectral', icon: '🔮', description: 'Choose 2 of 4 Spectral cards' }
 ];
 
 export class ShopEngine {
@@ -167,12 +183,49 @@ export class ShopEngine {
     else if (editionRoll > 0.90) edition = EDITIONS.HOLO;
     else if (editionRoll > 0.80) edition = EDITIONS.FOIL;
 
+    // Stake stickers (Part 5: 8 Stakes & stickers)
+    let isEternal = false;
+    let isPerishable = false;
+    let isRental = false;
+    let cost = joker.cost;
+
+    const stakeId = this.game.selectedStake ? this.game.selectedStake.id : 'stake_white';
+    const stakeIds = ['stake_white', 'stake_red', 'stake_green', 'stake_blue', 'stake_black', 'stake_purple', 'stake_orange', 'stake_gold'];
+    const stakeRank = stakeIds.indexOf(stakeId);
+
+    // Black Stake+: 30% chance for Eternal
+    if (stakeRank >= 4 && Math.random() < 0.30) {
+      isEternal = true;
+    }
+    // Orange Stake+: 30% chance for Perishable
+    if (!isEternal && stakeRank >= 6 && Math.random() < 0.30) {
+      isPerishable = true;
+    }
+    // Gold Stake: 30% chance for Rental
+    if (stakeRank >= 7 && Math.random() < 0.30) {
+      isRental = true;
+      cost = 1; // Rental jokers cost $1 to buy
+    }
+
     return {
       ...joker,
+      cost,
       category: 'joker',
       edition,
+      isEternal,
+      isPerishable,
+      isRental,
       instanceId: `shop_joker_${joker.id}_${Math.random().toString(36).substr(2, 6)}`,
-      sellValue: Math.max(1, Math.floor(joker.cost / 2))
+      sellValue: isRental ? 1 : Math.max(1, Math.floor(cost / 2))
+    };
+  }
+
+  getRandomSpectral() {
+    const card = SPECTRAL_CARDS[Math.floor(Math.random() * SPECTRAL_CARDS.length)];
+    return {
+      ...card,
+      category: 'consumable',
+      instanceId: `shop_spectral_${card.id}_${Math.random().toString(36).substr(2, 6)}`
     };
   }
 
@@ -284,6 +337,8 @@ export class ShopEngine {
         this.packCards.push(this.getRandomTarot());
       } else if (pack.type === 'planet') {
         this.packCards.push(this.getRandomPlanet());
+      } else if (pack.type === 'spectral') {
+        this.packCards.push(this.getRandomSpectral());
       } else if (pack.type === 'joker') {
         this.packCards.push(this.getRandomJoker());
       } else {

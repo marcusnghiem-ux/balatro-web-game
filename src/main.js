@@ -4,7 +4,7 @@
  * Boots GameEngine, initializes Renderer & TouchController, and wires reactive loops.
  */
 
-import { GameEngine } from './game/GameEngine.js';
+import { GameEngine, GAME_STATES } from './game/GameEngine.js';
 import { Renderer } from './ui/Renderer.js';
 import { TouchController } from './ui/TouchController.js';
 
@@ -27,21 +27,53 @@ window.addEventListener('DOMContentLoaded', () => {
   game.subscribe((event, data) => {
     switch (event) {
       case 'ROUND_STARTED':
+      case 'HAND_RESOLVED':
+        renderer.playSound('card_slide');
+        renderer.render();
+        break;
+
+      case 'DISCARDED':
+      case 'HAND_SORTED':
+        renderer.playSound('card_slide');
+        renderer.render();
+        break;
+
+      case 'JOKER_SOLD':
+      case 'CONSUMABLE_SOLD':
+        renderer.playSound('cash');
+        renderer.render();
+        break;
+
+      case 'CONSUMABLE_USED':
+        renderer.playSound('win');
+        renderer.render();
+        break;
+
+      case 'PACK_CARD_PICKED':
+        renderer.playSound('card_select');
+        renderer.render();
+        break;
+
+      case 'PACK_SKIPPED':
+        renderer.playSound('card_slide');
+        renderer.render();
+        break;
+
       case 'SELECTION_CHANGED':
       case 'HAND_REORDERED':
-      case 'HAND_SORTED':
-      case 'DISCARDED':
-      case 'HAND_RESOLVED':
+      case 'JOKER_REORDERED':
+      case 'CONSUMABLE_REORDERED':
+      case 'RUN_LOADED':
       case 'HAND_RENDER_NEEDED':
       case 'JOKER_BOUGHT':
-      case 'JOKER_SOLD':
-      case 'CONSUMABLE_USED':
-      case 'CONSUMABLE_SOLD':
       case 'SHOP_ITEM_BOUGHT':
       case 'VOUCHER_BOUGHT':
-      case 'PACK_CARD_PICKED':
-      case 'PACK_SKIPPED':
         renderer.render();
+        break;
+
+      case 'ENDLESS_MODE_STARTED':
+        renderer.render();
+        renderer.renderShop();
         break;
 
       case 'MAX_SELECTION_REACHED':
@@ -69,7 +101,7 @@ window.addEventListener('DOMContentLoaded', () => {
         break;
 
       case 'GAME_VICTORY':
-        renderer.showVictory();
+        renderer.showVictory(data);
         break;
 
       default:
@@ -78,8 +110,8 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // 5. Start the first run
-  game.startNewRun();
+  // 5. Start at authentic Title Screen (matching Photo 1)
+  game.state = GAME_STATES.TITLE;
   renderer.render();
 
   console.log('%c🃏 Balatro Web Game Engine Initialized', 'color: #f0b02f; font-weight: bold; font-size: 14px;');

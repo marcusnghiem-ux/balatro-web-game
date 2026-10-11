@@ -56,6 +56,22 @@ const CUSTOM_JOKER_HOOKS = {
   half_joker: {
     calculateHand: (h) => (h.allCards && h.allCards.length <= 3) ? ({ mult: 20, message: '+20 Mult' }) : null
   },
+  stencil: {
+    calculateGeneral: (ctx, joker, gameState) => {
+      const activeCount = (gameState?.jokerSystem?.count) || 1;
+      const emptySlots = Math.max(0, 5 - activeCount);
+      const multFactor = 1 + emptySlots;
+      return multFactor > 1 ? { multMultiplier: multFactor, message: `×${multFactor} Mult` } : null;
+    }
+  },
+  joker_stencil: {
+    calculateGeneral: (ctx, joker, gameState) => {
+      const activeCount = (gameState?.jokerSystem?.count) || 1;
+      const emptySlots = Math.max(0, 5 - activeCount);
+      const multFactor = 1 + emptySlots;
+      return multFactor > 1 ? { multMultiplier: multFactor, message: `×${multFactor} Mult` } : null;
+    }
+  },
   banner: {
     calculateGeneral: (ctx) => {
       const d = ctx.discardsLeft || 0;
@@ -133,10 +149,102 @@ const CUSTOM_JOKER_HOOKS = {
     calculateGeneral: () => ({ chips: 300, message: '+300 Chips' })
   },
   blueprint: {
-    calculateGeneral: () => ({ multMultiplier: 1.5, message: '×1.5 Mult' })
+    calculateCard: (c, ctx, joker) => {
+      const target = joker && joker.targetJoker;
+      if (!target || target.debuffed || target.id === 'blueprint') return null;
+      if (typeof target.calculateCard === 'function') {
+        const res = target.calculateCard(c, ctx, target);
+        if (res) return { ...res, message: `Blueprint (${target.name}): ${res.message}` };
+      }
+      return null;
+    },
+    calculateHand: (h, ctx, joker) => {
+      const target = joker && joker.targetJoker;
+      if (!target || target.debuffed || target.id === 'blueprint') return null;
+      if (typeof target.calculateHand === 'function') {
+        const res = target.calculateHand(h, ctx, target);
+        if (res) return { ...res, message: `Blueprint (${target.name}): ${res.message}` };
+      }
+      return null;
+    },
+    calculateGeneral: (ctx, joker) => {
+      const target = joker && joker.targetJoker;
+      if (!target || target.debuffed || target.id === 'blueprint') return null;
+      if (typeof target.calculateGeneral === 'function') {
+        const res = target.calculateGeneral(ctx, target);
+        if (res) return { ...res, message: `Blueprint (${target.name}): ${res.message}` };
+      }
+      return null;
+    },
+    onHandPlayed: (joker) => {
+      const target = joker && joker.targetJoker;
+      if (target && !target.debuffed && typeof target.onHandPlayed === 'function') {
+        target.onHandPlayed(target);
+      }
+    },
+    onDiscard: (cards, gameState, joker) => {
+      const target = joker && joker.targetJoker;
+      if (target && !target.debuffed && typeof target.onDiscard === 'function') {
+        target.onDiscard(cards, gameState, target);
+      }
+    },
+    onRoundEnd: (ctx, joker) => {
+      const target = joker && joker.targetJoker;
+      if (target && !target.debuffed && typeof target.onRoundEnd === 'function') {
+        const res = target.onRoundEnd(ctx, target);
+        if (res) return { ...res, message: `Blueprint (${target.name}): ${res.message}` };
+      }
+      return null;
+    }
   },
   brainstorm: {
-    calculateGeneral: () => ({ multMultiplier: 1.5, message: '×1.5 Mult' })
+    calculateCard: (c, ctx, joker) => {
+      const target = joker && joker.targetJoker;
+      if (!target || target.debuffed || target.id === 'brainstorm') return null;
+      if (typeof target.calculateCard === 'function') {
+        const res = target.calculateCard(c, ctx, target);
+        if (res) return { ...res, message: `Brainstorm (${target.name}): ${res.message}` };
+      }
+      return null;
+    },
+    calculateHand: (h, ctx, joker) => {
+      const target = joker && joker.targetJoker;
+      if (!target || target.debuffed || target.id === 'brainstorm') return null;
+      if (typeof target.calculateHand === 'function') {
+        const res = target.calculateHand(h, ctx, target);
+        if (res) return { ...res, message: `Brainstorm (${target.name}): ${res.message}` };
+      }
+      return null;
+    },
+    calculateGeneral: (ctx, joker) => {
+      const target = joker && joker.targetJoker;
+      if (!target || target.debuffed || target.id === 'brainstorm') return null;
+      if (typeof target.calculateGeneral === 'function') {
+        const res = target.calculateGeneral(ctx, target);
+        if (res) return { ...res, message: `Brainstorm (${target.name}): ${res.message}` };
+      }
+      return null;
+    },
+    onHandPlayed: (joker) => {
+      const target = joker && joker.targetJoker;
+      if (target && !target.debuffed && typeof target.onHandPlayed === 'function') {
+        target.onHandPlayed(target);
+      }
+    },
+    onDiscard: (cards, gameState, joker) => {
+      const target = joker && joker.targetJoker;
+      if (target && !target.debuffed && typeof target.onDiscard === 'function') {
+        target.onDiscard(cards, gameState, target);
+      }
+    },
+    onRoundEnd: (ctx, joker) => {
+      const target = joker && joker.targetJoker;
+      if (target && !target.debuffed && typeof target.onRoundEnd === 'function') {
+        const res = target.onRoundEnd(ctx, target);
+        if (res) return { ...res, message: `Brainstorm (${target.name}): ${res.message}` };
+      }
+      return null;
+    }
   },
   triboulet: {
     calculateCard: (c) => ['K', 'Q'].includes(c.rank) ? ({ multMultiplier: 2, message: '×2 Mult' }) : null
@@ -146,6 +254,22 @@ const CUSTOM_JOKER_HOOKS = {
   },
   chicot: {
     calculateGeneral: () => ({ mult: 10, message: '+10 Mult' })
+  },
+  loyalty_card: {
+    calculateGeneral: (ctx, joker) => {
+      if (joker && joker.handsRemaining === 0) {
+        return { multMultiplier: 4, message: 'Loyalty Card: ×4 Mult!' };
+      }
+      return null;
+    },
+    onHandPlayed: (joker) => {
+      if (!joker) return;
+      if (joker.handsRemaining === 0) {
+        joker.handsRemaining = 5;
+      } else {
+        joker.handsRemaining = Math.max(0, (joker.handsRemaining !== undefined ? joker.handsRemaining : 5) - 1);
+      }
+    }
   },
   golden_joker: {
     onRoundEnd: () => ({ money: 4, message: '+$4' })
@@ -226,17 +350,65 @@ export class JokerSystem {
     const instance = {
       ...joker,
       instanceId: `inst_${joker.id}_${Math.random().toString(36).substr(2, 6)}`,
-      sellValue: Math.max(1, Math.floor(joker.cost / 2))
+      sellValue: joker.isRental ? 1 : Math.max(1, Math.floor(joker.cost / 2)),
+      handsRemaining: joker.id === 'loyalty_card' ? (joker.handsRemaining !== undefined ? joker.handsRemaining : 5) : undefined,
+      perishableRoundsLeft: joker.isPerishable ? 5 : undefined,
+      isEternal: !!joker.isEternal,
+      isPerishable: !!joker.isPerishable,
+      isRental: !!joker.isRental,
+      debuffed: false
     };
     this.activeJokers.push(instance);
+    this.updateBlueprintTargets();
+    return true;
+  }
+
+  reorderJokers(fromIndex, toIndex) {
+    if (fromIndex < 0 || fromIndex >= this.activeJokers.length || toIndex < 0 || toIndex >= this.activeJokers.length) return false;
+    const [moved] = this.activeJokers.splice(fromIndex, 1);
+    this.activeJokers.splice(toIndex, 0, moved);
+    this.updateBlueprintTargets();
     return true;
   }
 
   removeJoker(index) {
     if (index >= 0 && index < this.activeJokers.length) {
-      return this.activeJokers.splice(index, 1)[0];
+      const j = this.activeJokers[index];
+      // Eternal jokers cannot be sold or destroyed!
+      if (j.isEternal) return null;
+      const removed = this.activeJokers.splice(index, 1)[0];
+      this.updateBlueprintTargets();
+      return removed;
     }
     return null;
+  }
+
+  updateBlueprintTargets() {
+    this.activeJokers.forEach((joker, index) => {
+      if (joker.id === 'blueprint') {
+        const nextJoker = this.activeJokers[index + 1];
+        if (nextJoker && !nextJoker.debuffed && nextJoker.id !== 'blueprint') {
+          joker.targetJoker = nextJoker;
+          joker.hasTarget = true;
+          joker.targetName = nextJoker.name;
+        } else {
+          joker.targetJoker = null;
+          joker.hasTarget = false;
+          joker.targetName = 'No target!';
+        }
+      } else if (joker.id === 'brainstorm') {
+        const leftmostJoker = this.activeJokers[0];
+        if (index !== 0 && leftmostJoker && !leftmostJoker.debuffed && leftmostJoker.id !== 'brainstorm') {
+          joker.targetJoker = leftmostJoker;
+          joker.hasTarget = true;
+          joker.targetName = leftmostJoker.name;
+        } else {
+          joker.targetJoker = null;
+          joker.hasTarget = false;
+          joker.targetName = 'No target!';
+        }
+      }
+    });
   }
 
   getJokers() {

@@ -1,7 +1,7 @@
 /* Balatro Style Sheet - Authentic Visuals, Vibrant Palette, and Tactile Card Animations */
 
 :root {
-  --balatro-gold: #f39c12;
+  --balatro-gold: #d49b28;
   --balatro-red: #fe5f55;
   --balatro-blue: #009dff;
   --card-width: 82px;
@@ -28,7 +28,12 @@
   user-select: none;
 }
 
-body, html {
+.hidden {
+  display: none !important;
+}
+
+body,
+html {
   margin: 0;
   padding: 0;
   width: 100vw;
@@ -39,34 +44,53 @@ body, html {
   touch-action: manipulation;
 }
 
-/* CRT Scanlines & Retro Arcade Shader Overlay */
+/* CRT Scanlines, Phosphor Micro-Flicker & Retro Arcade Shader Overlay */
 .crt-overlay {
-  background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%, 
-    rgba(0, 0, 0, 0.22) 50%
-  ), linear-gradient(
-    90deg,
-    rgba(255, 180, 0, 0.03),
-    rgba(0, 0, 0, 0.01),
-    rgba(255, 100, 0, 0.03)
-  );
-  background-size: 100% 4px, 6px 100%;
+  background: linear-gradient(rgba(18, 16, 24, 0) 50%,
+      rgba(0, 0, 0, 0.28) 50%), linear-gradient(90deg,
+      rgba(255, 180, 0, 0.025),
+      rgba(0, 0, 0, 0.01),
+      rgba(0, 200, 255, 0.025));
+  background-size: 100% 3px, 6px 100%;
   pointer-events: none;
-  opacity: 0.7;
+  opacity: 0.72;
+  animation: crtMicroFlicker 0.15s infinite alternate;
+}
+
+@keyframes crtMicroFlicker {
+  0% {
+    opacity: 0.70;
+  }
+
+  100% {
+    opacity: 0.74;
+  }
 }
 
 .vignette-overlay {
-  background: radial-gradient(
-    circle at center,
-    transparent 50%,
-    rgba(10, 6, 2, 0.85) 100%
-  );
+  background: radial-gradient(ellipse at 50% 50%,
+      transparent 42%,
+      rgba(10, 8, 20, 0.45) 72%,
+      rgba(2, 1, 6, 0.94) 100%);
   pointer-events: none;
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.85);
 }
 
-/* Canvas Background for Liquid Gold Vortex */
+/* Optional CRT Screen-Curvature Distortion */
+.crt-screen-curvature {
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 0 0 16px #0b0704, 0 0 60px rgba(0, 0, 0, 0.95), inset 0 0 40px rgba(0, 0, 0, 0.7);
+}
+
+/* Canvas Background for Liquid Satin & Floating Motes */
 #bg-canvas {
   filter: contrast(1.15) brightness(0.95);
+}
+
+#ambient-particles {
+  mix-blend-mode: screen;
+  pointer-events: none;
 }
 
 /* Sidebar Console Bezel */
@@ -79,15 +103,15 @@ body, html {
   width: var(--card-width);
   height: var(--card-height);
   border-radius: 9px;
-  background-color: #fcfbf7;
-  color: #1e293b;
-  border: 3px solid #2d3748;
+  background-color: #ffffff;
+  color: #111827;
+  border: 3.5px solid #ffffff;
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 5px 6px;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.55), 0 2px 4px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7), 0 2px 6px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   touch-action: none;
   /* Smooth bouncy spring transition for selecting & deselecting */
@@ -122,9 +146,20 @@ body, html {
 
 /* Scoring Pop Animation */
 @keyframes cardScorePop {
-  0% { transform: translateY(-34px) scale(1.05); filter: brightness(1); }
-  50% { transform: translateY(-56px) scale(1.22) rotate(-2deg); filter: brightness(1.35); }
-  100% { transform: translateY(-34px) scale(1.05); filter: brightness(1); }
+  0% {
+    transform: translateY(-34px) scale(1.05);
+    filter: brightness(1);
+  }
+
+  50% {
+    transform: translateY(-56px) scale(1.22) rotate(-2deg);
+    filter: brightness(1.35);
+  }
+
+  100% {
+    transform: translateY(-34px) scale(1.05);
+    filter: brightness(1);
+  }
 }
 
 .playing-card.card-scoring {
@@ -142,31 +177,126 @@ body, html {
   pointer-events: none;
 }
 
-.pips-1 { display: flex; align-items: center; justify-content: center; font-size: 26px; }
-.pips-2 { display: flex; flex-direction: column; justify-content: space-between; align-items: center; font-size: 14px; }
-.pips-3 { display: flex; flex-direction: column; justify-content: space-between; align-items: center; font-size: 13px; }
-.pips-4 { display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; font-size: 12px; }
-.pips-5 { display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; font-size: 11px; position: relative; }
-.pips-5 .pip-center { position: absolute; font-size: 12px; }
-.pips-6 { display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; font-size: 11px; }
-.pips-7 { display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; font-size: 10px; position: relative; }
-.pips-7 .pip-center { position: absolute; font-size: 10px; top: 32%; }
-.pips-8 { display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; font-size: 10px; }
-.pips-9 { display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; font-size: 9px; position: relative; }
-.pips-9 .pip-center { position: absolute; font-size: 9px; }
-.pips-10 { display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; font-size: 9px; }
-.pips-face { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; }
+.pips-1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+}
+
+.pips-2 {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.pips-3 {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.pips-4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  justify-items: center;
+  font-size: 12px;
+}
+
+.pips-5 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  justify-items: center;
+  font-size: 11px;
+  position: relative;
+}
+
+.pips-5 .pip-center {
+  position: absolute;
+  font-size: 12px;
+}
+
+.pips-6 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  justify-items: center;
+  font-size: 11px;
+}
+
+.pips-7 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  justify-items: center;
+  font-size: 10px;
+  position: relative;
+}
+
+.pips-7 .pip-center {
+  position: absolute;
+  font-size: 10px;
+  top: 32%;
+}
+
+.pips-8 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  justify-items: center;
+  font-size: 10px;
+}
+
+.pips-9 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  justify-items: center;
+  font-size: 9px;
+  position: relative;
+}
+
+.pips-9 .pip-center {
+  position: absolute;
+  font-size: 9px;
+}
+
+.pips-10 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  justify-items: center;
+  font-size: 9px;
+}
+
+.pips-face {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 900;
+}
 
 /* Authentic Balatro High-Contrast Suit Colors */
 .suit-hearts {
   color: #e63946;
 }
+
 .suit-diamonds {
   color: #f77f00;
 }
+
 .suit-clubs {
   color: #0077b6;
 }
+
 .suit-spades {
   color: #1e293b;
 }
@@ -176,6 +306,7 @@ body, html {
   background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%) !important;
   border-color: #38bdf8 !important;
 }
+
 .edition-foil::after {
   content: "FOIL";
   position: absolute;
@@ -190,6 +321,7 @@ body, html {
   background: linear-gradient(135deg, #fbcfe8 0%, #f472b6 50%, #c084fc 100%) !important;
   border-color: #f43f5e !important;
 }
+
 .edition-holo::after {
   content: "HOLO";
   position: absolute;
@@ -201,8 +333,13 @@ body, html {
 }
 
 @keyframes polychromeShift {
-  0% { filter: hue-rotate(0deg); }
-  100% { filter: hue-rotate(360deg); }
+  0% {
+    filter: hue-rotate(0deg);
+  }
+
+  100% {
+    filter: hue-rotate(360deg);
+  }
 }
 
 .edition-polychrome {
@@ -216,37 +353,44 @@ body, html {
   border-color: #009dff !important;
   box-shadow: 0 0 12px rgba(0, 157, 255, 0.4);
 }
+
 .enhancement-mult {
   border-color: #fe5f55 !important;
   box-shadow: 0 0 12px rgba(254, 95, 85, 0.4);
 }
+
 .enhancement-wild {
   background: linear-gradient(135deg, #fff 40%, #e9d5ff 100%) !important;
   border-color: #a855f7 !important;
   box-shadow: 0 0 14px rgba(168, 85, 247, 0.45);
 }
+
 .enhancement-glass {
-  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(186, 230, 253, 0.7) 100%) !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(186, 230, 253, 0.7) 100%) !important;
   border-color: #38bdf8 !important;
-  box-shadow: 0 0 16px rgba(56, 189, 248, 0.6), inset 0 0 8px rgba(255,255,255,0.8);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.6), inset 0 0 8px rgba(255, 255, 255, 0.8);
 }
+
 .enhancement-steel {
   background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 50%, #64748b 100%) !important;
   border-color: #475569 !important;
   box-shadow: 0 0 12px rgba(100, 116, 139, 0.5);
   color: #0f172a !important;
 }
+
 .enhancement-gold {
   background: linear-gradient(135deg, #fef08a 0%, #fde047 50%, #eab308 100%) !important;
   border-color: #ca8a04 !important;
   box-shadow: 0 0 15px rgba(234, 179, 8, 0.55);
   color: #713f12 !important;
 }
+
 .enhancement-stone {
   background: repeating-linear-gradient(45deg, #64748b, #64748b 4px, #475569 4px, #475569 8px) !important;
   border-color: #334155 !important;
   color: #f1f5f9 !important;
 }
+
 .enhancement-lucky {
   border-color: #10b981 !important;
   box-shadow: 0 0 14px rgba(16, 185, 129, 0.55);
@@ -254,10 +398,8 @@ body, html {
 
 /* CRT Retro Scanline Texture Overlay */
 .crt-overlay {
-  background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%, 
-    rgba(0, 0, 0, 0.18) 50%
-  );
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+      rgba(0, 0, 0, 0.18) 50%);
   background-size: 100% 4px;
   pointer-events: none;
 }
@@ -266,9 +408,10 @@ body, html {
 .blind-column-card {
   transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2), box-shadow 0.25s ease, border-color 0.25s ease;
 }
+
 .blind-column-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 35px rgba(0,0,0,0.85);
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.85);
 }
 
 /* Debuffed State */
@@ -276,6 +419,7 @@ body, html {
   filter: grayscale(0.9) brightness(0.7);
   opacity: 0.7;
 }
+
 .card-debuffed::before {
   content: "✕ DEBUFF";
   position: absolute;
@@ -286,7 +430,7 @@ body, html {
   font-weight: 900;
   color: #ef4444;
   white-space: nowrap;
-  background: rgba(0,0,0,0.9);
+  background: rgba(0, 0, 0, 0.9);
   padding: 2px 5px;
   border-radius: 4px;
   z-index: 10;
@@ -299,7 +443,7 @@ body, html {
   border-radius: 7px;
   background-color: #d63031;
   border: 3px solid #ff7675;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.7), -4px -4px 0 #961b1c;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7), -4px -4px 0 #961b1c;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -311,46 +455,44 @@ body, html {
   height: 100%;
   border-radius: 4px;
   border: 2px solid #ffffff;
-  background: repeating-linear-gradient(
-    45deg,
-    #c0392b,
-    #c0392b 3px,
-    #e74c3c 3px,
-    #e74c3c 6px
-  );
-  box-shadow: inset 0 0 4px rgba(0,0,0,0.5);
+  background: repeating-linear-gradient(45deg,
+      #c0392b,
+      #c0392b 3px,
+      #e74c3c 3px,
+      #e74c3c 6px);
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
 }
 
-/* Joker Card Representation */
+/* Authentic Balatro Joker Card Face */
 .joker-card {
-  width: 76px;
-  height: 106px;
+  width: 78px;
+  height: 114px;
   border-radius: 9px;
-  background: #18140f;
-  border: 3px solid #635035;
+  background: #ffffff !important;
+  color: #111827;
+  border: 3.5px solid #ffffff;
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
-  padding: 4px;
+  padding: 3px 2px;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.2), box-shadow 0.2s ease, border-color 0.2s ease;
   flex-shrink: 0;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.6);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.75), 0 2px 6px rgba(0, 0, 0, 0.45);
 }
 
 @media (min-width: 640px) {
   .joker-card {
-    width: 88px;
-    height: 120px;
+    width: 90px;
+    height: 128px;
   }
 }
 
 .joker-card:hover {
-  transform: translateY(-6px) scale(1.05);
-  border-color: var(--balatro-gold);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7);
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(240, 173, 40, 0.6);
 }
 
 .joker-card.joker-active {
@@ -359,14 +501,94 @@ body, html {
 }
 
 @keyframes jokerTrigger {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.22) translateY(-10px); box-shadow: 0 0 25px rgba(254, 95, 85, 0.9); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.22) translateY(-10px);
+    box-shadow: 0 0 25px rgba(254, 95, 85, 0.9);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
-.joker-rarity-common { border-color: #95a5a6; }
-.joker-rarity-uncommon { border-color: #2ecc71; }
-.joker-rarity-rare { border-color: #e74c3c; }
+.joker-body-grid {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+}
+
+.joker-side-label-left,
+.joker-side-label-right {
+  width: 11px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'VT323', monospace;
+  font-size: 11px;
+  font-weight: 900;
+  color: #1e293b;
+  line-height: 0.9;
+  user-select: none;
+  opacity: 0.85;
+}
+
+.joker-illustration-frame {
+  background: radial-gradient(circle at 50% 40%, #ffffff 0%, #f1f5f9 100%);
+  border: 1.5px solid #cbd5e1;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.joker-illustration-img {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
+  transition: transform 0.15s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.joker-card:hover .joker-illustration-img {
+  transform: scale(1.08) translateY(-1px);
+}
+
+.joker-rarity-banner {
+  font-family: 'VT323', monospace;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  padding: 0px 4px;
+  border-radius: 4px;
+  text-align: center;
+  line-height: 1.1;
+  width: 100%;
+}
+
+.rarity-common {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.rarity-uncommon {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.rarity-rare {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.rarity-legendary {
+  background: #a855f7;
+  color: #ffffff;
+}
 
 /* Floating Score Number Particles */
 .score-particle {
@@ -377,34 +599,66 @@ body, html {
   pointer-events: none;
   animation: floatUpFade 0.85s ease-out forwards;
   z-index: 60;
-  text-shadow: 0 3px 10px rgba(0,0,0,0.9);
+  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.9);
 }
 
 @keyframes floatUpFade {
-  0% { opacity: 1; transform: translateY(0) scale(0.85); }
-  50% { opacity: 1; transform: translateY(-34px) scale(1.3); }
-  100% { opacity: 0; transform: translateY(-65px) scale(1); }
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(0.85);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateY(-34px) scale(1.3);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-65px) scale(1);
+  }
 }
 
 /* Screen Shake Effect */
 @keyframes screenShake {
-  0%, 100% { transform: translate(0, 0); }
-  20% { transform: translate(-5px, 4px); }
-  40% { transform: translate(5px, -4px); }
-  60% { transform: translate(-4px, -3px); }
-  80% { transform: translate(4px, 3px); }
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  20% {
+    transform: translate(-5px, 4px);
+  }
+
+  40% {
+    transform: translate(5px, -4px);
+  }
+
+  60% {
+    transform: translate(-4px, -3px);
+  }
+
+  80% {
+    transform: translate(4px, 3px);
+  }
 }
 
 .screen-shake {
-  animation: screenShake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+  animation: screenShake 0.3s cubic-bezier(.36, .07, .19, .97) both;
 }
 
 /* Scrollbars */
-#jokers-container::-webkit-scrollbar, #consumables-container::-webkit-scrollbar, #hand-levels-list::-webkit-scrollbar {
+#jokers-container::-webkit-scrollbar,
+#consumables-container::-webkit-scrollbar,
+#hand-levels-list::-webkit-scrollbar {
   height: 4px;
   width: 4px;
 }
-#jokers-container::-webkit-scrollbar-thumb, #consumables-container::-webkit-scrollbar-thumb, #hand-levels-list::-webkit-scrollbar-thumb {
+
+#jokers-container::-webkit-scrollbar-thumb,
+#consumables-container::-webkit-scrollbar-thumb,
+#hand-levels-list::-webkit-scrollbar-thumb {
   background: #524128;
   border-radius: 4px;
 }
@@ -415,7 +669,7 @@ body, html {
   height: 98px;
   border-radius: 8px;
   background: #141824;
-  border: 2px solid #546e7a;
+  border: 3px solid #ffffff;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -425,7 +679,7 @@ body, html {
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7), 0 2px 6px rgba(0, 0, 0, 0.45);
 }
 
 @media (min-width: 640px) {
@@ -444,6 +698,7 @@ body, html {
   border-color: #9c27b0;
   background: linear-gradient(180deg, #1d1128 0%, #100b17 100%);
 }
+
 .consumable-type-planet {
   border-color: #00bcd4;
   background: linear-gradient(180deg, #0a1f29 0%, #081116 100%);
@@ -462,7 +717,7 @@ body, html {
   align-items: center;
   justify-content: space-between;
   padding: 8px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.8), inset 0 0 15px rgba(243, 156, 18, 0.2);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(243, 156, 18, 0.2);
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
@@ -477,8 +732,15 @@ body, html {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.97); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* ==========================================================================
@@ -521,6 +783,7 @@ body, html {
   color: #f8fafc !important;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.85), inset 0 0 15px rgba(0, 0, 0, 0.6) !important;
 }
+
 .playing-card.enhancement-stone .card-pips-container,
 .playing-card.enhancement-stone .card-center-stone {
   color: #94a3b8 !important;
@@ -549,28 +812,159 @@ body, html {
    BALATRO EDITIONS (Foil, Holographic, Polychrome)
    ========================================================================== */
 
-/* Foil: +50 Chips silvery luster */
-.playing-card.edition-foil, .joker-card.edition-foil {
-  box-shadow: 0 0 20px rgba(224, 242, 254, 0.8), inset 0 0 12px rgba(255, 255, 255, 0.7) !important;
-  border-color: #bae6fd !important;
+/* Foil: Dynamic silver shimmer sweep across the card face */
+.playing-card.edition-foil,
+.joker-card.edition-foil,
+.consumable-card.edition-foil {
+  box-shadow: 0 0 22px rgba(186, 230, 253, 0.85), inset 0 0 12px rgba(255, 255, 255, 0.8) !important;
+  border-color: #e0f2fe !important;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Holographic: +10 Mult prismatic sheen */
-.playing-card.edition-holo, .joker-card.edition-holo {
-  box-shadow: 0 0 22px rgba(236, 72, 153, 0.7), inset 0 0 14px rgba(147, 51, 234, 0.5) !important;
+.playing-card.edition-foil::before,
+.joker-card.edition-foil::before,
+.consumable-card.edition-foil::before {
+  content: '';
+  position: absolute;
+  inset: -60%;
+  background: linear-gradient(115deg,
+      transparent 20%,
+      rgba(255, 255, 255, 0.15) 35%,
+      rgba(255, 255, 255, 0.7) 45%,
+      rgba(215, 240, 255, 0.9) 50%,
+      rgba(255, 255, 255, 0.7) 55%,
+      rgba(255, 255, 255, 0.15) 65%,
+      transparent 80%);
+  transform: rotate(25deg);
+  animation: foilShimmerSweep 3s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes foilShimmerSweep {
+  0% {
+    transform: translateY(-130%) rotate(25deg);
+  }
+
+  100% {
+    transform: translateY(130%) rotate(25deg);
+  }
+}
+
+/* Holographic: Rainbow spectral gradient shifting as the card moves */
+.playing-card.edition-holo,
+.joker-card.edition-holo,
+.consumable-card.edition-holo {
+  box-shadow: 0 0 24px rgba(236, 72, 153, 0.85), inset 0 0 14px rgba(147, 51, 234, 0.6) !important;
   border-color: #f472b6 !important;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Polychrome: ×1.5 Mult shifting prismatic rainbow */
-@keyframes polyShimmer {
-  0% { box-shadow: 0 0 24px rgba(239, 68, 68, 0.8), inset 0 0 10px rgba(245, 158, 11, 0.6); border-color: #ef4444; }
-  33% { box-shadow: 0 0 24px rgba(16, 185, 129, 0.8), inset 0 0 10px rgba(59, 130, 246, 0.6); border-color: #10b981; }
-  66% { box-shadow: 0 0 24px rgba(168, 85, 247, 0.8), inset 0 0 10px rgba(236, 72, 153, 0.6); border-color: #a855f7; }
-  100% { box-shadow: 0 0 24px rgba(239, 68, 68, 0.8), inset 0 0 10px rgba(245, 158, 11, 0.6); border-color: #ef4444; }
+.playing-card.edition-holo::before,
+.joker-card.edition-holo::before,
+.consumable-card.edition-holo::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background: linear-gradient(125deg,
+      rgba(255, 0, 0, 0.4) 0%,
+      rgba(255, 154, 0, 0.4) 15%,
+      rgba(240, 230, 0, 0.4) 30%,
+      rgba(0, 230, 118, 0.4) 45%,
+      rgba(0, 229, 255, 0.4) 60%,
+      rgba(156, 39, 176, 0.4) 75%,
+      rgba(255, 0, 128, 0.4) 90%,
+      rgba(255, 0, 0, 0.4) 100%);
+  background-size: 200% 200%;
+  animation: holoSpectralShift 4s ease-in-out infinite alternate;
+  mix-blend-mode: color-dodge;
+  pointer-events: none;
+  z-index: 10;
 }
 
-.playing-card.edition-polychrome, .joker-card.edition-polychrome {
-  animation: polyShimmer 3s infinite ease-in-out !important;
+@keyframes holoSpectralShift {
+  0% {
+    background-position: 0% 0%;
+  }
+
+  50% {
+    background-position: 100% 100%;
+  }
+
+  100% {
+    background-position: 0% 100%;
+  }
+}
+
+/* Polychrome: Multi-chromatic color-cycling glow effect */
+@keyframes polyBorderCycle {
+  0% {
+    border-color: #ff4757 !important;
+    box-shadow: 0 0 25px rgba(255, 71, 87, 0.9), inset 0 0 10px rgba(245, 158, 11, 0.6) !important;
+  }
+
+  25% {
+    border-color: #ffa502 !important;
+    box-shadow: 0 0 25px rgba(255, 165, 2, 0.9), inset 0 0 10px rgba(255, 230, 0, 0.6) !important;
+  }
+
+  50% {
+    border-color: #2ed573 !important;
+    box-shadow: 0 0 25px rgba(46, 213, 115, 0.9), inset 0 0 10px rgba(0, 255, 150, 0.6) !important;
+  }
+
+  75% {
+    border-color: #1e90ff !important;
+    box-shadow: 0 0 25px rgba(30, 144, 255, 0.9), inset 0 0 10px rgba(168, 85, 247, 0.6) !important;
+  }
+
+  100% {
+    border-color: #ff4757 !important;
+    box-shadow: 0 0 25px rgba(255, 71, 87, 0.9), inset 0 0 10px rgba(245, 158, 11, 0.6) !important;
+  }
+}
+
+.playing-card.edition-polychrome,
+.joker-card.edition-polychrome,
+.consumable-card.edition-polychrome {
+  animation: polyBorderCycle 3.5s linear infinite !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.playing-card.edition-polychrome::before,
+.joker-card.edition-polychrome::before,
+.consumable-card.edition-polychrome::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+      rgba(255, 75, 75, 0.4),
+      rgba(255, 215, 0, 0.4),
+      rgba(50, 205, 50, 0.4),
+      rgba(30, 144, 255, 0.4),
+      rgba(186, 85, 211, 0.4));
+  background-size: 300% 300%;
+  animation: polyGradientFlow 4s linear infinite;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes polyGradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* Pack Card Item Layout */
@@ -590,7 +984,1033 @@ body, html {
 
 .pack-card-slot:hover {
   transform: translateY(-4px) scale(1.03);
-  border-color: #f0ad28;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.75), 0 0 14px rgba(240, 173, 40, 0.35);
+  border-color: #d49b28;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.75), 0 0 14px rgba(212, 155, 40, 0.35);
 }
 
+/* ==========================================================================
+   TITLE / HOME SCREEN (Exact match to Photo 1)
+   ========================================================================== */
+.title-balatro-text {
+  font-family: 'VT323', monospace;
+  color: #f8fafc;
+  background: linear-gradient(180deg, #ffffff 0%, #ffffff 32%, #009dff 36%, #ffffff 40%, #ffffff 58%, #fe5f55 62%, #ffffff 66%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(-3px -3px 0 #1b2631) drop-shadow(3px -3px 0 #1b2631) drop-shadow(-3px 3px 0 #1b2631) drop-shadow(3px 3px 0 #1b2631) drop-shadow(0 10px 0 #0d131a) drop-shadow(0 18px 30px rgba(0, 0, 0, 0.95));
+  letter-spacing: 6px;
+}
+
+.title-locked-joker-card {
+  animation: floatPadlock 3.2s ease-in-out infinite;
+}
+
+@keyframes floatPadlock {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+.title-btn {
+  font-family: 'VT323', monospace;
+  letter-spacing: 2px;
+  border-bottom-width: 4px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7), inset 0 2px 0 rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  transition: transform 0.1s ease, filter 0.15s ease;
+}
+
+.title-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+.title-btn:active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+
+/* ==========================================================================
+   DECK & STAKE SELECTOR MODAL (Exact match to Photo 2)
+   ========================================================================== */
+.deck-modal-dialog {
+  background: #27343b;
+  border: 4px solid #4a5d67;
+  border-radius: 26px;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.tab-pointer-triangle {
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 9px solid #fe5f55;
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.deck-arrow-pill {
+  width: 30px;
+  height: 72px;
+  background: #fe5f55;
+  border: 2px solid #ff857d;
+  border-bottom: 4px solid #c93b32;
+  border-radius: 12px;
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: transform 0.1s ease, filter 0.1s ease;
+}
+
+.deck-arrow-pill:hover {
+  filter: brightness(1.1);
+  transform: scale(1.04);
+}
+
+.deck-arrow-pill:active {
+  transform: scale(0.96);
+  border-bottom-width: 2px;
+}
+
+.stake-arrow-pill {
+  width: 26px;
+  height: 48px;
+  background: #fe5f55;
+  border: 2px solid #ff857d;
+  border-bottom: 3px solid #c93b32;
+  border-radius: 10px;
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: transform 0.1s ease, filter 0.1s ease;
+}
+
+.stake-arrow-pill:hover {
+  filter: brightness(1.1);
+  transform: scale(1.05);
+}
+
+.stake-arrow-pill:active {
+  transform: scale(0.95);
+  border-bottom-width: 2px;
+}
+
+.deck-rule-box {
+  background: #ffffff;
+  color: #1e293b;
+  border-radius: 12px;
+  padding: 10px 14px;
+  border: 2px solid #cbd5e1;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06), 0 4px 10px rgba(0, 0, 0, 0.12);
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+  position: relative;
+}
+
+.deck-play-btn {
+  background: #009dff;
+  border: 2px solid #54b8ff;
+  border-bottom: 5px solid #006eb3;
+  color: #ffffff;
+  font-family: 'VT323', monospace;
+  font-size: 36px;
+  letter-spacing: 3px;
+  border-radius: 18px;
+  padding: 10px 0;
+  width: 100%;
+  box-shadow: 0 10px 25px rgba(0, 157, 255, 0.45);
+  cursor: pointer;
+  transition: transform 0.1s ease, filter 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.deck-play-btn:hover {
+  filter: brightness(1.1);
+}
+
+.deck-play-btn:active {
+  transform: translateY(3px);
+  border-bottom-width: 2px;
+}
+
+.deck-back-btn {
+  background: #e67e22;
+  border: 2px solid #f39c12;
+  border-bottom: 4px solid #a85208;
+  color: #ffffff;
+  font-family: 'VT323', monospace;
+  font-size: 24px;
+  letter-spacing: 2px;
+  border-radius: 14px;
+  padding: 6px 0;
+  width: 100%;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  transition: transform 0.1s ease, filter 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.deck-back-btn:hover {
+  filter: brightness(1.08);
+}
+
+.deck-back-btn:active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+
+.btn-prompt-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.btn-prompt-x {
+  background: #0077c2;
+  border: 1.5px solid #ffffff;
+  color: #ffffff;
+}
+
+.btn-prompt-b {
+  background: #c0392b;
+  border: 1.5px solid #ffffff;
+  color: #ffffff;
+}
+
+/* 3D DECK PREVIEW STACK */
+.deck-preview-card {
+  width: 86px;
+  height: 122px;
+  border-radius: 12px;
+  background-color: #f8fafc;
+  border: 3px solid #2d3748;
+  box-shadow:
+    2px 2px 0 #ffffff,
+    4px 4px 0 #e2e8f0,
+    6px 6px 0 #cbd5e1,
+    8px 8px 0 #94a3b8,
+    12px 14px 22px rgba(0, 0, 0, 0.85);
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.3, 1.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.deck-preview-card:hover {
+  transform: translateY(-3px) scale(1.03);
+}
+
+.deck-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3a4a54;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.deck-dot.active {
+  background: #ffffff;
+  width: 14px;
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+/* ==========================================================================
+   COLLECTION & UNLOCKABLES
+   ========================================================================== */
+.collection-card {
+  background: rgba(18, 22, 28, 0.9);
+  border: 2px solid #334155;
+  border-radius: 14px;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  min-height: 160px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.collection-card:hover {
+  transform: translateY(-4px) scale(1.03);
+  border-color: #2ecc71;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.8);
+}
+
+.collection-card.is-locked {
+  filter: grayscale(0.85) brightness(0.65);
+  border-style: dashed;
+  border-color: #64748b;
+}
+
+.collection-card.is-locked:hover {
+  filter: grayscale(0.4) brightness(0.85);
+  border-color: #ef4444;
+}
+
+/* ==========================================================================
+   AUTHENTIC BALATRO POLISH: JOKER RARITIES, STICKERS, SHOP SHELVES & PARTICLES
+   ========================================================================== */
+
+/* Crisp stark-white borders & drop shadows */
+.playing-card {
+  border: 2.5px solid #ffffff !important;
+}
+
+.joker-card {
+  border: 2.5px solid #ffffff !important;
+  background: #14171a;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.75), 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Joker Rarity Banners (Part 1: Exact Balatro Rarity Palette) */
+.joker-rarity-banner {
+  width: 100%;
+  padding: 2px 4px;
+  font-size: 8px;
+  font-weight: 900;
+  text-transform: uppercase;
+  text-align: center;
+  border-radius: 5px;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+  line-height: 1.2;
+}
+
+.rarity-common {
+  background: #0072b2;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 114, 178, 0.65);
+}
+
+.rarity-uncommon {
+  background: #16a085;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(22, 160, 133, 0.65);
+}
+
+.rarity-rare {
+  background: #c0392b;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(192, 57, 43, 0.65);
+}
+
+.rarity-legendary {
+  background: #8e44ad;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(142, 68, 173, 0.85);
+}
+
+
+
+/* Loyalty Card Persistent Live Countdown Badge (Part 3) */
+.loyalty-badge {
+  font-family: 'VT323', monospace;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: #1b2631;
+  color: #5dade2;
+  border: 1.5px solid #2e86c1;
+  box-shadow: 0 0 8px rgba(46, 134, 193, 0.5);
+  margin-top: 1px;
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+}
+
+.loyalty-badge.active-glow {
+  background: #78281f;
+  color: #f9e79f;
+  border-color: #f39c12;
+  box-shadow: 0 0 16px rgba(243, 156, 18, 0.95);
+  animation: loyaltyPulse 0.75s ease-in-out infinite alternate;
+}
+
+@keyframes loyaltyPulse {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+
+  100% {
+    transform: scale(1.08);
+    filter: brightness(1.35);
+  }
+}
+
+/* Joker Stickers (Eternal, Perishable, Rental) */
+.joker-sticker {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  font-size: 10px;
+  padding: 1.5px 5px;
+  border-radius: 9999px;
+  font-weight: 900;
+  text-transform: uppercase;
+  z-index: 20;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.85);
+  line-height: 1.2;
+}
+
+.sticker-eternal {
+  background: #b7950b;
+  color: #fff;
+  border: 1.5px solid #f4d03f;
+}
+
+.sticker-perishable {
+  background: #d35400;
+  color: #fff;
+  border: 1.5px solid #e59866;
+}
+
+.sticker-rental {
+  background: #117864;
+  color: #a3e4d7;
+  border: 1.5px solid #1abc9c;
+}
+
+/* Shop Shelves: Dark inset wooden or grooved felt trays framed by sharp glowing neon-orange borders */
+.shop-shelf-tray {
+  background: radial-gradient(circle at 50% 30%, #151a1e 0%, #0a0d10 100%);
+  border: 2.5px solid #e67e22;
+  box-shadow: 0 0 18px rgba(230, 126, 34, 0.45), inset 0 4px 16px rgba(0, 0, 0, 0.9);
+  border-radius: 18px;
+  padding: 12px;
+  position: relative;
+}
+
+/* Reroll 3D Card Shuffle Flip Animation */
+@keyframes rerollFlip {
+  0% {
+    transform: rotateY(0deg) scale(1);
+  }
+
+  50% {
+    transform: rotateY(90deg) scale(0.88);
+    opacity: 0.4;
+  }
+
+  100% {
+    transform: rotateY(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+.card-reroll-anim {
+  animation: rerollFlip 0.35s ease-in-out;
+}
+
+/* Floating Cash Pop Particle (-$X) when cash is spent */
+.cash-pop-particle {
+  position: fixed;
+  font-family: 'VT323', monospace;
+  font-size: 26px;
+  font-weight: 900;
+  color: #fe5f55;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95);
+  pointer-events: none;
+  z-index: 100;
+  animation: cashPopUp 0.85s ease-out forwards;
+}
+
+@keyframes cashPopUp {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(0, -45px) scale(1.2);
+  }
+}
+
+/* Golden Chip Burst Particles Spraying into Target Counter */
+.chip-burst-particle {
+  position: fixed;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff, #f39c12);
+  box-shadow: 0 0 10px #f1c40f, 0 0 20px #e67e22;
+  pointer-events: none;
+  z-index: 100;
+  animation: chipBurstFly 0.75s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes chipBurstFly {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: var(--burst-target) scale(0.3);
+  }
+}
+
+/* ==========================================================================
+   AUTHENTIC BALATRO SHOP ARCHITECTURE & HOVER TOOLTIPS (sho[.jpg)
+   ========================================================================== */
+
+/* Authentic Red Marquee Carnival Bulb SHOP Header */
+.shop-marquee-box {
+  background: radial-gradient(circle at 50% 40%, #2b1515 0%, #160c0c 100%);
+  border: 3px solid #fe5f55;
+  box-shadow: 0 0 16px rgba(254, 95, 85, 0.6), inset 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.marquee-bulbs-strip {
+  width: 100%;
+  height: 6px;
+  background-image: radial-gradient(circle, #fff7b2 2px, transparent 2.5px);
+  background-size: 10px 6px;
+  background-repeat: repeat-x;
+  animation: bulbFlicker 1.2s infinite alternate;
+}
+
+@keyframes bulbFlicker {
+  0% {
+    opacity: 0.7;
+    filter: drop-shadow(0 0 2px #f1c40f);
+  }
+
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 6px #f39c12);
+  }
+
+  100% {
+    opacity: 0.85;
+    filter: drop-shadow(0 0 3px #f1c40f);
+  }
+}
+
+.marquee-shop-text {
+  letter-spacing: 4px;
+  text-shadow: 0 0 10px rgba(240, 173, 40, 0.8), 2px 2px 0px #900;
+}
+
+/* Floating Gold Price Tags directly above cards (sho[.jpg) */
+.shop-price-tag {
+  position: absolute;
+  top: -14px;
+  z-index: 30;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.price-affordable {
+  background: #19160e;
+  border: 2px solid #f0ad28;
+  color: #f0ad28;
+  text-shadow: 0 0 6px rgba(240, 173, 40, 0.6);
+}
+
+.price-unaffordable {
+  background: #181111;
+  border: 2px solid #7f1d1d;
+  color: #94a3b8;
+  opacity: 0.6;
+}
+
+.shop-card-slot:hover .shop-price-tag,
+.shop-voucher-slot:hover .shop-price-tag,
+.shop-pack-slot:hover .shop-price-tag {
+  transform: translateY(-2px) scale(1.08);
+}
+
+/* Recessed Shop Board & Grooves */
+.shop-main-recessed-board {
+  background: radial-gradient(circle at 50% 30%, #1e262d 0%, #11171d 100%);
+  border: 4px solid #33414d;
+  box-shadow: inset 0 6px 24px rgba(0, 0, 0, 0.85), 0 12px 32px rgba(0, 0, 0, 0.7);
+}
+
+.shop-shelf-groove {
+  background: radial-gradient(circle at 50% 50%, #151b22 0%, #0c1015 100%);
+  border: 2.5px solid #232d36;
+  box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.85);
+}
+
+.shop-empty-slot {
+  background: rgba(0, 0, 0, 0.35);
+  border: 2px dashed #2b3844;
+  border-radius: 14px;
+  min-height: 140px;
+  width: 100%;
+}
+
+.shop-action-btn {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6), inset 0 2px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.1s ease, filter 0.1s ease;
+}
+
+.shop-action-btn:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+}
+
+.shop-action-btn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.97);
+}
+
+/* Blueprint & Brainstorm Live Target Badges */
+.blueprint-badge {
+  font-size: 8px;
+  font-weight: 900;
+  text-transform: uppercase;
+  padding: 1px 4px;
+  border-radius: 4px;
+  margin-top: 2px;
+  max-width: 90%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.blueprint-active {
+  background: #064e3b;
+  color: #34d399;
+  border: 1px solid #10b981;
+  box-shadow: 0 0 6px rgba(52, 211, 153, 0.4);
+}
+
+.blueprint-no-target {
+  background: #334155;
+  color: #94a3b8;
+  border: 1px solid #475569;
+}
+
+/* Floating High-Contrast Balatro Tooltip */
+.balatro-tooltip-box {
+  position: fixed;
+  z-index: 1000;
+  max-width: 270px;
+  min-width: 200px;
+  background: #141920;
+  border: 2px solid #334155;
+  border-radius: 12px;
+  padding: 10px 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+  font-family: inherit;
+  transition: opacity 0.1s ease;
+}
+
+.tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #273544;
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+}
+
+.tooltip-title {
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.tooltip-rarity-pill {
+  font-size: 9px;
+  font-weight: 900;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+.tooltip-body {
+  font-size: 12px;
+  color: #e2e8f0;
+  line-height: 1.35;
+  font-weight: 600;
+  margin: 6px 0;
+}
+
+.tooltip-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #273544;
+  padding-top: 6px;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.tooltip-price-tag {
+  color: #f0ad28;
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+}
+
+.tooltip-sell-tag {
+  color: #cbd5e1;
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+}
+
+.tooltip-category-tag {
+  color: #64748b;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+/* Tooltip Keyword Highlights */
+.kw-mult {
+  color: #fe5f55;
+  font-weight: 800;
+}
+
+.kw-chips {
+  color: #009dff;
+  font-weight: 800;
+}
+
+.kw-money {
+  color: #f0ad28;
+  font-weight: 800;
+}
+
+.kw-chance {
+  color: #2ecc71;
+  font-weight: 800;
+}
+
+.tooltip-badges-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.tooltip-badge {
+  font-size: 8px;
+  font-weight: 900;
+  padding: 1px 5px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.badge-foil {
+  background: #1e3a8a;
+  color: #93c5fd;
+  border: 1px solid #3b82f6;
+}
+
+.badge-holo {
+  background: #581c87;
+  color: #d8b4fe;
+  border: 1px solid #a855f7;
+}
+
+.badge-polychrome {
+  background: linear-gradient(135deg, #ef4444, #eab308, #3b82f6);
+  color: #ffffff;
+  border: 1px solid #ffffff;
+}
+
+.badge-eternal {
+  background: #475569;
+  color: #f1f5f9;
+}
+
+.badge-perishable {
+  background: #7c2d12;
+  color: #fed7aa;
+}
+
+.badge-rental {
+  background: #064e3b;
+  color: #a7f3d0;
+}
+
+.tooltip-dynamic-status {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 6px;
+  border-radius: 6px;
+  margin-top: 6px;
+}
+
+.status-active {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid #f59e0b;
+}
+
+.status-pending {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+  border: 1px solid #3b82f6;
+}
+
+.status-copying {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid #10b981;
+}
+
+.status-no-target {
+  background: rgba(100, 116, 139, 0.2);
+  color: #94a3b8;
+  border: 1px solid #64748b;
+}
+
+/* ==========================================================================
+   AUTHENTIC BALATRO BOOSTER PACK METALLIC FOIL PACKAGING
+   (Matching media_1791707667079.jpg)
+   ========================================================================== */
+
+.shop-pack-slot {
+  width: 96px;
+  min-height: 148px;
+}
+
+@media (min-width: 640px) {
+  .shop-pack-slot {
+    width: 112px;
+    min-height: 168px;
+  }
+}
+
+.booster-foil-pouch {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.85), inset 0 0 10px rgba(0, 0, 0, 0.25);
+  transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.2), box-shadow 0.22s ease, filter 0.22s ease;
+  position: relative;
+  cursor: pointer;
+}
+
+.shop-pack-slot:hover .booster-foil-pouch {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 20px 34px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 255, 255, 0.45);
+  filter: brightness(1.08);
+}
+
+/* Top & Bottom Corrugated Heat-Seal Crimp Bars */
+.pack-crimp-header {
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  background: linear-gradient(180deg, #f8fafc 0%, #cbd5e1 35%, #94a3b8 70%, #64748b 100%);
+  border-bottom: 1.5px solid rgba(0, 0, 0, 0.45);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  position: relative;
+  overflow: hidden;
+}
+
+.pack-crimp-footer {
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  background: linear-gradient(0deg, #f8fafc 0%, #cbd5e1 35%, #94a3b8 70%, #64748b 100%);
+  border-top: 1.5px solid rgba(0, 0, 0, 0.45);
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.5), inset 0 -1px 0 rgba(255, 255, 255, 0.85);
+  position: relative;
+  overflow: hidden;
+}
+
+.crimp-teeth-strip {
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(90deg,
+      rgba(255, 255, 255, 0.9) 0px,
+      rgba(255, 255, 255, 0.9) 2px,
+      rgba(51, 65, 85, 0.75) 2px,
+      rgba(51, 65, 85, 0.75) 5px);
+  opacity: 0.8;
+}
+
+/* Specular Foil Glare Sheen */
+.pack-specular-glare {
+  background: linear-gradient(125deg,
+      rgba(255, 255, 255, 0.45) 0%,
+      rgba(255, 255, 255, 0.12) 28%,
+      transparent 32%,
+      transparent 65%,
+      rgba(255, 255, 255, 0.25) 85%,
+      transparent 100%);
+  mix-blend-mode: overlay;
+}
+
+.pack-title-primary {
+  text-shadow: 0 2px 0 #000, 0 3px 0 rgba(0, 0, 0, 0.7), 0 0 6px rgba(255, 255, 255, 0.7);
+}
+
+.pack-title-secondary {
+  text-shadow: 0 1.5px 0 #000, 0 2.5px 0 rgba(0, 0, 0, 0.7);
+}
+
+.pack-tier-ribbon {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+/* ==========================================================================
+   AUTHENTIC VOUCHER COUPON TICKET (Matching media_1791707667079.jpg)
+   ========================================================================== */
+
+.shop-voucher-slot {
+  width: 96px;
+  min-height: 148px;
+}
+
+@media (min-width: 640px) {
+  .shop-voucher-slot {
+    width: 112px;
+    min-height: 168px;
+  }
+}
+
+.voucher-ticket-frame {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 50%, #991b1b 0%, #7f1d1d 55%, #450a0a 100%);
+  border: 2.5px solid #f59e0b;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.8), inset 0 0 12px rgba(0, 0, 0, 0.6);
+  position: relative;
+  transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.2), box-shadow 0.22s ease;
+  overflow: hidden;
+}
+
+.shop-voucher-slot:hover .voucher-ticket-frame {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.9), 0 0 18px rgba(245, 158, 11, 0.6);
+}
+
+/* Notched perforated ticket edges */
+.voucher-ticket-frame::before,
+.voucher-ticket-frame::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  background: #11171d;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+}
+
+.voucher-ticket-frame::before {
+  left: -7px;
+  border-right: 2px solid #f59e0b;
+}
+
+.voucher-ticket-frame::after {
+  right: -7px;
+  border-left: 2px solid #f59e0b;
+}
+
+/* In-Run Sidebar Options Button (Matching media_1791707667079.jpg) */
+.sidebar-options-btn {
+  background: #f0ad28;
+  border: 2px solid #fcd34d;
+  border-bottom: 3.5px solid #b45309;
+  border-radius: 12px;
+  font-family: 'VT323', monospace;
+  font-size: 19px;
+  font-weight: 900;
+  color: #1e293b;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
+  transition: transform 0.1s ease, filter 0.1s ease;
+  cursor: pointer;
+}
+
+.sidebar-options-btn:hover {
+  filter: brightness(1.12);
+  transform: translateY(-2px);
+}
+
+.sidebar-options-btn:active {
+  transform: translateY(2px);
+  border-bottom-width: 1.5px;
+}
+
+/* Notification Pop Toast */
+.balatro-toast {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: rgba(15, 23, 42, 0.95);
+  border: 2px solid #f0ad28;
+  color: #fef08a;
+  padding: 8px 24px;
+  border-radius: 16px;
+  font-family: 'VT323', monospace;
+  font-size: 24px;
+  font-weight: 900;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85);
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.balatro-toast.toast-visible {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}

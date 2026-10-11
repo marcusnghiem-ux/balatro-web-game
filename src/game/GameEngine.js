@@ -10,8 +10,12 @@ import { JokerSystem } from './JokerSystem.js';
 import { ScoringEngine } from './ScoringEngine.js';
 import { ConsumableSystem } from './ConsumableSystem.js';
 import { ShopEngine } from './ShopEngine.js';
+import { DECKS, STAKES } from './DeckDefinitions.js';
+import { unlockablesManager } from './UnlockablesSystem.js';
+import { saveManager } from './SaveManager.js';
 
 export const GAME_STATES = {
+  TITLE: 'TITLE',
   BLIND_SELECT: 'BLIND_SELECT',
   SELECTING: 'SELECTING',
   SCORING: 'SCORING',
@@ -28,14 +32,27 @@ export const BLIND_TYPES = {
 };
 
 export const BOSS_MODIFIERS = [
-  { name: 'The Hook', desc: 'Discards 2 random cards per hand played', onHandPlayed: (game) => game.discardRandomCards(2), icon: '⚓' },
-  { name: 'The Psychic', desc: 'Must play 5 cards', minCardsPlayed: 5, icon: '👁️' },
-  { name: 'The Goad', desc: 'All Spades are debuffed', apply: (card) => card.suit === 'spades', icon: '♠️' },
-  { name: 'The Head', desc: 'All Hearts are debuffed', apply: (card) => card.suit === 'hearts', icon: '♥️' },
-  { name: 'The Window', desc: 'All Diamonds are debuffed', apply: (card) => card.suit === 'diamonds', icon: '♦️' },
-  { name: 'The Club', desc: 'All Clubs are debuffed', apply: (card) => card.suit === 'clubs', icon: '♣️' },
-  { name: 'The Wall', desc: 'Extra large blind requirement', isWall: true, icon: '🧱' },
-  { name: 'The Water', desc: 'Start with 0 discards this round', startDiscards: 0, icon: '🌊' }
+  { id: 'boss_hook', name: 'The Hook', desc: 'Discards 2 random cards per hand played', onHandPlayed: (game) => game.discardRandomCards(2), icon: '⚓', color: '#992d22', border: '#e74c3c' },
+  { id: 'boss_ox', name: 'The Ox', desc: 'Playing your most played hand sets money to $0', icon: '🐂', color: '#784212', border: '#b9770e' },
+  { id: 'boss_house', name: 'The House', desc: 'First hand is drawn face down', icon: '🏚️', color: '#1b2631', border: '#34495e' },
+  { id: 'boss_wall', name: 'The Wall', desc: 'Extra large blind requirement (3.5x base chips)', isWall: true, icon: '🧱', color: '#3e4444', border: '#7f8c8d' },
+  { id: 'boss_wheel', name: 'The Wheel', desc: '1 in 7 cards are drawn face down', icon: '🎡', color: '#196f3d', border: '#27ae60' },
+  { id: 'boss_arm', name: 'The Arm', desc: 'Decrease level of played poker hand', onHandPlayed: (game, handName) => { if (game.handLevels[handName] > 1) game.handLevels[handName]--; }, icon: '🦾', color: '#935116', border: '#e59866' },
+  { id: 'boss_fish', name: 'The Fish', desc: 'Cards drawn face down after each hand played', icon: '🐟', color: '#117864', border: '#16a085' },
+  { id: 'boss_psychic', name: 'The Psychic', desc: 'Must play exactly 5 cards', minCardsPlayed: 5, icon: '👁️', color: '#5b2c6f', border: '#8e44ad' },
+  { id: 'boss_goad', name: 'The Goad', desc: 'All Spades are debuffed', apply: (card) => card.suit === 'spades', icon: '♠️', color: '#212f3d', border: '#566573' },
+  { id: 'boss_head', name: 'The Head', desc: 'All Hearts are debuffed', apply: (card) => card.suit === 'hearts', icon: '♥️', color: '#78281f', border: '#c0392b' },
+  { id: 'boss_window', name: 'The Window', desc: 'All Diamonds are debuffed', apply: (card) => card.suit === 'diamonds', icon: '♦️', color: '#922b21', border: '#d98880' },
+  { id: 'boss_club', name: 'The Club', desc: 'All Clubs are debuffed', apply: (card) => card.suit === 'clubs', icon: '♣️', color: '#145a32', border: '#2ecc71' },
+  { id: 'boss_pillar', name: 'The Pillar', desc: 'Cards played previously this Ante are debuffed', icon: '🏛️', color: '#17202a', border: '#415b76' },
+  { id: 'boss_eye', name: 'The Eye', desc: 'No repeat hand types this round', noRepeatHands: true, icon: '🧿', color: '#6c3483', border: '#bb8fce' },
+  { id: 'boss_mouth', name: 'The Mouth', desc: 'Play only 1 hand type this round', singleHandType: true, icon: '👄', color: '#873600', border: '#dc7633' },
+  { id: 'boss_plant', name: 'The Plant', desc: 'All face cards are debuffed', apply: (card) => ['J', 'Q', 'K'].includes(card.rank), icon: '🌿', color: '#1e8449', border: '#52be80' },
+  { id: 'boss_serpent', name: 'The Serpent', desc: 'After Play or Discard, always draw 3 cards', icon: '🐍', color: '#0e6251', border: '#1abc9c' },
+  { id: 'boss_water', name: 'The Water', desc: 'Start with 0 discards this round', startDiscards: 0, icon: '🌊', color: '#1f618d', border: '#5dade2' },
+  { id: 'boss_needle', name: 'The Needle', desc: 'Play only 1 hand this round', maxHands: 1, icon: '🪡', color: '#4a235a', border: '#a569bd' },
+  { id: 'boss_flint', name: 'The Flint', desc: 'Base Chips and Mult are halved', halfBase: true, icon: '🪵', color: '#b9770e', border: '#f39c12' },
+  { id: 'boss_mark', name: 'The Mark', desc: 'All face cards are drawn face down', icon: '🎭', color: '#641e16', border: '#cd6155' }
 ];
 
 export const SKIP_TAGS = [
@@ -84,6 +101,8 @@ export class GameEngine {
 
     this.state = GAME_STATES.BLIND_SELECT;
     this.listeners = [];
+    this.endlessMode = false;
+    this.saveManager = saveManager;
 
     this.initDeck();
     this.setupAnteBlinds();
@@ -103,6 +122,16 @@ export class GameEngine {
   notify(event, data) {
     for (const listener of this.listeners) {
       listener(event, data, this);
+    }
+    // Auto-save on meaningful state changes
+    const autoSaveEvents = [
+      'ROUND_STARTED', 'ROUND_WON', 'HAND_RESOLVED', 'DISCARDED',
+      'SHOP_ITEM_BOUGHT', 'VOUCHER_BOUGHT', 'PACK_CARD_PICKED', 'PACK_SKIPPED',
+      'SHOP_REROLLED', 'CONSUMABLE_USED', 'CONSUMABLE_SOLD', 'JOKER_SOLD',
+      'BLIND_SKIPPED', 'ENDLESS_MODE_STARTED', 'BLIND_SELECTED'
+    ];
+    if (this.saveManager && autoSaveEvents.includes(event)) {
+      this.saveManager.saveCurrentRun(this);
     }
   }
 
@@ -131,12 +160,26 @@ export class GameEngine {
   }
 
   /**
-   * Start a brand new game run
+   * Start a brand new game run with specified Deck and Stake
    */
-  startNewRun() {
+  startNewRun(deckId = 'deck_red', stakeId = 'stake_white') {
+    this.selectedDeck = DECKS.find(d => d.id === deckId) || DECKS[0];
+    this.selectedStake = STAKES.find(s => s.id === stakeId) || STAKES[0];
+
     this.ante = 1;
     this.blindIndex = 0;
     this.money = 4;
+    this.maxHands = 4;
+    this.handsLeft = 4;
+    this.maxDiscards = 3;
+    this.discardsLeft = 3;
+    this.maxHandSize = 8;
+    this.endlessMode = false;
+    this.greenDeckActive = false;
+    this.ghostDeckActive = false;
+    this.anaglyphDeckActive = false;
+    this.plasmaDeckActive = false;
+
     this.jokerSystem = new JokerSystem(5);
     this.consumableSystem = new ConsumableSystem(2);
     this.shopCardSlots = 2;
@@ -150,18 +193,61 @@ export class GameEngine {
     }
 
     this.initDeck();
+
+    // Apply Deck Modifiers
+    if (this.selectedDeck && this.selectedDeck.apply) {
+      this.selectedDeck.apply(this);
+    }
+
+    // Apply Stake Modifiers
+    if (this.selectedStake.discardPenalty) {
+      this.maxDiscards = Math.max(1, this.maxDiscards - this.selectedStake.discardPenalty);
+      this.discardsLeft = this.maxDiscards;
+    }
+    if (this.selectedStake.handSizePenalty) {
+      this.maxHandSize = Math.max(5, this.maxHandSize - this.selectedStake.handSizePenalty);
+    }
+
     this.setupAnteBlinds();
     this.state = GAME_STATES.BLIND_SELECT;
+    if (this.saveManager) this.saveManager.saveCurrentRun(this);
     this.notify('BLIND_SELECT_ENTERED');
   }
 
   /**
-   * Configures all 3 blinds for the current Ante (Small, Big, and Boss Blind)
-   * Targets match official Balatro numbers (e.g. Ante 1: 300/450/600, Ante 2: 800/1200/1600)
+   * Returns base chip target for Ante, scaling exponentially beyond Ante 8
+   */
+  getAnteTargetBase(ante) {
+    const baseAnteTargets = [300, 800, 2000, 5000, 11000, 20000, 35000, 50000];
+    if (ante <= 8) return baseAnteTargets[ante - 1] || 300;
+    
+    // Official Balatro exponential curve for Endless Mode (Ante 9+)
+    const endlessAnteTable = {
+      9: 110000,
+      10: 560000,
+      11: 7200000,
+      12: 300000000,
+      13: 47000000000,
+      14: 29000000000000,
+      15: 77000000000000000,
+      16: 860000000000000000000
+    };
+    if (endlessAnteTable[ante]) return endlessAnteTable[ante];
+    return Math.floor(50000 * Math.pow(1.6, ante - 8) * Math.pow(ante - 7, 3.2));
+  }
+
+  /**
+   * Configures all 3 blinds for current Ante, with unique individual colors per blind and boss!
    */
   setupAnteBlinds() {
-    const baseAnteTargets = [300, 800, 2000, 5000, 11000, 20000, 35000, 50000];
-    const anteBase = baseAnteTargets[Math.min(this.ante - 1, baseAnteTargets.length - 1)] || 50000;
+    let anteBase = this.getAnteTargetBase(this.ante);
+
+    if (this.selectedStake && this.selectedStake.scoreMultiplier) {
+      anteBase = Math.floor(anteBase * this.selectedStake.scoreMultiplier);
+    }
+    if (this.plasmaDeckActive) {
+      anteBase = Math.floor(anteBase * 2.0);
+    }
 
     const boss = BOSS_MODIFIERS[Math.floor(Math.random() * BOSS_MODIFIERS.length)];
     const bossTarget = boss.isWall ? Math.floor(anteBase * 3.5) : Math.floor(anteBase * 2.0);
@@ -173,9 +259,12 @@ export class GameEngine {
         index: 0,
         type: BLIND_TYPES.SMALL,
         name: 'Small Blind',
+        color: '#0072b2',
+        border: '#009dff',
+        badgeColor: '#0072b2',
         target: Math.floor(anteBase * 1.0),
-        reward: '$$$+',
-        rewardValue: 3,
+        reward: this.selectedStake?.noSmallBlindReward ? '$0' : '$$$+',
+        rewardValue: this.selectedStake?.noSmallBlindReward ? 0 : 3,
         tag: getRandomTag(),
         status: this.blindIndex === 0 ? 'active' : (this.blindIndex > 0 ? 'defeated' : 'upcoming')
       },
@@ -183,6 +272,9 @@ export class GameEngine {
         index: 1,
         type: BLIND_TYPES.BIG,
         name: 'Big Blind',
+        color: '#8c6d1f',
+        border: '#f39c12',
+        badgeColor: '#8c6d1f',
         target: Math.floor(anteBase * 1.5),
         reward: '$$$$+',
         rewardValue: 4,
@@ -193,10 +285,14 @@ export class GameEngine {
         index: 2,
         type: BLIND_TYPES.BOSS,
         name: boss.name,
+        color: boss.color || '#8b2626',
+        border: boss.border || '#e74c3c',
+        badgeColor: boss.color || '#8b2626',
         target: bossTarget,
         reward: '$$$$$+',
         rewardValue: 5,
         desc: boss.desc,
+        icon: boss.icon || '⚓',
         bossObj: boss,
         status: this.blindIndex === 2 ? 'active' : 'upcoming'
       }
@@ -370,6 +466,13 @@ export class GameEngine {
       this.discardPile.push(card);
     }
 
+    // Trigger on_discard hooks for Jokers (e.g. Castle, Ramen, Green Joker)
+    for (const joker of this.jokerSystem.getJokers()) {
+      if (typeof joker.onDiscard === 'function') {
+        joker.onDiscard(selected, this, joker);
+      }
+    }
+
     this.drawToHandSize();
     this.applyBossDebuffs();
     this.notify('DISCARDED', { discardedCount: selected.length });
@@ -418,11 +521,6 @@ export class GameEngine {
    * Called after scoring animations complete
    * @param {number} scorePoints
    */
-  /**
-   * Finalizes the played hand score into the round score
-   * Called after scoring animations complete
-   * @param {number} scorePoints
-   */
   commitScoredPoints(scorePoints) {
     this.roundScore += scorePoints;
 
@@ -432,6 +530,13 @@ export class GameEngine {
     for (const card of played) {
       card.selected = false;
       this.discardPile.push(card);
+    }
+
+    // Trigger onHandPlayed hooks for Jokers (Loyalty Card countdown & reset)
+    for (const joker of this.jokerSystem.getJokers()) {
+      if (typeof joker.onHandPlayed === 'function') {
+        joker.onHandPlayed(joker, this);
+      }
     }
 
     // Boss effect for 'The Hook': Discards 2 random cards per hand played
@@ -480,7 +585,23 @@ export class GameEngine {
       }
     }
 
-    const totalEarned = baseReward + handsBonus + interest + goldCardBonus + endRoundJokerBonus;
+    // Perishable Jokers: decrement remaining rounds; if 0, debuff joker
+    for (const joker of this.jokerSystem.getJokers()) {
+      if (joker.isPerishable && joker.perishableRoundsLeft !== undefined) {
+        joker.perishableRoundsLeft--;
+        if (joker.perishableRoundsLeft <= 0) {
+          joker.debuffed = true;
+        }
+      }
+    }
+
+    // Rental Jokers: cost -$3 per round
+    let rentalCost = 0;
+    for (const joker of this.jokerSystem.getJokers()) {
+      if (joker.isRental) rentalCost += 3;
+    }
+
+    const totalEarned = Math.max(0, baseReward + handsBonus + interest + goldCardBonus + endRoundJokerBonus - rentalCost);
     this.money += totalEarned;
 
     if (this.anteBlinds && this.anteBlinds[this.blindIndex]) {
@@ -494,6 +615,7 @@ export class GameEngine {
       interest,
       goldCardBonus,
       endRoundJokerBonus,
+      rentalCost,
       totalEarned
     });
 
@@ -506,9 +628,24 @@ export class GameEngine {
       }
     } else {
       // Defeated Boss Blind!
-      if (this.ante >= this.maxAnte) {
+      if (this.anaglyphDeckActive) {
+        this.applySkipTag({ name: 'Double Tag', icon: '🏷️', desc: 'Gives a copy of the next selected Tag' });
+      }
+
+      if (this.ante >= this.maxAnte && !this.endlessMode) {
+        unlockablesManager.recordWin(
+          this.selectedDeck ? this.selectedDeck.id : 'deck_red',
+          this.selectedStake ? this.selectedStake.id : 'stake_white'
+        );
+        if (this.saveManager) this.saveManager.clearActiveRun();
         this.state = GAME_STATES.VICTORY;
-        this.notify('GAME_VICTORY');
+        this.notify('GAME_VICTORY', {
+          ante: this.ante,
+          roundScore: this.roundScore,
+          money: this.money,
+          deck: this.selectedDeck,
+          stake: this.selectedStake
+        });
         return;
       }
       this.ante++;
@@ -518,6 +655,58 @@ export class GameEngine {
     }
 
     this.shopEngine.initShopForRound();
+  }
+
+  /**
+   * Continues run into Endless Mode with exponential Ante 9+ scaling
+   */
+  continueEndlessMode() {
+    this.endlessMode = true;
+    this.ante = 9;
+    this.blindIndex = 0;
+    this.voucherBoughtThisAnte = false;
+    this.setupAnteBlinds();
+    this.state = GAME_STATES.SHOP;
+    this.shopEngine.initShopForRound();
+    if (this.saveManager) this.saveManager.saveCurrentRun(this);
+    this.notify('ENDLESS_MODE_STARTED');
+  }
+
+  /**
+   * Reorder active Jokers in top bar
+   */
+  reorderJokers(fromIndex, toIndex) {
+    const success = this.jokerSystem.reorderJokers(fromIndex, toIndex);
+    if (success) {
+      this.notify('JOKER_REORDERED');
+      if (this.saveManager) this.saveManager.saveCurrentRun(this);
+    }
+    return success;
+  }
+
+  /**
+   * Reorder active Consumables in top bar
+   */
+  reorderConsumables(fromIndex, toIndex) {
+    const success = this.consumableSystem.reorderConsumables(fromIndex, toIndex);
+    if (success) {
+      this.notify('CONSUMABLE_REORDERED');
+      if (this.saveManager) this.saveManager.saveCurrentRun(this);
+    }
+    return success;
+  }
+
+  /**
+   * Continue a previously saved run from localStorage
+   */
+  continueSavedRun() {
+    if (!this.saveManager) return false;
+    const loaded = this.saveManager.loadCurrentRun(this);
+    if (loaded) {
+      this.notify('RUN_LOADED');
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -692,6 +881,7 @@ export class GameEngine {
    */
   resolveGameOver() {
     this.state = GAME_STATES.GAME_OVER;
+    if (this.saveManager) this.saveManager.clearActiveRun();
     this.notify('GAME_OVER', {
       ante: this.ante,
       finalScore: this.roundScore,
