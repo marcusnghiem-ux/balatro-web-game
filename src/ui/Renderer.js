@@ -9,7 +9,7 @@ import { ScoringEngine } from '../game/ScoringEngine.js';
 import { HAND_DEFINITIONS } from '../game/HandEvaluator.js';
 import { GAME_STATES, BLIND_TYPES } from '../game/GameEngine.js';
 import { CONSUMABLE_TYPES, TAROT_CARDS, PLANET_CARDS } from '../game/ConsumableSystem.js';
-import { ENHANCEMENT_LABELS, EDITIONS } from '../game/Card.js';
+import { ENHANCEMENT_LABELS, EDITIONS, Card } from '../game/Card.js';
 import { DECKS, STAKES } from '../game/DeckDefinitions.js';
 import { unlockablesManager } from '../game/UnlockablesSystem.js';
 import { ALL_150_JOKERS } from '../game/JokerDatabase.js';
@@ -18,6 +18,18 @@ import { tooltipRenderer } from './TooltipRenderer.js';
 import { ShopUI } from './ShopUI.js';
 import { saveManager } from '../game/SaveManager.js';
 import { renderJokerCardFace, getJokerIllustrationHtml } from './JokerArtwork.js';
+import { BackgroundRenderer } from './BackgroundRenderer.js';
+import { GameOverScreen } from './GameOverScreen.js';
+import { DeckViewer } from './DeckViewer.js';
+import { stakeManager } from '../game/StakeManager.js';
+import { challengeMode } from '../game/ChallengeMode.js';
+import { MainMenu } from './MainMenu.js';
+import { TitleScreenRenderer } from './TitleScreenRenderer.js';
+import { RunInfoModal } from './RunInfoModal.js';
+import { ShopBackgroundManager } from './ShopBackgroundManager.js';
+import { TransitionAnimator } from './TransitionAnimator.js';
+import { DeckAnimator } from './DeckAnimator.js';
+import { CardRenderer } from './CardRenderer.js';
 
 // Swirling red & deep sapphire satin vortex palette for Title Screen (matching Photo 1)
 export const TITLE_COLOR_PALETTE = {
@@ -283,10 +295,28 @@ export class Renderer {
       tarots: document.getElementById('tab-coll-tarots')
     };
 
-    // Modal State
+    // Modal & Selection State
     this.selectedDeckIndex = 0;
     this.selectedStakeIndex = 0;
     this.collectionCurrentTab = 'decks';
+    this.collectionJokerPage = 1;
+    this.isChallengeMode = false;
+    this.selectedChallengeIndex = 0;
+
+    // Sub-module presentations
+    this.backgroundRenderer = new BackgroundRenderer(this.bgCanvas, this.game);
+    this.gameOverScreen = new GameOverScreen(this.game, this);
+    this.deckViewer = new DeckViewer(this.game, this);
+    this.stakeManager = stakeManager;
+    this.challengeMode = challengeMode;
+    this.mainMenu = new MainMenu(this.game, this);
+    this.titleScreenRenderer = new TitleScreenRenderer(this.titleScreen, this.backgroundRenderer);
+    this.runInfoModalComponent = new RunInfoModal(this.game, this);
+    this.shopBackgroundManager = new ShopBackgroundManager(this.bgCanvas, this.game);
+    this.cardRenderer = new CardRenderer();
+    this.transitionAnimator = new TransitionAnimator(this);
+    this.deckAnimator = new DeckAnimator(this, this.cardRenderer);
+    this.shouldAnimateDeal = false;
 
     // Audio Engine state
     this.audioCtx = null;
@@ -296,6 +326,16 @@ export class Renderer {
     this.initBgShader();
     this.initAmbientParticles();
     this.bindEvents();
+
+    // Wire up Deck Pile click listeners across all scenes
+    const deckCards = document.querySelectorAll('.deck-pile-card, #deck-counter, #shop-deck-counter, #blind-deck-counter');
+    deckCards.forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.playSound('card_slide');
+        this.deckViewer.show();
+      });
+    });
   }
 
   /**
@@ -821,9 +861,11 @@ export class Renderer {
       this.showRunInfo();
     });
 
-    this.closeRunInfoBtn.addEventListener('click', () => {
-      this.runInfoModal.classList.add('hidden');
-    });
+    if (this.closeRunInfoBtn) {
+      this.closeRunInfoBtn.addEventListener('click', () => {
+        this.runInfoModal?.classList.add('hidden');
+      });
+    }
 
     this.rerollBtn.addEventListener('click', () => {
       const prevCost = this.game.shopEngine.rerollCost;
@@ -852,6 +894,9 @@ export class Renderer {
     this.skipPackBtn.addEventListener('click', () => {
       this.game.skipPack();
       this.packOverlay.classList.add('hidden');
+      if (this.shopBackgroundManager) {
+        this.shopBackgroundManager.clearPackTheme();
+      }
       this.playSound('card_slide');
       this.render();
       this.renderShop();
@@ -862,14 +907,16 @@ export class Renderer {
       this.game.startNewRun();
     });
 
-    // Blind Select Stage "Select" buttons
+    // Blind Select Stage "Select" buttons with authentic Blind Shift-Down transition
     this.blindSelectBtns.forEach((btn, index) => {
       if (btn) {
         btn.addEventListener('click', () => {
           if (this.game.blindIndex === index) {
-            this.game.selectActiveBlind();
-            this.playSound('card_slide');
-            this.render();
+            this.transitionAnimator.animateBlindShiftDown(index, () => {
+              this.game.selectActiveBlind();
+              this.shouldAnimateDeal = true;
+              this.render();
+            });
           }
         });
       }
@@ -976,6 +1023,27 @@ export class Renderer {
       });
     }
 
+    const sidebarRunInfoBtn = document.getElementById('sidebar-run-info-btn');
+    if (sidebarRunInfoBtn) {
+      sidebarRunInfoBtn.addEventListener('click', () => {
+        this.showRunInfo();
+      });
+    }
+
+    const inRunInfoBtn = document.getElementById('in-run-info-btn');
+    if (inRunInfoBtn) {
+      inRunInfoBtn.addEventListener('click', () => {
+        if (this.inRunOptionsModal) this.inRunOptionsModal.classList.add('hidden');
+        this.showRunInfo();
+      });
+    }
+
+    if (this.previewHandName) {
+      this.previewHandName.style.cursor = 'pointer';
+      this.previewHandName.title = 'Click to view Poker Hand Levels';
+      this.previewHandName.addEventListener('click', () => this.showRunInfo());
+    }
+
     if (this.inRunSaveLeaveBtn) {
       this.inRunSaveLeaveBtn.addEventListener('click', () => {
         this.saveAndLeaveRun();
@@ -1040,6 +1108,7 @@ export class Renderer {
       this.deckPrevBtn.addEventListener('click', () => {
         this.selectedDeckIndex = (this.selectedDeckIndex - 1 + DECKS.length) % DECKS.length;
         this.renderDeckCarousel();
+        this.renderStakeCarousel();
         this.playSound('card_slide');
       });
     }
@@ -1048,21 +1117,24 @@ export class Renderer {
       this.deckNextBtn.addEventListener('click', () => {
         this.selectedDeckIndex = (this.selectedDeckIndex + 1) % DECKS.length;
         this.renderDeckCarousel();
+        this.renderStakeCarousel();
         this.playSound('card_slide');
       });
     }
 
     if (this.stakePrevBtn) {
-      this.stakePrevBtn.addEventListener('click', () => {
-        this.selectedStakeIndex = (this.selectedStakeIndex - 1 + STAKES.length) % STAKES.length;
+      this.stakePrevBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.selectedStakeIndex = this.stakeManager.cyclePrev(this.selectedStakeIndex);
         this.renderStakeCarousel();
         this.playSound('card_slide');
       });
     }
 
     if (this.stakeNextBtn) {
-      this.stakeNextBtn.addEventListener('click', () => {
-        this.selectedStakeIndex = (this.selectedStakeIndex + 1) % STAKES.length;
+      this.stakeNextBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.selectedStakeIndex = this.stakeManager.cycleNext(this.selectedStakeIndex);
         this.renderStakeCarousel();
         this.playSound('card_slide');
       });
@@ -1070,9 +1142,23 @@ export class Renderer {
 
     if (this.startSelectedRunBtn) {
       this.startSelectedRunBtn.addEventListener('click', () => {
+        if (this.isChallengeMode) {
+          const challenges = this.challengeMode.getChallengeList();
+          const challenge = challenges[this.selectedChallengeIndex || 0];
+          this.challengeMode.selectChallenge(challenge.id);
+          this.game.startNewRun(DECKS[0].id, STAKES[0].id);
+          this.challengeMode.applyActiveChallenge(this.game);
+          if (this.deckSelectModal) this.deckSelectModal.classList.add('hidden');
+          if (this.titleScreen) this.titleScreen.classList.add('hidden');
+          if (this.appContainer) this.appContainer.classList.remove('hidden');
+          this.playSound('win');
+          this.render();
+          return;
+        }
+
         const deck = DECKS[this.selectedDeckIndex];
         const stake = STAKES[this.selectedStakeIndex];
-        if (!unlockablesManager.isDeckUnlocked(deck.id)) {
+        if (!unlockablesManager.isDeckUnlocked(deck.id) || !this.stakeManager.isStakeUnlocked(deck.id, this.selectedStakeIndex)) {
           this.playSound('card_deselect');
           return;
         }
@@ -1084,6 +1170,25 @@ export class Renderer {
         this.game.startNewRun(deck.id, stake.id);
         this.playSound('win');
         this.render();
+      });
+    }
+
+    const tabChallengesBtn = document.getElementById('tab-challenges');
+    if (tabChallengesBtn) {
+      tabChallengesBtn.addEventListener('click', () => {
+        this.isChallengeMode = true;
+        this.playSound('card_select');
+        this.renderChallengeCarousel();
+      });
+    }
+
+    const tabNewRunBtn = document.getElementById('tab-new-run');
+    if (tabNewRunBtn) {
+      tabNewRunBtn.addEventListener('click', () => {
+        this.isChallengeMode = false;
+        this.playSound('card_select');
+        this.renderDeckCarousel();
+        this.renderStakeCarousel();
       });
     }
 
@@ -1385,7 +1490,7 @@ export class Renderer {
     if (this.startSelectedRunBtn) {
       if (isUnlocked) {
         this.startSelectedRunBtn.disabled = false;
-        this.startSelectedRunBtn.innerHTML = 'PLAY <span class="btn-prompt-badge btn-prompt-x">ⓧ</span>';
+        this.startSelectedRunBtn.innerHTML = 'PLAY';
         this.startSelectedRunBtn.className = 'deck-play-btn';
       } else {
         this.startSelectedRunBtn.disabled = true;
@@ -1409,6 +1514,7 @@ export class Renderer {
         dot.addEventListener('click', () => {
           this.selectedDeckIndex = idx;
           this.renderDeckCarousel();
+          this.renderStakeCarousel();
           this.playSound('card_slide');
         });
         this.deckDotsContainer.appendChild(dot);
@@ -1425,22 +1531,125 @@ export class Renderer {
    * Renders the Stake (difficulty) Carousel
    */
   renderStakeCarousel() {
-    const stake = STAKES[this.selectedStakeIndex];
+    const deck = DECKS[this.selectedDeckIndex] || DECKS[0];
+    this.selectedStakeIndex = this.stakeManager.clampIndex(this.selectedStakeIndex);
+    const stake = this.stakeManager.getStakeByIndex(this.selectedStakeIndex);
     if (!stake) return;
 
+    const isUnlocked = this.stakeManager.isStakeUnlocked(deck.id, this.selectedStakeIndex);
+
+    // 1. Update Stake Name
     if (this.stakePreviewName) {
-      this.stakePreviewName.textContent = stake.name;
-      this.stakePreviewName.style.color = '#1e293b';
+      if (isUnlocked) {
+        this.stakePreviewName.innerHTML = `<span style="color: #0f172a;">${stake.name.toUpperCase()}</span>`;
+      } else {
+        this.stakePreviewName.innerHTML = `<span style="color: #64748b;">${stake.name.toUpperCase()}</span> <span class="text-[10px] bg-slate-800 text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/40 ml-1 font-bold">🔒 LOCKED</span>`;
+      }
     }
 
+    // 2. Update Stake Description & Lock Requirement
     if (this.stakePreviewDesc) {
-      this.stakePreviewDesc.textContent = stake.description;
+      if (isUnlocked) {
+        this.stakePreviewDesc.innerHTML = `<div class="text-[12px] font-bold text-slate-800 tracking-wide">${stake.description}</div>`;
+      } else {
+        const prevStake = STAKES[Math.max(0, this.selectedStakeIndex - 1)];
+        this.stakePreviewDesc.innerHTML = `
+          <div class="text-[12px] font-bold text-slate-700 tracking-wide opacity-85">${stake.description}</div>
+          <div class="text-[10px] font-bold text-red-600 mt-1 bg-red-100/90 py-0.5 px-2 rounded border border-red-300 inline-block shadow-sm">
+            🔒 Defeat ${prevStake ? prevStake.name : 'previous stake'} with ${deck.name} to unlock!
+          </div>
+        `;
+      }
     }
 
+    // 3. Update Stake Poker Chip Graphic
     if (this.stakePreviewChip) {
-      this.stakePreviewChip.textContent = stake.icon || '❂';
-      this.stakePreviewChip.style.borderColor = stake.color || '#cbd5e1';
-      this.stakePreviewChip.style.boxShadow = `0 4px 14px ${stake.color || '#cbd5e1'}55`;
+      this.stakePreviewChip.innerHTML = this.stakeManager.generateChipSvg(stake, isUnlocked);
+      this.stakePreviewChip.style.background = 'transparent';
+      this.stakePreviewChip.style.border = 'none';
+      this.stakePreviewChip.style.boxShadow = isUnlocked
+        ? `0 6px 16px ${stake.color || '#cbd5e1'}66`
+        : '0 4px 10px rgba(0,0,0,0.4)';
+    }
+
+    // 4. Update Stake Carousel Arrow Buttons (< and >)
+    if (this.stakePrevBtn) {
+      this.stakePrevBtn.disabled = false;
+      this.stakePrevBtn.style.opacity = '1';
+      this.stakePrevBtn.style.cursor = 'pointer';
+      this.stakePrevBtn.style.filter = 'none';
+      this.stakePrevBtn.title = 'Previous Stake';
+    }
+
+    if (this.stakeNextBtn) {
+      this.stakeNextBtn.disabled = false;
+      this.stakeNextBtn.style.opacity = '1';
+      this.stakeNextBtn.style.cursor = 'pointer';
+      this.stakeNextBtn.style.filter = 'none';
+      this.stakeNextBtn.title = 'Next Stake';
+    }
+
+    // 5. Update Play Button State
+    const isDeckUnlocked = unlockablesManager.isDeckUnlocked(deck.id);
+    if (this.startSelectedRunBtn && !this.isChallengeMode) {
+      if (!isDeckUnlocked) {
+        this.startSelectedRunBtn.disabled = true;
+        this.startSelectedRunBtn.textContent = 'DECK LOCKED 🔒';
+        this.startSelectedRunBtn.className = 'deck-play-btn opacity-50 cursor-not-allowed bg-slate-800 border-slate-700 text-slate-400';
+      } else if (!isUnlocked) {
+        this.startSelectedRunBtn.disabled = true;
+        this.startSelectedRunBtn.textContent = 'STAKE LOCKED 🔒';
+        this.startSelectedRunBtn.className = 'deck-play-btn opacity-50 cursor-not-allowed bg-slate-800 border-slate-700 text-slate-400';
+      } else {
+        this.startSelectedRunBtn.disabled = false;
+        this.startSelectedRunBtn.textContent = 'PLAY';
+        this.startSelectedRunBtn.className = 'deck-play-btn';
+      }
+    }
+
+    // 6. Update Visual Status Dots
+    const dotsContainer = document.getElementById('stake-dots-container');
+    if (dotsContainer) {
+      dotsContainer.innerHTML = this.stakeManager.generateStatusDotsHtml(deck.id, this.selectedStakeIndex);
+      dotsContainer.querySelectorAll('.stake-status-dot').forEach(dot => {
+        dot.addEventListener('click', () => {
+          const idx = parseInt(dot.dataset.stakeIndex, 10);
+          this.selectedStakeIndex = this.stakeManager.clampIndex(idx);
+          this.renderStakeCarousel();
+          if (dot.dataset.unlocked === 'true') {
+            this.playSound('card_slide');
+          } else {
+            this.playSound('card_deselect');
+          }
+        });
+      });
+    }
+  }
+
+  renderChallengeCarousel() {
+    const challenges = this.challengeMode.getChallengeList();
+    const curIdx = this.selectedChallengeIndex || 0;
+    const challenge = challenges[curIdx] || challenges[0];
+
+    if (this.deckPreviewName) {
+      this.deckPreviewName.textContent = `${challenge.name} 🏆`;
+    }
+    if (this.deckPreviewDescBox) {
+      this.deckPreviewDescBox.innerHTML = `
+        <div class="font-bold text-sm text-amber-300 mb-1">${challenge.icon} ${challenge.name}</div>
+        <div class="text-xs text-slate-200 leading-snug">${challenge.description}</div>
+      `;
+      this.deckPreviewDescBox.className = 'deck-rule-box w-full bg-slate-900 border-amber-500/50';
+    }
+    if (this.startSelectedRunBtn) {
+      this.startSelectedRunBtn.disabled = false;
+      this.startSelectedRunBtn.textContent = 'PLAY CHALLENGE';
+      this.startSelectedRunBtn.className = 'deck-play-btn bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black';
+    }
+    if (this.deckDotsContainer) {
+      this.deckDotsContainer.innerHTML = challenges.map((c, i) => `
+        <div class="deck-dot ${i === curIdx ? 'active' : ''}" style="${i === curIdx ? 'background:#f59e0b;' : 'background:#475569;'}" title="${c.name}"></div>
+      `).join('');
     }
   }
 
@@ -1510,26 +1719,84 @@ export class Renderer {
         this.collectionTotalProgress.textContent = `Discovered: ${discoveredCount} / ${ALL_150_JOKERS.length} Jokers`;
       }
 
-      ALL_150_JOKERS.forEach(joker => {
+      const pageSize = 15;
+      const totalPages = Math.ceil(ALL_150_JOKERS.length / pageSize);
+      const currentPage = Math.max(1, Math.min(totalPages, this.collectionJokerPage || 1));
+      const startIdx = (currentPage - 1) * pageSize;
+      const pageJokers = ALL_150_JOKERS.slice(startIdx, startIdx + pageSize);
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'w-full flex flex-col items-center gap-3';
+
+      // 3x5 Grid of 15 Jokers matching Reference Photo 2
+      const grid = document.createElement('div');
+      grid.className = 'collection-grid-3x5';
+
+      pageJokers.forEach(joker => {
         const isDiscovered = unlockablesManager.profile.sandboxAllUnlocked || unlockablesManager.profile.discoveredItems.includes(joker.id) || joker.id === 'joker';
         const card = document.createElement('div');
-        const rarityColor = joker.rarity === 'legendary' ? '#9b59b6' : (joker.rarity === 'rare' ? '#fe5f55' : (joker.rarity === 'uncommon' ? '#009dff' : '#2ecc71'));
-        card.className = `collection-card bg-[#141d22] border-2 rounded-2xl p-2.5 flex flex-col justify-between items-center text-center shadow-lg transition-all ${isDiscovered ? 'border-amber-500/50 hover:border-amber-300' : 'border-slate-800 is-locked opacity-60'}`;
+        const rarity = (joker.rarity || 'common').toLowerCase();
 
-        card.innerHTML = `
-          <div class="w-12 h-16 rounded-xl mb-1.5 shadow flex items-center justify-center border-2 overflow-hidden p-0.5 relative" style="border-color: ${isDiscovered ? rarityColor : '#334155'}; background: ${isDiscovered ? '#ffffff' : '#0f172a'};">
-            ${isDiscovered ? getJokerIllustrationHtml(joker) : '<span class="text-2xl">🔒</span>'}
-          </div>
-          <span class="font-pixel text-base text-white font-bold leading-tight truncate w-full" title="${joker.name}">${isDiscovered ? joker.name : '?????'}</span>
-          <div class="text-[10px] text-slate-300 my-1 line-clamp-3 leading-snug">
-            ${isDiscovered ? (joker.description || 'Special joker effect') : 'Undiscovered Joker'}
-          </div>
-          <span class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase" style="background-color: ${isDiscovered ? rarityColor + '33' : '#1e293b'}; color: ${isDiscovered ? rarityColor : '#64748b'}; border: 1px solid ${isDiscovered ? rarityColor : '#334155'}">
-            ${isDiscovered ? (joker.rarity || 'Common') : 'Locked'}
-          </span>
-        `;
-        this.collectionGrid.appendChild(card);
+        card.className = `playing-card joker-card relative flex flex-col items-center justify-between p-1 select-none shadow-md transition-all ${isDiscovered ? '' : 'is-locked opacity-70 grayscale'}`;
+        card.style.height = '120px';
+
+        if (isDiscovered) {
+          card.innerHTML = renderJokerCardFace(joker);
+          tooltipRenderer.attach(card, joker);
+        } else {
+          card.innerHTML = `
+            <div class="joker-locked-pill bg-slate-700 text-slate-300 font-pixel text-xs px-2 py-0.5 rounded">LOCKED</div>
+            <div class="w-full flex-1 flex flex-col items-center justify-center text-slate-500 font-pixel">
+              <span class="text-3xl">🔒</span>
+              <span class="text-xs">?????</span>
+            </div>
+          `;
+        }
+        grid.appendChild(card);
       });
+      wrapper.appendChild(grid);
+
+      // Pagination Controls matching Photo 2: < Page X/10 >
+      const pager = document.createElement('div');
+      pager.className = 'flex items-center justify-center gap-2 mt-2';
+      pager.innerHTML = `
+        <button id="collection-prev-page" class="collection-pager-btn px-4 py-1">◀</button>
+        <div class="collection-pager-btn px-6 py-1 font-pixel text-2xl tracking-wider select-none">
+          Page ${currentPage}/${totalPages}
+        </div>
+        <button id="collection-next-page" class="collection-pager-btn px-4 py-1">▶</button>
+      `;
+
+      pager.querySelector('#collection-prev-page').addEventListener('click', () => {
+        if (currentPage > 1) {
+          this.collectionJokerPage = currentPage - 1;
+          this.playSound('card_slide');
+          this.renderCollectionModal('jokers');
+        }
+      });
+
+      pager.querySelector('#collection-next-page').addEventListener('click', () => {
+        if (currentPage < totalPages) {
+          this.collectionJokerPage = currentPage + 1;
+          this.playSound('card_slide');
+          this.renderCollectionModal('jokers');
+        }
+      });
+      wrapper.appendChild(pager);
+
+      // Wide Orange Back Button matching Photo 2
+      const backBtn = document.createElement('button');
+      backBtn.className = 'collection-back-btn mt-1';
+      backBtn.textContent = 'Back';
+      backBtn.addEventListener('click', () => {
+        this.playSound('card_deselect');
+        if (this.collectionModal) {
+          this.collectionModal.classList.add('hidden');
+        }
+      });
+      wrapper.appendChild(backBtn);
+
+      this.collectionGrid.appendChild(wrapper);
     } else if (tab === 'vouchers') {
       if (this.collectionTotalProgress) {
         this.collectionTotalProgress.textContent = `Vouchers: ${VOUCHER_CATALOG.length} Available`;
@@ -1642,7 +1909,9 @@ export class Renderer {
       const blindBorder = blind.border || '#009dff';
 
       if (scoreTarget) scoreTarget.textContent = blind.target.toLocaleString();
-      if (rewardLabel) rewardLabel.textContent = blind.reward;
+      if (rewardLabel) {
+        rewardLabel.innerHTML = `<span class="px-2 py-0.5 rounded-md bg-[#196f3d] border border-[#27ae60] text-amber-200 font-pixel text-sm font-black shadow">${blind.reward}</span>`;
+      }
 
       // Unique title & individual colors
       if (titleEl) {
@@ -1651,19 +1920,29 @@ export class Renderer {
         titleEl.style.borderColor = blindBorder;
       }
 
-      // Unique badge & individual colors
+      // Unique badge & individual colors with animated spinning chip graphics
       if (badgeEl) {
         badgeEl.style.backgroundColor = blindColor;
         badgeEl.style.borderColor = blindBorder;
         if (i === 2) {
-          badgeEl.textContent = blind.icon || '⚓';
-          badgeEl.style.fontSize = '2.4rem';
+          badgeEl.innerHTML = `
+            <span class="text-3xl drop-shadow transform hover:scale-110 transition">${blind.icon || '⚓'}</span>
+            <span class="text-[10px] font-pixel tracking-wider text-amber-200 uppercase mt-0.5">BOSS</span>
+          `;
         } else if (i === 0) {
-          badgeEl.innerHTML = '<span class="text-xs">SMALL</span><span class="text-xs">BLIND</span>';
-          badgeEl.style.fontSize = '';
+          badgeEl.innerHTML = `
+            <div class="w-8 h-8 rounded-full border-2 border-dashed border-white/80 bg-blue-500/80 flex items-center justify-center font-pixel text-xs text-white shadow animate-[spin_6s_linear_infinite]">
+              ❂
+            </div>
+            <span class="text-[10px] font-pixel tracking-wider text-white mt-0.5">SMALL</span>
+          `;
         } else if (i === 1) {
-          badgeEl.innerHTML = '<span class="text-xs">BIG</span><span class="text-xs">BLIND</span>';
-          badgeEl.style.fontSize = '';
+          badgeEl.innerHTML = `
+            <div class="w-8 h-8 rounded-full border-2 border-dashed border-white/80 bg-amber-500/80 flex items-center justify-center font-pixel text-xs text-white shadow animate-[spin_6s_linear_infinite]">
+              ❂
+            </div>
+            <span class="text-[10px] font-pixel tracking-wider text-white mt-0.5">BIG</span>
+          `;
         }
       }
 
@@ -1852,18 +2131,24 @@ export class Renderer {
         })}
       `;
 
+      // Drag-to-sell and Safe Shop Inspection
+      card.draggable = true;
+      card.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'owned_joker', index }));
+      });
+      card.addEventListener('click', (e) => {
+        if (this.game.state === GAME_STATES.SHOP) {
+          e.stopPropagation();
+          this.playSound('card_select');
+          this.shopUI.inspectedItem = joker;
+          this.shopUI.inspectedType = 'owned_joker';
+          this.shopUI.inspectedIndex = index;
+          this.shopUI.renderBuySellSquare();
+        }
+      });
+
       // Attach floating inspection tooltip
       tooltipRenderer.attach(card, joker);
-
-      const sellBtn = card.querySelector('.sell-joker-btn');
-      if (sellBtn) {
-        sellBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          this.game.sellJoker(index);
-          this.playSound('cash');
-          this.render();
-        });
-      }
 
       this.jokersContainer.appendChild(card);
     });
@@ -1883,30 +2168,57 @@ export class Renderer {
       card.dataset.index = index;
       card.id = `consumable-dom-${item.instanceId || item.id}`;
       card.title = `${item.name} (${item.type}): ${item.description}`;
+      card.draggable = true;
 
       card.innerHTML = `
         <div class="text-[9px] font-black uppercase text-cyan-200 tracking-wider truncate w-full text-center">
           ${item.name}
         </div>
         <div class="text-3xl sm:text-4xl my-auto">${item.icon}</div>
-        <div class="w-full flex justify-between items-center text-[9px] px-0.5 font-bold">
-          <button class="use-consumable-btn bg-cyan-600 hover:bg-cyan-500 text-white rounded px-1.5 py-0.5 text-[8px] font-black uppercase">Use</button>
-          <button class="sell-consumable-btn text-amber-400 hover:text-amber-200 text-[8px] font-black">$${item.sellValue || 1}</button>
+        <div class="w-full flex justify-center items-center text-[9px] px-0.5 font-bold">
+          <button class="use-consumable-btn bg-cyan-600 hover:bg-cyan-500 text-white rounded px-2.5 py-0.5 text-[8px] font-black uppercase">Use</button>
         </div>
       `;
+
+      card.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'owned_consumable', index }));
+      });
+
+      card.addEventListener('click', (e) => {
+        if (this.game.state === GAME_STATES.SHOP) {
+          e.stopPropagation();
+          this.playSound('card_select');
+          this.shopUI.inspectedItem = item;
+          this.shopUI.inspectedType = 'owned_consumable';
+          this.shopUI.inspectedIndex = index;
+          this.shopUI.renderBuySellSquare();
+        }
+      });
 
       // Attach floating inspection tooltip
       tooltipRenderer.attach(card, item);
 
       card.querySelector('.use-consumable-btn').addEventListener('click', (e) => {
         e.stopPropagation();
+        const selectedCount = this.game.getSelectedCards().length;
+        const isTargeted = item.type === 'Tarot' || item.type === 'Spectral';
+        const hasCards = (this.game.hand && this.game.hand.length > 0) || (this.game.deck && this.game.deck.length > 0);
+        if (isTargeted && selectedCount === 0 && hasCards) {
+          this.openConsumableTargetModal(item, index);
+          return;
+        }
+
         const res = this.game.useConsumable(index);
         if (res.success) {
           this.playSound('win');
           this.render();
           if (this.game.state === GAME_STATES.SHOP) this.renderShop();
         } else {
-          alert(res.message);
+          if (isTargeted && hasCards) {
+            this.openConsumableTargetModal(item, index);
+          } else {
+            alert(res.message);
+          }
         }
       });
 
@@ -1923,80 +2235,30 @@ export class Renderer {
 
   /**
    * Render player hand cards with authentic pips and lift animations
+   * When shouldAnimateDeal is true, plays the physical unravelling and dealing sequence out of the deck pile!
    */
   renderHand() {
+    if (this.shouldAnimateDeal) {
+      this.shouldAnimateDeal = false;
+      this.deckAnimator.dealCards(this.game.hand, this.playerHandEl, () => {
+        this.renderPreviewBanner();
+        this.updateActionButtons();
+      });
+      return;
+    }
+
     this.playerHandEl.innerHTML = '';
     const cards = this.game.hand;
     const total = cards.length;
 
     cards.forEach((card, i) => {
-      const cardEl = document.createElement('div');
-      cardEl.className = `playing-card suit-${card.suit}`;
-      cardEl.dataset.cardId = card.id;
-      cardEl.dataset.index = i;
-
-      if (card.selected) cardEl.classList.add('card-selected');
-      if (card.debuffed) cardEl.classList.add('card-debuffed');
-      if (card.edition !== 'normal') cardEl.classList.add(`edition-${card.edition}`);
-      if (card.enhancement !== 'none') cardEl.classList.add(`enhancement-${card.enhancement}`);
-
-      // Smooth fan spread
-      const offset = i - (total - 1) / 2;
-      const rotation = offset * 2.2;
-      const translateY = Math.abs(offset) * 2.5;
-
-      if (!card.selected) {
-        cardEl.style.transform = `rotate(${rotation}deg) translateY(${translateY}px)`;
-      }
-
-      const suitSymbol = card.getSuitSymbol();
-      const pipsHtml = this.generateCardPipsHtml(card.rank, suitSymbol);
-
-      cardEl.innerHTML = `
-        <div class="flex items-center justify-between leading-none pointer-events-none">
-          <div class="flex flex-col items-center">
-            <span class="font-black text-sm sm:text-base font-sans">${card.rank}</span>
-            <span class="text-xs sm:text-sm font-sans">${suitSymbol}</span>
-          </div>
-          <span class="text-[9px] font-black text-slate-400 uppercase font-sans">${card.enhancement !== 'none' ? card.enhancement : ''}</span>
-        </div>
-
-        ${pipsHtml}
-
-        <div class="flex items-center justify-between leading-none rotate-180 pointer-events-none">
-          <div class="flex flex-col items-center">
-            <span class="font-black text-sm sm:text-base font-sans">${card.rank}</span>
-            <span class="text-xs sm:text-sm font-sans">${suitSymbol}</span>
-          </div>
-        </div>
-      `;
-
+      const cardEl = this.cardRenderer.createCardElement(card, i, total);
       this.playerHandEl.appendChild(cardEl);
     });
   }
 
   generateCardPipsHtml(rank, symbol) {
-    if (['J', 'Q', 'K'].includes(rank)) {
-      return `<div class="card-pips-container pips-face">
-        <span>${rank}</span>
-        <span class="text-sm opacity-60">👑</span>
-      </div>`;
-    }
-    if (rank === 'A') {
-      return `<div class="card-pips-container pips-1"><span>${symbol}</span></div>`;
-    }
-
-    const num = parseInt(rank, 10);
-    if (num === 2) return `<div class="card-pips-container pips-2"><span>${symbol}</span><span>${symbol}</span></div>`;
-    if (num === 3) return `<div class="card-pips-container pips-3"><span>${symbol}</span><span>${symbol}</span><span>${symbol}</span></div>`;
-    if (num === 4) return `<div class="card-pips-container pips-4"><span>${symbol}</span><span>${symbol}</span><span>${symbol}</span><span>${symbol}</span></div>`;
-    if (num === 5) return `<div class="card-pips-container pips-5"><span>${symbol}</span><span>${symbol}</span><span class="pip-center">${symbol}</span><span>${symbol}</span><span>${symbol}</span></div>`;
-    if (num === 6) return `<div class="card-pips-container pips-6">${`<span>${symbol}</span>`.repeat(6)}</div>`;
-    if (num === 7) return `<div class="card-pips-container pips-7"><span>${symbol}</span><span>${symbol}</span><span class="pip-center">${symbol}</span><span>${symbol}</span><span>${symbol}</span><span>${symbol}</span><span>${symbol}</span></div>`;
-    if (num === 8) return `<div class="card-pips-container pips-8">${`<span>${symbol}</span>`.repeat(8)}</div>`;
-    if (num === 9) return `<div class="card-pips-container pips-9"><span>${symbol}</span><span>${symbol}</span><span>${symbol}</span><span>${symbol}</span><span class="pip-center">${symbol}</span><span>${symbol}</span><span>${symbol}</span><span>${symbol}</span><span>${symbol}</span></div>`;
-    if (num === 10) return `<div class="card-pips-container pips-10">${`<span>${symbol}</span>`.repeat(10)}</div>`;
-    return `<div class="card-pips-container pips-1"><span>${symbol}</span></div>`;
+    return this.cardRenderer.generateCardPipsHtml(rank, symbol);
   }
 
   renderPreviewBanner() {
@@ -2006,24 +2268,155 @@ export class Renderer {
       this.previewHandLevel.textContent = 'lvl. 1';
       this.previewChipsBox.textContent = '0';
       this.previewMultBox.textContent = '0';
+      this.setFireOverflow(false);
       return;
     }
 
-    const preview = ScoringEngine.preview(
-      selected,
-      this.game.jokerSystem.getJokers(),
-      this.game.handLevels,
-      {
-        discardsLeft: this.game.discardsLeft,
-        handsLeft: this.game.handsLeft,
-        money: this.game.money
-      }
-    );
+    const preview = this.game.calculateCurrentHandPreview();
 
     this.previewHandName.textContent = preview.handName;
     this.previewHandLevel.textContent = `lvl. ${preview.level || 1}`;
-    this.previewChipsBox.textContent = preview.chips;
-    this.previewMultBox.textContent = preview.mult;
+    this.previewChipsBox.textContent = preview.chips.toLocaleString();
+    this.previewMultBox.textContent = preview.mult.toLocaleString();
+
+    // Trigger high-impact Single-Hand Blind Overflow fire effect!
+    const isOverflow = Boolean(preview.isSingleHandOverflow);
+    this.setFireOverflow(isOverflow);
+  }
+
+  setFireOverflow(isActive) {
+    const roundScoreCard = document.getElementById('round-score-card') || this.currentScoreEl?.closest('.bg-\\[\\#1b1713\\]') || this.currentScoreEl?.parentElement?.parentElement;
+    if (isActive) {
+      if (this.liveHandCard) this.liveHandCard.classList.add('score-fire-overflow');
+      if (this.previewChipsBox) this.previewChipsBox.classList.add('chips-fire');
+      if (this.previewMultBox) this.previewMultBox.classList.add('mult-fire');
+      if (roundScoreCard) roundScoreCard.classList.add('round-score-fire');
+      if (this.currentScoreEl) this.currentScoreEl.classList.add('score-counter-fire');
+    } else {
+      if (this.liveHandCard) this.liveHandCard.classList.remove('score-fire-overflow');
+      if (this.previewChipsBox) this.previewChipsBox.classList.remove('chips-fire');
+      if (this.previewMultBox) this.previewMultBox.classList.remove('mult-fire');
+      if (roundScoreCard) roundScoreCard.classList.remove('round-score-fire');
+      if (this.currentScoreEl) this.currentScoreEl.classList.remove('score-counter-fire');
+    }
+  }
+
+  /**
+   * Opens clean 8-card target selection modal for Tarot / Spectral card modifications
+   */
+  openConsumableTargetModal(item, itemIndex) {
+    let modal = document.getElementById('consumable-target-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'consumable-target-modal';
+      modal.className = 'consumable-target-modal';
+      document.body.appendChild(modal);
+    }
+
+    const eligibleCards = (this.game.hand && this.game.hand.length > 0)
+      ? this.game.hand.slice(0, 8)
+      : (this.game.deck || []).slice(0, 8);
+    let selectedSet = new Set();
+    const maxSelect = item.maxTargets || (item.name === 'Death' ? 2 : (item.name === 'Strength' ? 2 : (item.name === 'The Hanged Man' ? 2 : 1)));
+
+    const renderModalContent = () => {
+      modal.innerHTML = `
+        <div class="consumable-target-dialog flex flex-col gap-4 select-none">
+          <div class="flex items-center justify-between border-b border-amber-500/40 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-3xl">${item.icon || '🃏'}</span>
+              <div>
+                <h3 class="font-pixel text-3xl text-amber-300 leading-none">${item.name}</h3>
+                <span class="text-xs text-slate-300 font-bold">${item.description}</span>
+              </div>
+            </div>
+            <button id="close-consumable-modal-btn" class="text-slate-400 hover:text-white font-bold text-2xl px-2 cursor-pointer">✕</button>
+          </div>
+
+          <div class="text-xs font-black uppercase tracking-wider text-slate-300 flex justify-between">
+            <span>Select up to ${maxSelect} target card(s):</span>
+            <span class="text-amber-400 font-pixel text-base">${selectedSet.size} / ${maxSelect} Selected</span>
+          </div>
+
+          <!-- Up to 8 Eligible Cards Grid -->
+          <div class="grid grid-cols-4 sm:grid-cols-8 gap-2 py-2">
+            ${eligibleCards.map(card => {
+              const isSelected = selectedSet.has(card.id);
+              const suitSymbol = card.getSuitSymbol();
+              const isRed = card.suit === 'hearts' || card.suit === 'diamonds';
+              return `
+                <div class="target-card-btn ${isSelected ? 'target-selected' : ''} bg-[#faf8f5] rounded-xl p-1.5 flex flex-col items-center justify-between h-24 border-2 shadow" data-card-id="${card.id}">
+                  <div class="flex items-center justify-between w-full leading-none ${isRed ? 'text-[#fe5f55]' : 'text-[#009dff]'}">
+                    <span class="font-black text-xs font-sans">${card.rank}</span>
+                    <span class="text-[10px] font-sans">${suitSymbol}</span>
+                  </div>
+                  <div class="text-2xl my-auto ${isRed ? 'text-[#fe5f55]' : 'text-[#009dff]'}">
+                    ${suitSymbol}
+                  </div>
+                  <span class="text-[8px] font-black uppercase text-slate-500 truncate w-full text-center">
+                    ${card.enhancement !== 'none' ? card.enhancement : ''}
+                  </span>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <!-- Bottom Action Buttons -->
+          <div class="flex items-center justify-end gap-3 border-t border-slate-700/80 pt-3">
+            <button id="cancel-target-btn" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm rounded-xl cursor-pointer">
+              Cancel
+            </button>
+            <button id="confirm-target-btn" class="px-6 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-pixel text-xl font-black rounded-xl shadow-lg cursor-pointer ${selectedSet.size === 0 ? 'opacity-50 cursor-not-allowed' : ''}">
+              Apply Effect
+            </button>
+          </div>
+        </div>
+      `;
+
+      modal.querySelectorAll('.target-card-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const cid = btn.dataset.cardId;
+          if (selectedSet.has(cid)) {
+            selectedSet.delete(cid);
+          } else {
+            if (selectedSet.size < maxSelect) {
+              selectedSet.add(cid);
+            } else if (maxSelect === 1) {
+              selectedSet.clear();
+              selectedSet.add(cid);
+            }
+          }
+          this.playSound('card_select');
+          renderModalContent();
+        });
+      });
+
+      modal.querySelector('#close-consumable-modal-btn')?.addEventListener('click', () => {
+        modal.classList.add('hidden');
+      });
+      modal.querySelector('#cancel-target-btn')?.addEventListener('click', () => {
+        modal.classList.add('hidden');
+      });
+
+      modal.querySelector('#confirm-target-btn')?.addEventListener('click', () => {
+        if (selectedSet.size === 0) return;
+        eligibleCards.forEach(c => {
+          c.selected = selectedSet.has(c.id);
+        });
+        const res = this.game.useConsumable(itemIndex);
+        modal.classList.add('hidden');
+        if (res.success) {
+          this.playSound('win');
+          this.render();
+          if (this.game.state === GAME_STATES.SHOP) this.renderShop();
+        } else {
+          alert(res.message);
+        }
+      });
+    };
+
+    modal.classList.remove('hidden');
+    renderModalContent();
   }
 
   updateActionButtons() {
@@ -2127,6 +2520,11 @@ export class Renderer {
         this.tallyMult.textContent = tallyMultVal;
         this.tallyTotal.textContent = (tallyChipsVal * tallyMultVal).toLocaleString();
 
+        // Dynamically activate red-orange fire overflow when target is achieved
+        if (scoringResult.isSingleHandOverflow || (tallyChipsVal * tallyMultVal >= this.game.roundTarget && this.game.roundTarget > 0)) {
+          this.setFireOverflow(true);
+        }
+
         if (step.mod && step.mod.multMultiplier) {
           this.playSound('mult_x');
         } else if (step.mod && step.mod.mult) {
@@ -2148,6 +2546,9 @@ export class Renderer {
     // Multiplication: Play mult_chord chime and flash tally total
     this.playSound('mult_chord');
     this.tallyTotal.textContent = (tallyChipsVal * tallyMultVal).toLocaleString();
+    if (scoringResult.isSingleHandOverflow || (tallyChipsVal * tallyMultVal >= this.game.roundTarget && this.game.roundTarget > 0)) {
+      this.setFireOverflow(true);
+    }
     this.tallyTotal.style.transform = 'scale(1.25)';
     this.tallyTotal.style.color = '#f1c40f';
     document.body.classList.add('screen-shake');
@@ -2170,6 +2571,7 @@ export class Renderer {
     this.scoringBoard.classList.add('opacity-0', 'scale-95');
     this.scoringStage.classList.add('hidden');
     this.playedCardsStage.innerHTML = '';
+    this.setFireOverflow(false);
 
     this.game.commitScoredPoints(scoringResult.finalScore);
   }
@@ -2229,33 +2631,27 @@ export class Renderer {
     setTimeout(() => p.remove(), 850);
   }
 
-  showRunInfo() {
-    this.handLevelsList.innerHTML = '';
-    const hands = Object.entries(HAND_DEFINITIONS);
+  showRunInfo(tab = null) {
+    if (this.runInfoModalComponent) {
+      this.runInfoModalComponent.show(tab);
+    }
+  }
 
-    hands.forEach(([name, def]) => {
-      const level = this.game.handLevels[name] || 1;
-      const chips = def.baseChips + (level - 1) * def.levelChips;
-      const mult = def.baseMult + (level - 1) * def.levelMult;
-
-      const row = document.createElement('div');
-      row.className = 'bg-black/60 border border-[#4a391e] rounded-xl p-3 flex justify-between items-center';
-      row.innerHTML = `
-        <div class="flex flex-col">
-          <span class="font-pixel text-xl text-amber-300">${name}</span>
-          <span class="text-[11px] text-slate-400 font-bold">${def.description}</span>
-        </div>
-        <div class="flex items-center gap-3 font-pixel text-2xl">
-          <span class="text-xs font-black text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Lv. ${level}</span>
-          <span class="text-[#009dff]">${chips}</span>
-          <span class="text-white text-sm">✕</span>
-          <span class="text-[#fe5f55]">${mult}</span>
-        </div>
-      `;
-      this.handLevelsList.appendChild(row);
-    });
-
-    this.runInfoModal.classList.remove('hidden');
+  showTitleScreen() {
+    this.game.state = GAME_STATES.TITLE;
+    if (this.mainMenu) {
+      this.mainMenu.show();
+    } else if (this.titleScreen) {
+      this.titleScreen.classList.remove('hidden');
+    }
+    if (this.appContainer) this.appContainer.classList.add('hidden');
+    if (this.deckSelectModal) this.deckSelectModal.classList.add('hidden');
+    if (this.gameOverModal) this.gameOverModal.classList.add('hidden');
+    if (this.optionsModal) this.optionsModal.classList.add('hidden');
+    if (this.backgroundRenderer) {
+      this.backgroundRenderer.setAntePalette(0);
+    }
+    this.playSound('card_slide');
   }
 
   /**
@@ -2273,7 +2669,19 @@ export class Renderer {
    * ZONE C: Interactive Booster Pack Opening Overlay
    * Displays cards face up to choose from with visible mutations, editions, and keep buttons!
    */
+  openBoosterPack(pack) {
+    this.showPackOpeningOverlay({
+      pack: pack,
+      cards: this.game.shopEngine.packCards || [],
+      choicesRemaining: pack.choices || 1
+    });
+  }
+
   showPackOpeningOverlay(packData) {
+    if (this.shopBackgroundManager && packData && packData.pack) {
+      this.shopBackgroundManager.setPackTheme(packData.pack);
+    }
+
     this.packOverlayTitle.textContent = packData.pack.name.toUpperCase();
     this.packOverlaySubtitle.textContent = `Choose ${packData.choicesRemaining} of ${packData.cards.length} cards to keep in your deck`;
     this.packCardsContainer.innerHTML = '';
@@ -2380,6 +2788,9 @@ export class Renderer {
           this.render();
           if (pickRes.packFinished) {
             this.packOverlay.classList.add('hidden');
+            if (this.shopBackgroundManager) {
+              this.shopBackgroundManager.clearPackTheme();
+            }
             this.renderShop();
           } else {
             // Re-render remaining picks
@@ -2401,12 +2812,9 @@ export class Renderer {
   }
 
   showGameOver(data) {
-    this.gameOverTitle.textContent = 'GAME OVER';
-    this.gameOverTitle.className = 'font-pixel text-6xl text-[#fe5f55] tracking-wider';
-    this.gameOverMessage.textContent = `You reached Ante ${data.ante} but fell short of ${data.targetScore.toLocaleString()} chips.`;
-    this.finalAnteEl.textContent = `Ante ${data.ante}`;
-    this.finalScoreEl.textContent = data.finalScore.toLocaleString();
-    this.gameOverModal.classList.remove('hidden');
+    if (this.gameOverScreen) {
+      this.gameOverScreen.show(data);
+    }
     this.playSound('game_over');
   }
 

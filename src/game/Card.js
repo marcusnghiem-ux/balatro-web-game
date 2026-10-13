@@ -4,6 +4,8 @@
  * selection states, and interactive drag-and-drop metadata.
  */
 
+import { KingQueenRenderer } from '../ui/KingQueenRenderer.js';
+
 export const SUITS = {
   HEARTS: 'hearts',
   DIAMONDS: 'diamonds',
@@ -71,6 +73,7 @@ export class Card {
     this.edition = options.edition || EDITIONS.NORMAL;
     this.enhancement = options.enhancement || ENHANCEMENTS.NONE;
     this.debuffed = options.debuffed || false;
+    this.isFaceDown = options.isFaceDown || false;
 
     // Interactive UI states
     this.selected = false;
@@ -95,58 +98,118 @@ export class Card {
   }
 
   /**
+   * Procedural high-contrast pixel-art SVG court cards (King, Queen, Jack)
+   * Powered by KingQueenRenderer.
+   */
+  static getFaceCardSvg(rank, suit) {
+    return KingQueenRenderer.getFaceCardSvg(rank, suit);
+  }
+
+  /**
+   * Procedural grand Ace pixel emblem matching Reference Screenshot 4
+   */
+  static getAceSvg(suit) {
+    const isRed = suit === 'hearts' || suit === 'diamonds';
+    const mainCol = isRed ? '#fe5f55' : '#009dff';
+    const darkCol = isRed ? '#b03a2e' : '#1b4f72';
+
+    if (suit === 'diamonds') {
+      return `
+        <svg viewBox="0 0 60 76" class="w-full h-full select-none pointer-events-none drop-shadow-md">
+          <polygon points="30,6 54,38 30,70 6,38" fill="${mainCol}" stroke="#ffffff" stroke-width="2.5"/>
+          <!-- Internal horizontal hatch engraving -->
+          <line x1="12" y1="32" x2="48" y2="32" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.8"/>
+          <line x1="16" y1="26" x2="44" y2="26" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.8"/>
+          <line x1="22" y1="20" x2="38" y2="20" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.8"/>
+          <line x1="12" y1="44" x2="48" y2="44" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.8"/>
+          <line x1="16" y1="50" x2="44" y2="50" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.8"/>
+          <line x1="22" y1="56" x2="38" y2="56" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.8"/>
+          <!-- Inner core diamond -->
+          <polygon points="30,22 42,38 30,54 18,38" fill="${darkCol}"/>
+        </svg>
+      `;
+    }
+
+    if (suit === 'spades') {
+      return `
+        <svg viewBox="0 0 60 76" class="w-full h-full select-none pointer-events-none drop-shadow-md">
+          <path d="M 30 8 C 22 24, 8 36, 12 50 C 16 60, 26 56, 30 46 C 34 56, 44 60, 48 50 C 52 36, 38 24, 30 8 Z" fill="${mainCol}" stroke="#ffffff" stroke-width="2.5"/>
+          <path d="M 26 46 L 24 64 L 36 64 L 34 46 Z" fill="${mainCol}" stroke="#ffffff" stroke-width="2"/>
+          <line x1="18" y1="36" x2="42" y2="36" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.8"/>
+          <line x1="22" y1="28" x2="38" y2="28" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.8"/>
+          <circle cx="30" cy="38" r="6" fill="${darkCol}"/>
+        </svg>
+      `;
+    }
+
+    if (suit === 'hearts') {
+      return `
+        <svg viewBox="0 0 60 76" class="w-full h-full select-none pointer-events-none drop-shadow-md">
+          <path d="M 30 20 C 24 6, 8 10, 8 26 C 8 46, 30 66, 30 66 C 30 66, 52 46, 52 26 C 52 10, 36 6, 30 20 Z" fill="${mainCol}" stroke="#ffffff" stroke-width="2.5"/>
+          <line x1="16" y1="30" x2="44" y2="30" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.8"/>
+          <line x1="20" y1="38" x2="40" y2="38" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.8"/>
+          <circle cx="30" cy="34" r="5" fill="${darkCol}"/>
+        </svg>
+      `;
+    }
+
+    // Clubs
+    return `
+      <svg viewBox="0 0 60 76" class="w-full h-full select-none pointer-events-none drop-shadow-md">
+        <circle cx="30" cy="22" r="12" fill="${mainCol}" stroke="#ffffff" stroke-width="2"/>
+        <circle cx="18" cy="38" r="12" fill="${mainCol}" stroke="#ffffff" stroke-width="2"/>
+        <circle cx="42" cy="38" r="12" fill="${mainCol}" stroke="#ffffff" stroke-width="2"/>
+        <path d="M 26 38 L 24 62 L 36 62 L 34 38 Z" fill="${mainCol}" stroke="#ffffff" stroke-width="2"/>
+        <circle cx="30" cy="34" r="5" fill="${darkCol}"/>
+      </svg>
+    `;
+  }
+
+  /**
+   * Authentic Balatro card back (Ornamental red geometric filigree)
+   */
+  static getCardBackSvg() {
+    return `
+      <div class="w-full h-full rounded-xl bg-[#c0392b] border-2 border-white shadow-inner flex items-center justify-center relative overflow-hidden select-none">
+        <div class="absolute inset-1 rounded-lg border border-amber-300/60 opacity-80" style="background: repeating-linear-gradient(45deg, #a93226, #a93226 4px, #c0392b 4px, #c0392b 8px);"></div>
+        <div class="w-8 h-10 rounded-full border-2 border-amber-200/90 flex items-center justify-center bg-[#8e281d] z-10 shadow">
+          <span class="text-amber-200 text-lg font-pixel font-bold">❂</span>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
    * Toggle selected state
    * @returns {boolean}
    */
   toggleSelect() {
+    if (this.isFaceDown) return false;
     this.selected = !this.selected;
     return this.selected;
   }
 
-  /**
-   * Explicitly set selection
-   * @param {boolean} val
-   */
   setSelected(val) {
+    if (this.isFaceDown) return;
     this.selected = !!val;
   }
 
-  /**
-   * Check if card is a face card (Jack, Queen, King)
-   * @returns {boolean}
-   */
   isFaceCard() {
     return ['J', 'Q', 'K'].includes(this.rank);
   }
 
-  /**
-   * Check if rank is even
-   * @returns {boolean}
-   */
   isEven() {
     return ['2', '4', '6', '8', '10'].includes(this.rank);
   }
 
-  /**
-   * Check if rank is odd
-   * @returns {boolean}
-   */
   isOdd() {
     return ['3', '5', '7', '9', 'A'].includes(this.rank);
   }
 
-  /**
-   * Get suit symbol
-   * @returns {string}
-   */
   getSuitSymbol() {
     return SUIT_SYMBOLS[this.suit] || '?';
   }
 
-  /**
-   * Get formatted display name
-   * @returns {string}
-   */
   getDisplayName() {
     const rankNames = {
       'A': 'Ace',
@@ -159,17 +222,15 @@ export class Card {
     return `${r} of ${s}`;
   }
 
-  /**
-   * Clone card instance
-   * @returns {Card}
-   */
   clone() {
     const card = new Card(this.suit, this.rank, {
       edition: this.edition,
       enhancement: this.enhancement,
-      debuffed: this.debuffed
+      debuffed: this.debuffed,
+      isFaceDown: this.isFaceDown
     });
     card.selected = this.selected;
     return card;
   }
 }
+

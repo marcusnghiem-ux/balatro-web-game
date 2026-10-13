@@ -162,6 +162,67 @@ html {
   }
 }
 
+/* ==========================================================================
+   6. RUN INFO PERSISTENT MODAL ARCHITECTURE (Matching 20261012_133112_HDR & 20261012_133118_HDR)
+   ========================================================================== */
+
+.run-info-wrapper {
+  position: relative;
+  border-radius: 24px;
+}
+
+/* Left Bright Arcade Orange "Back" Action Bar */
+.run-info-back-bar {
+  position: relative;
+  box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.4), inset -2px -2px 0 rgba(0, 0, 0, 0.35), 0 10px 25px rgba(0, 0, 0, 0.6);
+  user-select: none;
+}
+
+.run-info-back-bar:active {
+  transform: scale(0.98);
+}
+
+/* Center Dark Slate Console */
+.run-info-console {
+  background-color: #1c2628;
+  border-color: #37474a;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6), 0 15px 35px rgba(0, 0, 0, 0.85);
+}
+
+/* Right Protruding Red Navigation Tabs */
+.run-info-tabs-column {
+  user-select: none;
+}
+
+.run-info-tab-btn {
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4), inset 1px 1px 0 rgba(255, 255, 255, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.run-info-tab-btn:hover {
+  filter: brightness(1.1);
+}
+
+.run-info-tab-btn.active-tab {
+  filter: brightness(1.15);
+  border-left: none;
+}
+
+/* Tab 1: Poker Hands Row */
+.run-info-hand-row {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.run-info-hand-row:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.35);
+}
+
+/* Tab 4: Stake & Modifiers Card */
+.run-info-stake-main-card {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
 .playing-card.card-scoring {
   animation: cardScorePop 0.4s ease-out forwards;
   z-index: 45 !important;
@@ -534,7 +595,14 @@ html {
   color: #1e293b;
   line-height: 0.9;
   user-select: none;
-  opacity: 0.85;
+  opacity: 0.9;
+  padding: 4px 0;
+  z-index: 10;
+}
+
+.joker-side-label-right {
+  transform: rotate(180deg);
+  transform-origin: center center;
 }
 
 .joker-illustration-frame {
@@ -1002,20 +1070,14 @@ html {
   letter-spacing: 6px;
 }
 
-.title-locked-joker-card {
-  animation: floatPadlock 3.2s ease-in-out infinite;
+.title-logo-container {
+  z-index: 20;
+  position: relative;
 }
 
-@keyframes floatPadlock {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-7px);
-  }
+.title-balatro-text {
+  position: relative;
+  z-index: 20;
 }
 
 .title-btn {
@@ -1115,6 +1177,16 @@ html {
   border-bottom-width: 2px;
 }
 
+.stake-arrow-pill:disabled,
+.stake-arrow-pill.disabled {
+  opacity: 0.35 !important;
+  cursor: not-allowed !important;
+  filter: grayscale(0.85) brightness(0.65) !important;
+  box-shadow: none !important;
+  transform: none !important;
+  pointer-events: none !important;
+}
+
 .deck-rule-box {
   background: #ffffff;
   color: #1e293b;
@@ -1189,30 +1261,6 @@ html {
 .deck-back-btn:active {
   transform: translateY(2px);
   border-bottom-width: 2px;
-}
-
-.btn-prompt-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  font-size: 11px;
-  font-weight: 900;
-  line-height: 1;
-}
-
-.btn-prompt-x {
-  background: #0077c2;
-  border: 1.5px solid #ffffff;
-  color: #ffffff;
-}
-
-.btn-prompt-b {
-  background: #c0392b;
-  border: 1.5px solid #ffffff;
-  color: #ffffff;
 }
 
 /* 3D DECK PREVIEW STACK */
@@ -1300,8 +1348,8 @@ html {
 }
 
 .joker-card {
-  border: 2.5px solid #ffffff !important;
-  background: #14171a;
+  border: 2.5px solid #cbd5e1 !important;
+  background: #ffffff !important;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.75), 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
@@ -2013,4 +2061,981 @@ html {
 .balatro-toast.toast-visible {
   transform: translateX(-50%) translateY(0);
   opacity: 1;
+}
+
+/* ==========================================================================
+   FIRE / FLAME SINGLE-HAND BLIND OVERFLOW ANIMATION (Matching Reference Photo 4)
+   ========================================================================== */
+
+@keyframes fireFlameLick {
+  0% {
+    transform: translateY(0) scaleX(1) scaleY(1);
+    opacity: 0.85;
+  }
+  25% {
+    transform: translateY(-4px) scaleX(1.08) scaleY(1.15) skewX(2deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-2px) scaleX(0.95) scaleY(1.05) skewX(-2deg);
+    opacity: 0.9;
+  }
+  75% {
+    transform: translateY(-6px) scaleX(1.12) scaleY(1.22) skewX(3deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scaleX(1) scaleY(1);
+    opacity: 0.85;
+  }
+}
+
+@keyframes fireGlowPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 15px rgba(254, 95, 85, 0.7)) drop-shadow(0 0 35px rgba(243, 156, 18, 0.6));
+  }
+  50% {
+    filter: drop-shadow(0 0 25px rgba(254, 95, 85, 1)) drop-shadow(0 0 50px rgba(243, 156, 18, 0.9)) drop-shadow(0 0 70px rgba(231, 76, 60, 0.8));
+  }
+}
+
+@keyframes cyanFlamePulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 15px rgba(0, 157, 255, 0.7)) drop-shadow(0 0 30px rgba(84, 184, 255, 0.6));
+  }
+  50% {
+    filter: drop-shadow(0 0 25px rgba(0, 157, 255, 1)) drop-shadow(0 0 45px rgba(84, 184, 255, 0.95));
+  }
+}
+
+/* Container overflow aura */
+.score-fire-overflow {
+  position: relative;
+  animation: fireGlowPulse 1.2s infinite ease-in-out;
+  border-color: #fe5f55 !important;
+  box-shadow: 0 0 30px rgba(254, 95, 85, 0.6), inset 0 0 15px rgba(243, 156, 18, 0.4) !important;
+}
+
+/* Fire effect on Round Score Box when single-hand overflow is achieved */
+.round-score-fire {
+  position: relative;
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 35px rgba(245, 158, 11, 0.8), 0 0 70px rgba(239, 68, 68, 0.7), inset 0 0 20px rgba(245, 158, 11, 0.5) !important;
+  animation: fireGlowPulse 0.9s infinite alternate ease-in-out;
+}
+
+.round-score-fire::before {
+  content: "";
+  position: absolute;
+  top: -18px;
+  left: 5%;
+  right: 5%;
+  height: 24px;
+  background: radial-gradient(ellipse at 50% 100%, #fef08a 0%, #f59e0b 35%, #ef4444 65%, transparent 95%);
+  animation: fireFlameLick 0.55s infinite alternate ease-in-out;
+  pointer-events: none;
+  z-index: 10;
+  border-radius: 50% 50% 0 0;
+  filter: blur(1px);
+}
+
+/* Red-orange fire glow on score counter numbers */
+.score-counter-fire {
+  color: #fffae0 !important;
+  text-shadow: 0 0 10px #f59e0b, 0 0 25px #ef4444, 0 0 45px #dc2626 !important;
+  animation: fireGlowPulse 0.8s infinite alternate ease-in-out;
+}
+
+/* Electric Cyan Fire on Chips Box */
+.chips-fire {
+  position: relative;
+  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 65%, #0369a1 100%) !important;
+  border-color: #7dd3fc !important;
+  box-shadow: 0 0 25px #009dff, 0 0 50px rgba(56, 189, 248, 0.8), inset 0 0 15px #ffffff !important;
+  animation: cyanFlamePulse 1.1s infinite alternate ease-in-out;
+  color: #ffffff !important;
+  text-shadow: 0 0 10px #ffffff, 0 0 20px #009dff !important;
+}
+
+.chips-fire::before {
+  content: "";
+  position: absolute;
+  top: -16px;
+  left: 5%;
+  right: 5%;
+  height: 22px;
+  background: radial-gradient(ellipse at 50% 100%, #38bdf8 0%, #009dff 50%, transparent 80%);
+  animation: fireFlameLick 0.6s infinite alternate ease-in-out;
+  pointer-events: none;
+  z-index: 10;
+  border-radius: 50% 50% 0 0;
+  filter: blur(1px);
+}
+
+/* Fiery Crimson / Orange Fire on Mult Box */
+.mult-fire {
+  position: relative;
+  background: linear-gradient(180deg, #f59e0b 0%, #ef4444 60%, #b91c1c 100%) !important;
+  border-color: #fde047 !important;
+  box-shadow: 0 0 30px #f59e0b, 0 0 60px rgba(239, 68, 68, 0.9), inset 0 0 15px #fef08a !important;
+  animation: fireGlowPulse 1s infinite alternate ease-in-out;
+  color: #ffffff !important;
+  text-shadow: 0 0 10px #ffffff, 0 0 20px #f59e0b !important;
+}
+
+.mult-fire::before {
+  content: "";
+  position: absolute;
+  top: -18px;
+  left: 5%;
+  right: 5%;
+  height: 26px;
+  background: radial-gradient(ellipse at 50% 100%, #fef08a 0%, #f59e0b 40%, #ef4444 70%, transparent 90%);
+  animation: fireFlameLick 0.5s infinite alternate ease-in-out;
+  pointer-events: none;
+  z-index: 10;
+  border-radius: 50% 50% 0 0;
+  filter: blur(1.5px);
+}
+
+/* ==========================================================================
+   SHOP BUY/SELL SQUARE DROP ZONE
+   ========================================================================== */
+
+.shop-buy-sell-zone {
+  min-height: 52px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 2px dashed rgba(245, 158, 11, 0.6);
+  border-radius: 16px;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+.shop-buy-sell-zone.drag-over-active {
+  border-color: #fbbf24 !important;
+  background: rgba(245, 158, 11, 0.25) !important;
+  box-shadow: 0 0 35px rgba(245, 158, 11, 0.7), inset 0 0 25px rgba(245, 158, 11, 0.35) !important;
+  transform: scale(1.02);
+}
+
+/* ==========================================================================
+   FULL-BLEED JOKER CARD ARTWORK & OVERLAYS
+   ========================================================================== */
+
+.joker-fullbleed-canvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Card Face Overlays: Completely removed from card face for authentic Balatro aesthetics.
+   Name and rarity appear exclusively in hover/tap tooltips (.tooltip-rarity-pill) */
+.joker-rarity-pill,
+.joker-bottom-name-tag,
+.joker-card .joker-rarity-banner {
+  display: none !important;
+}
+
+.tooltip-rarity-pill {
+  display: inline-block !important;
+}
+
+/* ==========================================================================
+   DECK VIEWER DIALOG & MINI CARDS
+   ========================================================================== */
+
+.deck-viewer-dialog {
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), 0 0 50px rgba(240, 173, 40, 0.35);
+}
+
+.deck-view-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  gap: 6px;
+}
+
+.deck-view-mini-card {
+  width: 44px;
+  height: 60px;
+  background: #faf8f5;
+  border-radius: 7px;
+  border: 1.5px solid #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 3px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+  font-family: monospace;
+  font-weight: 900;
+  font-size: 11px;
+  line-height: 1;
+  position: relative;
+  transition: transform 0.12s ease;
+}
+
+.deck-view-mini-card:hover {
+  transform: translateY(-4px) scale(1.08);
+  z-index: 10;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
+}
+
+/* ==========================================================================
+   COLLECTION 3x5 GRID (Matching Reference Photo 2)
+   ========================================================================== */
+
+.collection-grid-3x5 {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.collection-pager-btn {
+  background: #fe5f55;
+  border: 2px solid #ff8d85;
+  border-bottom: 4px solid #b91c1c;
+  border-radius: 12px;
+  font-family: 'VT323', monospace;
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffffff;
+  padding: 4px 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  transition: filter 0.12s ease, transform 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.collection-pager-btn:hover {
+  filter: brightness(1.1);
+}
+
+.collection-pager-btn:active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+
+.collection-back-btn {
+  background: #f39c12;
+  border: 2px solid #f8c26c;
+  border-bottom: 4px solid #b77107;
+  border-radius: 14px;
+  font-family: 'VT323', monospace;
+  font-size: 26px;
+  font-weight: 900;
+  color: #ffffff;
+  width: 100%;
+  padding: 8px 0;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+  transition: filter 0.12s ease, transform 0.1s ease;
+}
+
+.collection-back-btn:hover {
+  filter: brightness(1.1);
+}
+
+.collection-back-btn:active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+
+/* ==========================================================================
+   CONSUMABLE TARGETING 8-CARD OVERLAY MODAL
+   ========================================================================== */
+
+.consumable-target-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.consumable-target-dialog {
+  max-width: 640px;
+  width: 100%;
+  background: #182024;
+  border: 3px solid #f0ad28;
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+  color: #ffffff;
+}
+
+.target-card-btn {
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.3, 1), box-shadow 0.15s ease;
+  border: 2.5px solid transparent;
+  border-radius: 12px;
+}
+
+.target-card-btn:hover {
+  transform: translateY(-6px);
+}
+
+.target-card-btn.target-selected {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.9) !important;
+  transform: translateY(-10px) !important;
+}
+
+/* ==========================================================================
+   AUTHENTIC SHOP DRAG-AND-DROP INTERACTION ZONES (Screenshots 20261012_131157 & 20261012_132451)
+   ========================================================================== */
+
+/* 1. Dynamic Top Joker Bar Drop Overlay */
+.joker-bar-drop-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 35;
+  transition: opacity 0.15s ease, transform 0.15s cubic-bezier(0.2, 0.8, 0.3, 1), box-shadow 0.15s ease;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+.joker-bar-drop-overlay.overlay-buy {
+  background: radial-gradient(ellipse at center, #27ae60 0%, #1e8449 100%);
+  border: 3.5px solid #ffffff;
+  box-shadow: 0 8px 30px rgba(39, 174, 96, 0.8), inset 0 2px 6px rgba(255, 255, 255, 0.4);
+}
+
+.joker-bar-drop-overlay.overlay-sell {
+  background: radial-gradient(ellipse at center, #c2881a 0%, #875c07 100%);
+  border: 3.5px solid #ffffff;
+  box-shadow: 0 8px 30px rgba(194, 136, 26, 0.8), inset 0 2px 6px rgba(255, 255, 255, 0.4);
+}
+
+.joker-bar-drop-overlay.is-drag-over {
+  transform: scale(1.02);
+  filter: brightness(1.15);
+  box-shadow: 0 0 35px rgba(255, 255, 255, 0.9), inset 0 0 16px rgba(255, 255, 255, 0.6) !important;
+}
+
+/* 2. Right-Side "Buy and Use" Target Card */
+.shop-buy-use-card {
+  width: 90px;
+  height: 126px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #f39c12 0%, #d35400 100%);
+  border: 3px solid #ffffff;
+  box-shadow: 0 8px 24px rgba(243, 156, 18, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.3, 1), box-shadow 0.15s ease, opacity 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  user-select: none;
+  touch-action: none;
+}
+
+@media (min-width: 640px) {
+  .shop-buy-use-card {
+    width: 104px;
+    height: 144px;
+  }
+}
+
+.shop-buy-use-card:hover:not(.drop-zone-disabled) {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 10px 28px rgba(243, 156, 18, 0.7);
+}
+
+.shop-buy-use-card.is-drag-over:not(.drop-zone-disabled) {
+  transform: scale(1.06);
+  filter: brightness(1.15);
+  box-shadow: 0 0 32px rgba(243, 156, 18, 0.95), inset 0 0 12px rgba(255, 255, 255, 0.8) !important;
+}
+
+.shop-buy-use-card.drop-zone-disabled {
+  background: linear-gradient(180deg, #333a42 0%, #1f2429 100%) !important;
+  border: 2.5px dashed rgba(255, 255, 255, 0.3) !important;
+  opacity: 0.38 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  filter: grayscale(0.85) !important;
+  transform: none !important;
+}
+
+/* 3. Right-Side Gameplay "USE" Target Card (20261012_131157_HDR.jpg) */
+.game-use-target-card {
+  width: 86px;
+  height: 118px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%);
+  border: 3px solid #ffffff;
+  box-shadow: 0 8px 24px rgba(231, 76, 60, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.3, 1), box-shadow 0.15s ease;
+  user-select: none;
+  touch-action: none;
+}
+
+@media (min-width: 640px) {
+  .game-use-target-card {
+    width: 96px;
+    height: 132px;
+  }
+}
+
+.game-use-target-card.is-drag-over {
+  transform: scale(1.06);
+  filter: brightness(1.15);
+  box-shadow: 0 0 32px rgba(231, 76, 60, 0.95), inset 0 0 12px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* 4. Fluid Floating Drag Avatar (Hardware accelerated, zero sticking) */
+.card-drag-avatar {
+  position: fixed;
+  pointer-events: none;
+  z-index: 99999;
+  will-change: transform, left, top;
+  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.85));
+  transform-origin: center center;
+  touch-action: none;
+  user-select: none;
+}
+
+/* ==========================================================================
+   5. AUTHENTIC BALATRO DEALING & TRANSITION ANIMATION POLISH
+   ========================================================================== */
+
+/* Card Dealing Settling Bounce Effect */
+.card-settle-bounce {
+  animation: cardSettleBounceAnim 0.24s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes cardSettleBounceAnim {
+  0% {
+    transform: scale(1.12);
+  }
+  60% {
+    transform: scale(0.96);
+  }
+  100% {
+    transform: scale(1.0);
+  }
+}
+
+/* Blind Shift-Down Lock Settle Glow */
+.blind-lock-settle {
+  animation: blindLockSettleGlow 0.35s ease-out forwards;
+}
+
+@keyframes blindLockSettleGlow {
+  0% {
+    box-shadow: 0 0 35px rgba(255, 219, 112, 0.95), inset 0 0 14px rgba(255, 255, 255, 0.7);
+    filter: brightness(1.2);
+  }
+  100% {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    filter: brightness(1);
+  }
+}
+
+/* ==========================================================================
+   6. BALATRO GAME OVER SUMMARY SCREEN (MATCHING REFERENCE PHOTO 20261012_132855_HDR)
+   ========================================================================== */
+
+.balatro-game-over-dialog {
+  background-color: #283236;
+  border: 4px solid #cbd5e1;
+  border-radius: 26px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), inset 0 2px 2px rgba(255, 255, 255, 0.15);
+  max-width: 440px;
+  width: 100%;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  user-select: none;
+  color: #ffffff;
+  position: relative;
+  z-index: 10;
+  backdrop-filter: blur(12px);
+}
+
+.balatro-game-over-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.balatro-game-over-title {
+  font-family: 'VT323', monospace;
+  font-size: 52px;
+  line-height: 1;
+  color: #fe5f55;
+  letter-spacing: 2px;
+  margin: 0;
+  text-align: center;
+  font-weight: 900;
+  text-shadow: 0 4px 0 #111827, 0 6px 12px rgba(0, 0, 0, 0.8);
+}
+
+.balatro-game-over-body {
+  background-color: #141c1f;
+  border: 2px solid #232c31;
+  border-radius: 16px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* Stat Bar Row */
+.balatro-stat-bar {
+  background-color: #c8ccd2;
+  border-radius: 8px;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+  min-height: 32px;
+  gap: 8px;
+}
+
+.balatro-stat-bar.full-width {
+  width: 100%;
+  padding: 5px 10px;
+  min-height: 36px;
+}
+
+.balatro-stat-label {
+  font-family: 'VT323', monospace;
+  font-size: 19px;
+  font-weight: bold;
+  color: #1a2127;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+/* Stat Pills */
+.balatro-pill {
+  border-radius: 6px;
+  padding: 2px 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  line-height: 1;
+}
+
+.balatro-chip-icon {
+  font-size: 15px;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.balatro-pill-text {
+  font-family: 'VT323', monospace;
+  font-size: 19px;
+  font-weight: bold;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.balatro-pill.pill-red {
+  background-color: #fe5f55;
+  color: #ffffff;
+}
+
+.balatro-pill.pill-blue {
+  background-color: #009dff;
+  color: #ffffff;
+}
+
+.balatro-pill.pill-amber {
+  background-color: #f59e0b;
+  color: #ffffff;
+}
+
+.balatro-pill.pill-green {
+  background-color: #22c55e;
+  color: #ffffff;
+}
+
+.balatro-pill.pill-orange {
+  background-color: #fe5f55;
+  color: #ffffff;
+}
+
+.balatro-pill.pill-dark {
+  background-color: #141c1f;
+  color: #ffffff;
+}
+
+.balatro-pill-text.text-amber {
+  color: #f59e0b;
+}
+
+/* Columns Section */
+.balatro-game-over-columns {
+  display: grid;
+  grid-template-columns: 1.14fr 0.86fr;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.balatro-stats-col-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.balatro-stats-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Copy Seed Container & Button */
+.balatro-copy-seed-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 3px;
+}
+
+.balatro-copy-btn {
+  background-color: #009dff;
+  border: none;
+  border-radius: 8px;
+  padding: 3px 24px;
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+  box-shadow: 0 3px 0 #0076bf, 0 4px 6px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  transition: transform 0.1s ease, background-color 0.15s ease, box-shadow 0.1s ease;
+  line-height: 1;
+}
+
+.balatro-copy-btn:hover {
+  background-color: #1cb0ff;
+  transform: translateY(-1px);
+}
+
+.balatro-copy-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #0076bf;
+}
+
+.balatro-copy-btn.copied {
+  background-color: #16a34a !important;
+  box-shadow: 0 3px 0 #15803d !important;
+}
+
+/* Defeated By Card */
+.balatro-defeated-by-card {
+  background-color: #141c1f;
+  border: 2px solid #232c31;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.balatro-defeated-by-header {
+  background-color: #c8ccd2;
+  color: #1a2127;
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 3px 6px;
+  text-align: center;
+  letter-spacing: 0.3px;
+  line-height: 1;
+}
+
+.balatro-defeated-by-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px;
+  flex: 1;
+  min-height: 85px;
+}
+
+.balatro-defeated-name {
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+  text-align: center;
+  line-height: 1.1;
+}
+
+/* Circular Blind Badge Token */
+.balatro-blind-circular-badge {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.6), inset 0 2px 3px rgba(255, 255, 255, 0.3);
+  position: relative;
+}
+
+.balatro-blind-circular-badge.blind-badge-small {
+  background: radial-gradient(circle at 35% 35%, #0072b2, #004b7a);
+  border: 2px dashed rgba(255, 255, 255, 0.85);
+}
+
+.balatro-blind-circular-badge.blind-badge-big {
+  background: radial-gradient(circle at 35% 35%, #e69500, #9e6400);
+  border: 2px dashed rgba(255, 255, 255, 0.85);
+}
+
+.balatro-blind-circular-badge.blind-badge-boss {
+  background: radial-gradient(circle at 35% 35%, #dc2626, #7f1d1d);
+  border: 2px dashed rgba(255, 255, 255, 0.85);
+}
+
+.balatro-blind-badge-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 0.92;
+}
+
+.blind-badge-line1,
+.blind-badge-line2 {
+  font-family: 'VT323', monospace;
+  font-size: 14px;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Action Buttons (Vertically Stacked) */
+.balatro-game-over-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.balatro-arcade-action-btn {
+  background-color: #fe5f55;
+  color: #ffffff;
+  font-family: 'VT323', monospace;
+  font-size: 26px;
+  font-weight: bold;
+  border: 2px solid #ff9d94;
+  border-radius: 12px;
+  padding: 8px 0;
+  width: 100%;
+  letter-spacing: 0.5px;
+  box-shadow: 0 5px 0 #b91c1c, 0 8px 16px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: all 0.12s ease;
+  line-height: 1;
+}
+
+.balatro-arcade-action-btn:hover {
+  background-color: #ff7067;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 0 #b91c1c, 0 10px 18px rgba(0, 0, 0, 0.55);
+}
+
+.balatro-arcade-action-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #b91c1c, 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================================================
+   BLIND SHIFT-DOWN TRANSITION: tactile settle flash on HUD arrival
+   ========================================================================== */
+
+@keyframes blindLockSettleFlash {
+  0%   { box-shadow: 0 0 0 3px #f1c40f, 0 0 22px rgba(241, 196, 15, 0.9); }
+  40%  { box-shadow: 0 0 0 6px #f59e0b, 0 0 36px rgba(245, 158, 11, 0.8); }
+  100% { box-shadow: none; }
+}
+
+/* Applied for 300ms after blind card lands in HUD slot */
+.blind-lock-settle {
+  animation: blindLockSettleFlash 0.3s ease-out forwards;
+}
+
+/* ==========================================================================
+   DECK DEAL ANIMATION: elastic card settle bounce on arrival
+   ========================================================================== */
+
+@keyframes cardSettleBounce {
+  0%   { transform: scale(1.18) translateY(-8px); }
+  38%  { transform: scale(0.93) translateY(3px); }
+  65%  { transform: scale(1.05) translateY(-2px); }
+  82%  { transform: scale(0.98) translateY(1px); }
+  100% { transform: scale(1)   translateY(0); }
+}
+
+/* Triggered when a dealing-flight card lands in its final hand slot */
+.card-settle-bounce {
+  animation: cardSettleBounce 0.26s cubic-bezier(0.3, 0.8, 0.5, 1.15) forwards;
+}
+
+/* ==========================================================================
+   JOKER CARD: Vertical "JOKER" side-label ribbon (authentic Balatro style)
+   ========================================================================== */
+
+/* Left column: reads top-to-bottom */
+.joker-side-label-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 2px 1px;
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 10px;
+  font-weight: 900;
+  color: #1a1a2e;
+  letter-spacing: 0.5px;
+  line-height: 1;
+  opacity: 0.75;
+  user-select: none;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+/* Right column: 180° rotated — reads bottom-to-top (authentic playing card symmetry) */
+.joker-side-label-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 2px 1px;
+  font-family: 'VT323', 'Courier New', monospace;
+  font-size: 10px;
+  font-weight: 900;
+  color: #1a1a2e;
+  letter-spacing: 0.5px;
+  line-height: 1;
+  opacity: 0.75;
+  user-select: none;
+  pointer-events: none;
+  flex-shrink: 0;
+  transform: rotate(180deg);
+}
+
+.joker-fullbleed-canvas {
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   FIRE OVERFLOW: Enhanced single-hand blind overflow particle system
+   ========================================================================== */
+
+/* Live Preview Chips box fire — blue electric glow */
+.chips-fire {
+  box-shadow: 0 0 0 2px #009dff, 0 0 18px rgba(0, 157, 255, 0.9), 0 0 36px rgba(0, 157, 255, 0.5) !important;
+  animation: cyanFlamePulse 0.7s infinite alternate ease-in-out;
+}
+
+/* Live Preview Mult box fire — red-orange glow */
+.mult-fire {
+  box-shadow: 0 0 0 2px #fe5f55, 0 0 18px rgba(254, 95, 85, 0.9), 0 0 36px rgba(254, 95, 85, 0.5) !important;
+  animation: fireGlowPulse 0.7s infinite alternate ease-in-out;
+}
+
+/* Score counter digits intensify on overflow */
+.score-counter-fire {
+  color: #f1c40f !important;
+  text-shadow: 0 0 14px rgba(241, 196, 15, 0.95), 0 0 28px rgba(245, 158, 11, 0.7);
+  animation: fireGlowPulse 0.8s infinite alternate ease-in-out;
+}
+
+/* Flame tongue pseudo-elements extending from round-score-card top */
+.round-score-fire {
+  border-color: #f97316 !important;
+  box-shadow: 0 0 0 2px #f97316, 0 0 20px rgba(249, 115, 22, 0.9), 0 0 42px rgba(249, 115, 22, 0.5) !important;
+  position: relative;
+  animation: fireGlowPulse 0.9s infinite alternate ease-in-out;
+}
+
+.round-score-fire::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 8%;
+  width: 84%;
+  height: 28px;
+  background: linear-gradient(to top,
+    rgba(249, 115, 22, 0.85) 0%,
+    rgba(251, 191, 36, 0.55) 40%,
+    transparent 100%);
+  border-radius: 8px 8px 0 0;
+  pointer-events: none;
+  animation: fireFlameLick 0.55s infinite alternate ease-in-out;
+  z-index: 2;
+}
+
+.round-score-fire::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 22%;
+  width: 56%;
+  height: 18px;
+  background: linear-gradient(to top,
+    rgba(254, 95, 85, 0.7) 0%,
+    rgba(252, 211, 77, 0.4) 50%,
+    transparent 100%);
+  border-radius: 6px 6px 0 0;
+  pointer-events: none;
+  animation: fireFlameLick 0.4s 0.12s infinite alternate ease-in-out;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   DEPLOY / CACHE BUSTING: Service worker deregistration helper
+   Add class 'sw-bypass' to body to skip cached responses
+   ========================================================================== */
+.sw-bypass { /* placeholder hook for SW bypass logic */ }
+
+/* ==========================================================================
+   ACCESSIBILITY: Prefers-reduced-motion — disable all custom keyframe animations
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .blind-lock-settle,
+  .card-settle-bounce,
+  .chips-fire,
+  .mult-fire,
+  .score-counter-fire,
+  .round-score-fire,
+  .round-score-fire::before,
+  .round-score-fire::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }

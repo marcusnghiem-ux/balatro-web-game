@@ -9,6 +9,18 @@ import { Renderer } from './ui/Renderer.js';
 import { TouchController } from './ui/TouchController.js';
 
 window.addEventListener('DOMContentLoaded', () => {
+  // DEPLOYMENT FIX: Deregister any stale service workers so new deployments
+  // are never blocked by a cached SW serving old asset hashes.
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(registrations => {
+      registrations.forEach(sw => sw.unregister());
+    });
+  }
+
+  // Log build timestamp to DevTools so you can instantly verify a fresh deployment
+  // eslint-disable-next-line no-undef
+  const buildTime = (typeof __BUILD_TIME__ !== 'undefined') ? __BUILD_TIME__ : 'dev';
+  console.log(`%c🃏 Balatro Web — Build: ${buildTime}`, 'color:#f59e0b;font-weight:bold');
   // 1. Initialize core state machine
   const game = new GameEngine();
 
@@ -27,6 +39,10 @@ window.addEventListener('DOMContentLoaded', () => {
   game.subscribe((event, data) => {
     switch (event) {
       case 'ROUND_STARTED':
+        renderer.shouldAnimateDeal = true;
+        renderer.render();
+        break;
+
       case 'HAND_RESOLVED':
         renderer.playSound('card_slide');
         renderer.render();

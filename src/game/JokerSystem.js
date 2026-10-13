@@ -5,6 +5,7 @@
  */
 
 import { ALL_150_JOKERS } from './JokerDatabase.js';
+import { ScoreCalculator } from './ScoreCalculator.js';
 
 // Specific custom logic map for distinct iconic Jokers
 const CUSTOM_JOKER_HOOKS = {
@@ -56,14 +57,9 @@ const CUSTOM_JOKER_HOOKS = {
   half_joker: {
     calculateHand: (h) => (h.allCards && h.allCards.length <= 3) ? ({ mult: 20, message: '+20 Mult' }) : null
   },
-  stencil: {
-    calculateGeneral: (ctx, joker, gameState) => {
-      const activeCount = (gameState?.jokerSystem?.count) || 1;
-      const emptySlots = Math.max(0, 5 - activeCount);
-      const multFactor = 1 + emptySlots;
-      return multFactor > 1 ? { multMultiplier: multFactor, message: `×${multFactor} Mult` } : null;
-    }
-  },
+  // BUG FIX #18: Removed duplicate 'stencil' key — 'joker_stencil' is the canonical ID
+  // matching JokerDatabase.js. In JS object literals the last duplicate key wins silently,
+  // so the earlier 'stencil' entry was dead code and could mask the wrong ID at runtime.
   joker_stencil: {
     calculateGeneral: (ctx, joker, gameState) => {
       const activeCount = (gameState?.jokerSystem?.count) || 1;
@@ -103,10 +99,35 @@ const CUSTOM_JOKER_HOOKS = {
     calculateCard: (c) => ['10', '4'].includes(c.rank) ? ({ chips: 10, mult: 4, message: '+10 Chips, +4 Mult' }) : null
   },
   gros_michel: {
-    calculateGeneral: () => ({ mult: 15, message: '+15 Mult' })
+    calculateGeneral: () => ({ mult: 15, message: '+15 Mult' }),
+    onRoundEnd: (ctx, joker, gameState) => {
+      if (Math.random() < (1 / 6)) {
+        return { destroy: true, message: 'Gros Michel: Extinct!', extinct: 'gros_michel' };
+      }
+      return null;
+    }
   },
   cavendish: {
-    calculateGeneral: () => ({ multMultiplier: 3, message: '×3 Mult' })
+    calculateGeneral: () => ({ multMultiplier: 3, message: '×3 Mult' }),
+    onRoundEnd: (ctx, joker) => {
+      if (Math.random() < 0.001) {
+        return { destroy: true, message: 'Cavendish: Extinct!' };
+      }
+      return null;
+    }
+  },
+  ice_cream: {
+    calculateGeneral: (ctx, joker) => {
+      const ch = joker.currentChips !== undefined ? joker.currentChips : 100;
+      return { chips: ch, message: `+${ch} Chips` };
+    },
+    onHandPlayed: (joker) => {
+      joker.currentChips = (joker.currentChips !== undefined ? joker.currentChips : 100) - 5;
+      if (joker.currentChips <= 0) {
+        return { destroy: true, message: 'Ice Cream: Melted away!' };
+      }
+      return null;
+    }
   },
   bull: {
     calculateGeneral: (ctx) => {
@@ -115,7 +136,36 @@ const CUSTOM_JOKER_HOOKS = {
     }
   },
   popcorn: {
-    calculateGeneral: () => ({ mult: 20, message: '+20 Mult' })
+    calculateGeneral: (ctx, joker) => {
+      const m = joker.currentMult !== undefined ? joker.currentMult : 20;
+      return { mult: m, message: `+${m} Mult` };
+    },
+    onRoundEnd: (ctx, joker) => {
+      joker.currentMult = (joker.currentMult !== undefined ? joker.currentMult : 20) - 4;
+      if (joker.currentMult <= 0) {
+        return { destroy: true, message: 'Popcorn: All popped!' };
+      }
+      return { message: `Popcorn: -4 Mult (${joker.currentMult} left)` };
+    }
+  },
+  seltzer: {
+    calculateGeneral: () => ({ message: 'Seltzer: Retriggering cards' }),
+    onHandPlayed: (joker) => {
+      joker.handsRemaining = (joker.handsRemaining !== undefined ? joker.handsRemaining : 10) - 1;
+      if (joker.handsRemaining <= 0) {
+        return { destroy: true, message: 'Seltzer: Lost fizz!' };
+      }
+      return null;
+    }
+  },
+  turtle_bean: {
+    onRoundEnd: (ctx, joker) => {
+      joker.handSizeBonus = (joker.handSizeBonus !== undefined ? joker.handSizeBonus : 5) - 1;
+      if (joker.handSizeBonus <= 0) {
+        return { destroy: true, message: 'Turtle Bean: Depleted!' };
+      }
+      return null;
+    }
   },
   the_duo: {
     calculateHand: (h) => ['Pair', 'Two Pair', 'Full House'].includes(h.handName) ? ({ multMultiplier: 2, message: '×2 Mult' }) : null
@@ -140,10 +190,188 @@ const CUSTOM_JOKER_HOOKS = {
     }
   },
   card_sharp: {
-    calculateGeneral: () => ({ multMultiplier: 3, message: '×3 Mult' })
+    calculateHand: (evalResult, ctx) => {
+      const handsPlayed = ctx.handsPlayedThisRound || [];
+      if (handsPlayed.includes(evalResult.handName)) {
+        return { multMultiplier: 3, message: 'Card Sharp: ×3 Mult' };
+      }
+      return null;
+    }
+  },
+  baseball_card: {
+    calculateGeneral: (ctx, joker, activeJokers) => {
+      const list = activeJokers || joker.parentSystem?.activeJokers || [];
+      const uncommonCount = list.filter(j => j !== joker && j.rarity === 'uncommon' && !j.debuffed).length;
+      if (uncommonCount === 0) return null;
+      const mult = Math.pow(1.5, uncommonCount);
+      return {
+        multMultiplier: mult,
+        message: `Baseball Card: ×${mult.toFixed(2)} Mult (${uncommonCount} Uncommon)`
+      };
+    }
+  },
+  abstract_joker: {
+    calculateGeneral: (ctx, joker, activeJokers) => {
+      const list = activeJokers || joker.parentSystem?.activeJokers || [];
+      const activeCount = list.filter(j => !j.debuffed).length;
+      const m = activeCount * 3;
+      return m > 0 ? { mult: m, message: `Abstract Joker: +${m} Mult` } : null;
+    }
+  },
+  baron: {
+    calculateGeneral: (ctx) => {
+      const held = ctx.heldCards || [];
+      const kings = held.filter(c => c.rank === 'K' && !c.debuffed).length;
+      if (kings === 0) return null;
+      const factor = Math.pow(1.5, kings);
+      return { multMultiplier: factor, message: `Baron: ×${factor.toFixed(2)} Mult (${kings} King${kings > 1 ? 's' : ''})` };
+    }
+  },
+  shoot_the_moon: {
+    calculateGeneral: (ctx) => {
+      const held = ctx.heldCards || [];
+      const queens = held.filter(c => c.rank === 'Q' && !c.debuffed).length;
+      if (queens === 0) return null;
+      return { mult: queens * 13, message: `Shoot the Moon: +${queens * 13} Mult (${queens} Queen${queens > 1 ? 's' : ''})` };
+    }
+  },
+  acrobat: {
+    calculateGeneral: (ctx) => {
+      if (ctx.handsLeft === 1) {
+        return { multMultiplier: 3, message: 'Acrobat: ×3 Mult' };
+      }
+      return null;
+    }
+  },
+  swashbuckler: {
+    calculateGeneral: (ctx, joker, activeJokers) => {
+      const list = activeJokers || joker.parentSystem?.activeJokers || [];
+      let total = 0;
+      for (const j of list) {
+        if (j !== joker && !j.debuffed) total += (j.sellValue || 1);
+      }
+      return total > 0 ? { mult: total, message: `Swashbuckler: +${total} Mult` } : null;
+    }
+  },
+  constellation: {
+    calculateGeneral: (ctx, joker) => {
+      const m = joker.currentMultMultiplier !== undefined ? joker.currentMultMultiplier : 1;
+      return m > 1 ? { multMultiplier: m, message: `Constellation: ×${m.toFixed(1)} Mult` } : null;
+    }
+  },
+  hologram: {
+    calculateGeneral: (ctx, joker) => {
+      const m = joker.currentMultMultiplier !== undefined ? joker.currentMultMultiplier : 1;
+      return m > 1 ? { multMultiplier: m, message: `Hologram: ×${m.toFixed(2)} Mult` } : null;
+    }
+  },
+  campfire: {
+    calculateGeneral: (ctx, joker) => {
+      const m = joker.currentMultMultiplier !== undefined ? joker.currentMultMultiplier : 1;
+      return m > 1 ? { multMultiplier: m, message: `Campfire: ×${m.toFixed(2)} Mult` } : null;
+    }
+  },
+  obelisk: {
+    calculateGeneral: (ctx, joker) => {
+      const m = joker.currentMultMultiplier !== undefined ? joker.currentMultMultiplier : 1;
+      return m > 1 ? { multMultiplier: m, message: `Obelisk: ×${m.toFixed(1)} Mult` } : null;
+    }
+  },
+  hit_the_road: {
+    calculateGeneral: (ctx, joker) => {
+      const m = joker.currentMultMultiplier !== undefined ? joker.currentMultMultiplier : 1;
+      return m > 1 ? { multMultiplier: m, message: `Hit the Road: ×${m.toFixed(1)} Mult` } : null;
+    }
+  },
+  throwback: {
+    calculateGeneral: (ctx, joker, activeJokers, gameState) => {
+      const skipped = (gameState && gameState.stats && gameState.stats.blindsSkipped) || ctx.blindsSkipped || 0;
+      const factor = 1 + skipped * 0.25;
+      return factor > 1 ? { multMultiplier: factor, message: `Throwback: ×${factor.toFixed(2)} Mult` } : null;
+    }
+  },
+  flower_pot: {
+    calculateHand: (evalResult) => {
+      const suits = new Set(evalResult.scoringCards.map(c => c.enhancement === 'wild' ? 'all' : c.suit));
+      const hasD = suits.has('diamonds') || suits.has('all');
+      const hasC = suits.has('clubs') || suits.has('all');
+      const hasH = suits.has('hearts') || suits.has('all');
+      const hasS = suits.has('spades') || suits.has('all');
+      if (hasD && hasC && hasH && hasS) {
+        return { multMultiplier: 3, message: 'Flower Pot: ×3 Mult' };
+      }
+      return null;
+    }
+  },
+  seeing_double: {
+    calculateHand: (evalResult) => {
+      const clubs = evalResult.scoringCards.some(c => c.suit === 'clubs' || c.enhancement === 'wild');
+      const others = evalResult.scoringCards.some(c => c.suit !== 'clubs' || c.enhancement === 'wild');
+      if (clubs && others) {
+        return { multMultiplier: 2, message: 'Seeing Double: ×2 Mult' };
+      }
+      return null;
+    }
+  },
+  lucky_cat: {
+    calculateGeneral: (ctx, joker) => {
+      const m = joker.currentMultMultiplier !== undefined ? joker.currentMultMultiplier : 1;
+      return m > 1 ? { multMultiplier: m, message: `Lucky Cat: ×${m.toFixed(2)} Mult` } : null;
+    }
+  },
+  drivers_license: {
+    calculateGeneral: (ctx, joker, activeJokers, gameState) => {
+      const deck = (gameState && gameState.deck) || [];
+      const hand = (gameState && gameState.hand) || [];
+      const discard = (gameState && gameState.discardPile) || [];
+      const allCards = [...deck, ...hand, ...discard];
+      const enhancedCount = allCards.filter(c => c.enhancement && c.enhancement !== 'none').length;
+      if (enhancedCount >= 16) {
+        return { multMultiplier: 3, message: `Driver's License: ×3 Mult (${enhancedCount} Enhanced)` };
+      }
+      return null;
+    }
+  },
+  steel_joker: {
+    calculateGeneral: (ctx, joker, activeJokers, gameState) => {
+      const deck = (gameState && gameState.deck) || [];
+      const hand = (gameState && gameState.hand) || [];
+      const discard = (gameState && gameState.discardPile) || [];
+      const allCards = [...deck, ...hand, ...discard];
+      const steelCount = allCards.filter(c => c.enhancement === 'steel').length;
+      if (steelCount === 0) return null;
+      const factor = 1 + steelCount * 0.2;
+      return { multMultiplier: factor, message: `Steel Joker: ×${factor.toFixed(1)} Mult (${steelCount} Steel)` };
+    }
+  },
+  stone_joker: {
+    calculateGeneral: (ctx, joker, activeJokers, gameState) => {
+      const deck = (gameState && gameState.deck) || [];
+      const hand = (gameState && gameState.hand) || [];
+      const discard = (gameState && gameState.discardPile) || [];
+      const allCards = [...deck, ...hand, ...discard];
+      const stoneCount = allCards.filter(c => c.enhancement === 'stone').length;
+      if (stoneCount === 0) return null;
+      const chips = stoneCount * 25;
+      return { chips, message: `Stone Joker: +${chips} Chips (${stoneCount} Stone)` };
+    }
+  },
+  glass_joker: {
+    calculateGeneral: (ctx, joker) => {
+      const m = joker.currentMultMultiplier !== undefined ? joker.currentMultMultiplier : 1;
+      return m > 1 ? { multMultiplier: m, message: `Glass Joker: ×${m.toFixed(2)} Mult` } : null;
+    }
   },
   ramen: {
-    calculateGeneral: () => ({ multMultiplier: 2, message: '×2 Mult' })
+    calculateGeneral: (ctx, joker) => {
+      const m = joker.currentMultMultiplier !== undefined ? joker.currentMultMultiplier : 2;
+      return { multMultiplier: m, message: `×${m.toFixed(2)} Mult` };
+    },
+    onDiscard: (cards, gameState, joker) => {
+      const reduction = cards.length * 0.01;
+      const cur = joker.currentMultMultiplier !== undefined ? joker.currentMultMultiplier : 2;
+      joker.currentMultMultiplier = Math.max(1, cur - reduction);
+    }
   },
   stuntman: {
     calculateGeneral: () => ({ chips: 300, message: '+300 Chips' })
@@ -158,20 +386,20 @@ const CUSTOM_JOKER_HOOKS = {
       }
       return null;
     },
-    calculateHand: (h, ctx, joker) => {
+    calculateHand: (h, ctx, joker, activeJokers, gameState) => {
       const target = joker && joker.targetJoker;
       if (!target || target.debuffed || target.id === 'blueprint') return null;
       if (typeof target.calculateHand === 'function') {
-        const res = target.calculateHand(h, ctx, target);
+        const res = target.calculateHand(h, ctx, target, activeJokers, gameState);
         if (res) return { ...res, message: `Blueprint (${target.name}): ${res.message}` };
       }
       return null;
     },
-    calculateGeneral: (ctx, joker) => {
+    calculateGeneral: (ctx, joker, activeJokers, gameState) => {
       const target = joker && joker.targetJoker;
       if (!target || target.debuffed || target.id === 'blueprint') return null;
       if (typeof target.calculateGeneral === 'function') {
-        const res = target.calculateGeneral(ctx, target);
+        const res = target.calculateGeneral(ctx, target, activeJokers, gameState);
         if (res) return { ...res, message: `Blueprint (${target.name}): ${res.message}` };
       }
       return null;
@@ -207,20 +435,20 @@ const CUSTOM_JOKER_HOOKS = {
       }
       return null;
     },
-    calculateHand: (h, ctx, joker) => {
+    calculateHand: (h, ctx, joker, activeJokers, gameState) => {
       const target = joker && joker.targetJoker;
       if (!target || target.debuffed || target.id === 'brainstorm') return null;
       if (typeof target.calculateHand === 'function') {
-        const res = target.calculateHand(h, ctx, target);
+        const res = target.calculateHand(h, ctx, target, activeJokers, gameState);
         if (res) return { ...res, message: `Brainstorm (${target.name}): ${res.message}` };
       }
       return null;
     },
-    calculateGeneral: (ctx, joker) => {
+    calculateGeneral: (ctx, joker, activeJokers, gameState) => {
       const target = joker && joker.targetJoker;
       if (!target || target.debuffed || target.id === 'brainstorm') return null;
       if (typeof target.calculateGeneral === 'function') {
-        const res = target.calculateGeneral(ctx, target);
+        const res = target.calculateGeneral(ctx, target, activeJokers, gameState);
         if (res) return { ...res, message: `Brainstorm (${target.name}): ${res.message}` };
       }
       return null;
@@ -286,11 +514,18 @@ const CUSTOM_JOKER_HOOKS = {
 };
 
 // Auto-fallback hook builder for any joker with numeric descriptions
+// Strictly rejects any conditional phrases to prevent phantom scoring bugs
 function buildDynamicFallbackHook(joker) {
   const desc = joker.description || '';
-  
-  // Check for X Mult (e.g. "X2 Mult" or "X1.5 Mult")
-  const xMultMatch = desc.match(/X([0-9.]+)\s*Mult/i);
+
+  // Reject ANY conditional trigger phrases - these MUST NOT have automatic static fallback!
+  const conditionalRegex = /(each|per|if|when|gains|held in hand|uncommon|empty|discarded|remaining|for every|sell value|consecutive|skipped|destroyed|enhanced|contains|odds|chance|scored|first|last|final)/i;
+  if (conditionalRegex.test(desc)) {
+    return {};
+  }
+
+  // Check for flat unconditional X Mult (e.g. "X2 Mult" with no conditions)
+  const xMultMatch = desc.match(/^X([0-9.]+)\s*Mult\.?$/i);
   if (xMultMatch) {
     const factor = parseFloat(xMultMatch[1]);
     return {
@@ -298,8 +533,8 @@ function buildDynamicFallbackHook(joker) {
     };
   }
 
-  // Check for +X Mult
-  const plusMultMatch = desc.match(/\+([0-9]+)\s*Mult/i);
+  // Check for flat unconditional +X Mult
+  const plusMultMatch = desc.match(/^\+([0-9]+)\s*Mult\.?$/i);
   if (plusMultMatch) {
     const val = parseInt(plusMultMatch[1], 10);
     return {
@@ -307,8 +542,8 @@ function buildDynamicFallbackHook(joker) {
     };
   }
 
-  // Check for +X Chips
-  const plusChipsMatch = desc.match(/\+([0-9]+)\s*Chips/i);
+  // Check for flat unconditional +X Chips
+  const plusChipsMatch = desc.match(/^\+([0-9]+)\s*Chips\.?$/i);
   if (plusChipsMatch) {
     const val = parseInt(plusChipsMatch[1], 10);
     return {
@@ -316,8 +551,8 @@ function buildDynamicFallbackHook(joker) {
     };
   }
 
-  // Check for Earn $X
-  const moneyMatch = desc.match(/Earn\s*\$([0-9]+)/i) || desc.match(/\+\$([0-9]+)/i);
+  // Check for flat Earn $X at end of round
+  const moneyMatch = desc.match(/^(?:Earn|\+)\s*\$([0-9]+)(?:\s*at end of round)?\.?$/i);
   if (moneyMatch) {
     const val = parseInt(moneyMatch[1], 10);
     return {
@@ -338,9 +573,11 @@ export const JOKER_CATALOG = ALL_150_JOKERS.map(j => {
 });
 
 export class JokerSystem {
-  constructor(maxJokers = 5) {
+  constructor(maxJokers = 5, game = null) {
     this.maxJokers = maxJokers;
     this.activeJokers = [];
+    // BUG FIX #8: Store game reference so addJoker/removeJoker can mutate maxHandSize.
+    this._game = game;
   }
 
   addJoker(joker) {
@@ -351,16 +588,128 @@ export class JokerSystem {
       ...joker,
       instanceId: `inst_${joker.id}_${Math.random().toString(36).substr(2, 6)}`,
       sellValue: joker.isRental ? 1 : Math.max(1, Math.floor(joker.cost / 2)),
-      handsRemaining: joker.id === 'loyalty_card' ? (joker.handsRemaining !== undefined ? joker.handsRemaining : 5) : undefined,
+      handsRemaining: joker.id === 'loyalty_card' ? 5 : (joker.id === 'seltzer' ? 10 : undefined),
+      currentMult: joker.id === 'popcorn' ? 20 : undefined,
+      currentChips: joker.id === 'ice_cream' ? 100 : undefined,
+      currentMultMultiplier: joker.id === 'ramen' ? 2 : (['constellation', 'hologram', 'campfire', 'obelisk', 'hit_the_road', 'lucky_cat', 'glass_joker'].includes(joker.id) ? 1 : undefined),
+      handSizeBonus: joker.id === 'turtle_bean' ? 5 : undefined,
       perishableRoundsLeft: joker.isPerishable ? 5 : undefined,
       isEternal: !!joker.isEternal,
       isPerishable: !!joker.isPerishable,
       isRental: !!joker.isRental,
-      debuffed: false
+      debuffed: false,
+      parentSystem: this
     };
     this.activeJokers.push(instance);
     this.updateBlueprintTargets();
+
+    // BUG FIX #8: Turtle Bean must actually apply its hand-size bonus.
+    // Previously the bonus was stored as metadata only and never written to maxHandSize.
+    if (instance.id === 'turtle_bean' && instance.handSizeBonus) {
+      const gs = instance.parentSystem && instance.parentSystem._game;
+      if (gs && typeof gs.maxHandSize === 'number') {
+        gs.maxHandSize += instance.handSizeBonus;
+      }
+    }
+
     return true;
+  }
+
+  /**
+   * Evaluates end of round lifecycle degradation for all active Jokers:
+   * - Gros Michel extinction check (1 in 6)
+   * - Cavendish extinction check (1 in 1000)
+   * - Popcorn Mult reduction (-4) and pop destruction
+   * - Turtle bean hand size countdown
+   * - Perishable sticker countdown (debuffs after 5 rounds)
+   */
+  triggerRoundEndDegradation(gameState) {
+    const notifications = [];
+    const indicesToRemove = [];
+
+    this.activeJokers.forEach((joker, index) => {
+      // Perishable: debuffs after 5 rounds
+      if (joker.isPerishable && joker.perishableRoundsLeft !== undefined) {
+        joker.perishableRoundsLeft--;
+        if (joker.perishableRoundsLeft <= 0) {
+          joker.debuffed = true;
+          notifications.push({ joker, message: `${joker.name}: Perished!` });
+        }
+      }
+
+      // Execute onRoundEnd hook
+      if (typeof joker.onRoundEnd === 'function') {
+        const res = joker.onRoundEnd({ money: gameState?.money || 0 }, joker, gameState);
+        if (res) {
+          if (res.destroy && !joker.isEternal) {
+            indicesToRemove.push(index);
+            if (res.extinct && gameState) {
+              gameState.grosMichelExtinct = true;
+            }
+          }
+          if (res.message) {
+            notifications.push({ joker, message: res.message });
+          }
+        }
+      }
+    });
+
+    // Remove destroyed jokers from highest index downward
+    indicesToRemove.sort((a, b) => b - a).forEach(idx => {
+      this.activeJokers.splice(idx, 1);
+    });
+
+    if (indicesToRemove.length > 0) {
+      this.updateBlueprintTargets();
+    }
+
+    return notifications;
+  }
+
+  /**
+   * Evaluates per-hand played degradation:
+   * - Ice Cream losing chips (-5 chips per hand, melts at 0)
+   * - Loyalty Card countdown (every 6th hand X4 Mult)
+   * - Seltzer countdown (-1 hand, expires at 0)
+   */
+  triggerHandPlayedDegradation(gameState) {
+    const notifications = [];
+    const indicesToRemove = [];
+
+    this.activeJokers.forEach((joker, index) => {
+      if (typeof joker.onHandPlayed === 'function') {
+        const res = joker.onHandPlayed(joker, gameState);
+        if (res) {
+          if (res.destroy && !joker.isEternal) {
+            indicesToRemove.push(index);
+          }
+          if (res.message) {
+            notifications.push({ joker, message: res.message });
+          }
+        }
+      }
+    });
+
+    indicesToRemove.sort((a, b) => b - a).forEach(idx => {
+      this.activeJokers.splice(idx, 1);
+    });
+
+    if (indicesToRemove.length > 0) {
+      this.updateBlueprintTargets();
+    }
+
+    return notifications;
+  }
+
+  /**
+   * Evaluates discard degradation (e.g. Ramen losing X0.01 per card discarded)
+   */
+  triggerDiscardDegradation(cards, gameState) {
+    this.activeJokers.forEach(joker => {
+      if (typeof joker.onDiscard === 'function') {
+        joker.onDiscard(cards, gameState, joker);
+      }
+    });
   }
 
   reorderJokers(fromIndex, toIndex) {
@@ -376,6 +725,10 @@ export class JokerSystem {
       const j = this.activeJokers[index];
       // Eternal jokers cannot be sold or destroyed!
       if (j.isEternal) return null;
+      // BUG FIX #8: Revert Turtle Bean hand-size bonus when Joker is sold/destroyed.
+      if (j.id === 'turtle_bean' && j.handSizeBonus && this._game) {
+        this._game.maxHandSize = Math.max(4, this._game.maxHandSize - j.handSizeBonus);
+      }
       const removed = this.activeJokers.splice(index, 1)[0];
       this.updateBlueprintTargets();
       return removed;
@@ -417,6 +770,208 @@ export class JokerSystem {
 
   get count() {
     return this.activeJokers.length;
+  }
+
+  /**
+   * Strictly evaluates active Jokers from left to right (index 0 to n-1).
+   * Sequential ordering strictly matters: +Mult applied before xMult scales differently than after.
+   * Handles Blueprint (copies right) and Brainstorm (copies leftmost).
+   *
+   * @param {Object} evalResult - Evaluated hand from HandEvaluator
+   * @param {number} startChips - Accumulated chips before Joker processing
+   * @param {number} startMult - Accumulated mult before Joker processing
+   * @param {Object} [context={}] - Game context
+   * @returns {Object} { chips, mult, steps }
+   */
+  evaluateSequentialJokers(evalResult, startChips, startMult, context = {}) {
+    let currentChips = startChips;
+    let currentMult = startMult;
+    const steps = [];
+
+    for (let i = 0; i < this.activeJokers.length; i++) {
+      const joker = this.activeJokers[i];
+      if (joker.debuffed) continue;
+
+      const effectiveJoker = this.resolveEffectiveJoker(joker, i);
+      if (!effectiveJoker) continue;
+
+      // 1. Hand Synergy Hook
+      if (typeof effectiveJoker.calculateHand === 'function') {
+        const mod = effectiveJoker.calculateHand(evalResult, context, joker, this.activeJokers, context.gameState);
+        if (mod) {
+          if (mod.chips) currentChips += mod.chips;
+          if (mod.mult) currentMult += mod.mult;
+          if (mod.multMultiplier) currentMult = Math.floor(currentMult * mod.multMultiplier);
+
+          steps.push({
+            type: 'JOKER_TRIGGER',
+            jokerId: joker.instanceId || joker.id,
+            jokerName: joker.name,
+            jokerIndex: i,
+            mod,
+            currentChips,
+            currentMult,
+            message: `${joker.name}: ${mod.message}`
+          });
+        }
+      }
+
+      // 2. General Independent Synergy Hook
+      if (typeof effectiveJoker.calculateGeneral === 'function') {
+        const mod = effectiveJoker.calculateGeneral(context, joker, this.activeJokers, context.gameState);
+        if (mod) {
+          if (mod.chips) currentChips += mod.chips;
+          if (mod.mult) currentMult += mod.mult;
+          if (mod.multMultiplier) currentMult = Math.floor(currentMult * mod.multMultiplier);
+
+          steps.push({
+            type: 'JOKER_TRIGGER',
+            jokerId: joker.instanceId || joker.id,
+            jokerName: joker.name,
+            jokerIndex: i,
+            mod,
+            currentChips,
+            currentMult,
+            message: `${joker.name}: ${mod.message}`
+          });
+        }
+      }
+
+      // 3. Joker Self-Editions
+      if (joker.edition === 'foil') {
+        currentChips += 50;
+        steps.push({
+          type: 'JOKER_EDITION',
+          jokerId: joker.instanceId || joker.id,
+          jokerName: joker.name,
+          chipsAdded: 50,
+          currentChips,
+          currentMult,
+          message: `${joker.name} (Foil): +50 Chips`
+        });
+      }
+      if (joker.edition === 'holo' || joker.edition === 'holographic') {
+        currentMult += 10;
+        steps.push({
+          type: 'JOKER_EDITION',
+          jokerId: joker.instanceId || joker.id,
+          jokerName: joker.name,
+          multAdded: 10,
+          currentChips,
+          currentMult,
+          message: `${joker.name} (Holo): +10 Mult`
+        });
+      }
+      if (joker.edition === 'polychrome') {
+        currentMult = Math.floor(currentMult * 1.5);
+        steps.push({
+          type: 'JOKER_EDITION',
+          jokerId: joker.instanceId || joker.id,
+          jokerName: joker.name,
+          multMultiplier: 1.5,
+          currentChips,
+          currentMult,
+          message: `${joker.name} (Poly): ×1.5 Mult`
+        });
+      }
+    }
+
+    return {
+      chips: currentChips,
+      mult: currentMult,
+      steps
+    };
+  }
+
+  /**
+   * Evaluates card-specific triggers from Jokers strictly in left-to-right order (index 0 to n-1).
+   * (e.g. Greedy Joker, Wrathful Joker, Scary Face, Even Steven, Scholar, etc.)
+   */
+  evaluateCardTriggers(card, startChips, startMult, context = {}) {
+    let currentChips = startChips;
+    let currentMult = startMult;
+    const steps = [];
+
+    for (let j = 0; j < this.activeJokers.length; j++) {
+      const joker = this.activeJokers[j];
+      if (joker.debuffed) continue;
+
+      const effectiveJoker = this.resolveEffectiveJoker(joker, j);
+      if (effectiveJoker && typeof effectiveJoker.calculateCard === 'function') {
+        const mod = effectiveJoker.calculateCard(card, context, joker, this.activeJokers, context.gameState);
+        if (mod) {
+          if (mod.chips) currentChips += mod.chips;
+          if (mod.mult) currentMult += mod.mult;
+          if (mod.multMultiplier) currentMult = Math.floor(currentMult * mod.multMultiplier);
+
+          steps.push({
+            type: 'JOKER_CARD_TRIGGER',
+            jokerId: joker.instanceId || joker.id,
+            cardId: card.id,
+            jokerName: joker.name,
+            jokerIndex: j,
+            mod,
+            currentChips,
+            currentMult,
+            message: `${joker.name}: ${mod.message}`
+          });
+        }
+      }
+    }
+
+    return {
+      chips: currentChips,
+      mult: currentMult,
+      steps
+    };
+  }
+
+  /**
+   * Resolves effective joker accounting for Blueprint & Brainstorm copying.
+   *
+   * BUG FIX #7: Matches the ScoreCalculator.resolveEffectiveJoker 1-hop chain fix.
+   * Blueprint copying Brainstorm now correctly resolves to Brainstorm's target
+   * (the leftmost non-copy Joker) instead of returning null.
+   */
+  resolveEffectiveJoker(joker, currentIndex) {
+    if (joker.id === 'blueprint') {
+      const target = this.activeJokers[currentIndex + 1];
+      if (!target || target.debuffed) return null;
+
+      if (target.id !== 'blueprint' && target.id !== 'brainstorm') {
+        return target;
+      }
+
+      // BUG FIX #7: Blueprint→Brainstorm → resolve leftmost (1 hop only).
+      if (target.id === 'brainstorm') {
+        const brainstormTarget = this.activeJokers[0];
+        if (
+          brainstormTarget &&
+          !brainstormTarget.debuffed &&
+          brainstormTarget.id !== 'brainstorm' &&
+          brainstormTarget.id !== 'blueprint' &&
+          currentIndex !== 0
+        ) {
+          return brainstormTarget;
+        }
+      }
+      return null;
+    }
+    if (joker.id === 'brainstorm') {
+      const target = this.activeJokers[0];
+      if (currentIndex !== 0 && target && !target.debuffed && target.id !== 'brainstorm') {
+        return target;
+      }
+      return null;
+    }
+    return joker;
+  }
+
+  /**
+   * Convenience calculation method delegating to ScoreCalculator
+   */
+  calculateProjectedScore(playedCards, handLevels = {}, context = {}) {
+    return ScoreCalculator.preview(playedCards, this.activeJokers, handLevels, context);
   }
 
   /**

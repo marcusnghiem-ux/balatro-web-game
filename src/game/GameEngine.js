@@ -7,12 +7,15 @@
 import { Card, SUITS, RANKS, EDITIONS, ENHANCEMENTS } from './Card.js';
 import { HandEvaluator, HAND_DEFINITIONS } from './HandEvaluator.js';
 import { JokerSystem } from './JokerSystem.js';
+import { ScoreCalculator } from './ScoreCalculator.js';
 import { ScoringEngine } from './ScoringEngine.js';
 import { ConsumableSystem } from './ConsumableSystem.js';
 import { ShopEngine } from './ShopEngine.js';
 import { DECKS, STAKES } from './DeckDefinitions.js';
 import { unlockablesManager } from './UnlockablesSystem.js';
 import { saveManager } from './SaveManager.js';
+import { handLevelManager } from './HandLevelManager.js';
+import { statsManager } from './StatsManager.js';
 
 export const GAME_STATES = {
   TITLE: 'TITLE',
@@ -68,7 +71,8 @@ export const SKIP_TAGS = [
 
 export class GameEngine {
   constructor() {
-    this.jokerSystem = new JokerSystem(5);
+    // BUG FIX #8: Pass game ref so JokerSystem can apply Turtle Bean hand-size bonus.
+    this.jokerSystem = new JokerSystem(5, this);
     this.consumableSystem = new ConsumableSystem(2);
     this.shopEngine = new ShopEngine(this);
     this.shopCardSlots = 2;
@@ -80,6 +84,8 @@ export class GameEngine {
     for (const handName of Object.keys(HAND_DEFINITIONS)) {
       this.handLevels[handName] = 1;
     }
+    this.handLevelManager = handLevelManager;
+    this.handLevelManager.attachGame(this);
 
     this.ante = 1;
     this.maxAnte = 8;
@@ -97,15 +103,30 @@ export class GameEngine {
     this.deck = [];
     this.hand = [];
     this.discardPile = [];
-    this.maxHandSize = 8;
-
     this.state = GAME_STATES.BLIND_SELECT;
     this.listeners = [];
     this.endlessMode = false;
     this.saveManager = saveManager;
 
+    // Run seed and lifetime run statistics tracking
+    this.seed = this.generateSeed();
+    this.statsManager = statsManager;
+    this.statsManager.reset(this.seed);
+    this.stats = this.statsManager;
+    this.handsPlayedThisRound = [];
+    this.allowedHandType = null;
+
     this.initDeck();
     this.setupAnteBlinds();
+  }
+
+  generateSeed() {
+    const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+    let s = '';
+    for (let i = 0; i < 8; i++) {
+      s += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return s;
   }
 
   /**
@@ -180,7 +201,8 @@ export class GameEngine {
     this.anaglyphDeckActive = false;
     this.plasmaDeckActive = false;
 
-    this.jokerSystem = new JokerSystem(5);
+    // BUG FIX #8: Pass game ref so JokerSystem can apply Turtle Bean hand-size bonus.
+    this.jokerSystem = new JokerSystem(5, this);
     this.consumableSystem = new ConsumableSystem(2);
     this.shopCardSlots = 2;
     this.activeVouchers = [];
@@ -208,10 +230,25 @@ export class GameEngine {
       this.maxHandSize = Math.max(5, this.maxHandSize - this.selectedStake.handSizePenalty);
     }
 
+    this.seed = this.generateSeed();
+    if (this.statsManager) {
+      this.statsManager.reset(this.seed);
+    }
+
     this.setupAnteBlinds();
     this.state = GAME_STATES.BLIND_SELECT;
     if (this.saveManager) this.saveManager.saveCurrentRun(this);
     this.notify('BLIND_SELECT_ENTERED');
+  }
+
+  /**
+   * Resets the game to start a fresh run
+   */
+  reset() {
+    this.startNewRun(
+      this.selectedDeck ? this.selectedDeck.id : 'deck_red',
+      this.selectedStake ? this.selectedStake.id : 'stake_white'
+    );
   }
 
   /**
@@ -250,7 +287,8 @@ export class GameEngine {
     }
 
     const boss = BOSS_MODIFIERS[Math.floor(Math.random() * BOSS_MODIFIERS.length)];
-    const bossTarget = boss.isWall ? Math.floor(anteBase * 3.5) : Math.floor(anteBase * 2.0);
+    // BUG FIX #6: The Wall multiplier is 3× per Balatro wiki, not 3.5×.
+    const bossTarget = boss.isWall ? Math.floor(anteBase * 3.0) : Math.floor(anteBase * 2.0);
 
     const getRandomTag = () => SKIP_TAGS[Math.floor(Math.random() * SKIP_TAGS.length)];
 
@@ -342,10 +380,15 @@ export class GameEngine {
    */
   startRound() {
     this.roundScore = 0;
-    this.handsLeft = 4;
-    this.discardsLeft = (this.activeBoss && this.activeBoss.startDiscards !== undefined) 
-      ? this.activeBoss.startDiscards 
-      : 3;
+    // BUG FIX #4 & #5: Use maxHands / maxDiscards so Grabber & Wasteful Vouchers persist.
+    this.handsLeft = this.maxHands || 4;
+    this.discardsLeft = (this.activeBoss && this.activeBoss.startDiscards !== undefined)
+      ? this.activeBoss.startDiscards
+      : (this.maxDiscards || 3);
+
+    this.handsPlayedThisRound = [];
+    this.allowedHandType = null;
+    if (this.stats) this.stats.roundsPlayed++;
 
     // Shuffle discard back into deck
     this.deck.push(...this.discardPile, ...this.hand);
@@ -361,16 +404,36 @@ export class GameEngine {
 
   /**
    * Draw cards from deck until hand is full, keeping them sorted by rank
+   * Properly sets isFaceDown for boss blinds (The House, The Mark, The Wheel, The Fish)
    */
   drawToHandSize() {
     while (this.hand.length < this.maxHandSize && this.deck.length > 0) {
       const card = this.deck.pop();
       card.selected = false;
+
+      // Handle boss blinds that draw cards face-down
+      if (this.activeBoss) {
+        if (this.activeBoss.name === 'The House' && this.handsPlayedThisRound.length === 0) {
+          card.isFaceDown = true;
+        } else if (this.activeBoss.name === 'The Mark' && card.isFaceCard()) {
+          card.isFaceDown = true;
+        } else if (this.activeBoss.name === 'The Wheel' && Math.random() < (1 / 7)) {
+          card.isFaceDown = true;
+        } else if (this.activeBoss.name === 'The Fish' && this.handsPlayedThisRound.length > 0) {
+          card.isFaceDown = true;
+        } else {
+          card.isFaceDown = false;
+        }
+      } else {
+        card.isFaceDown = false;
+      }
+
       this.hand.push(card);
     }
     // Automatically sort hand cards in order of rank (high to low)
     this.hand.sort((a, b) => b.order - a.order);
   }
+
 
   /**
    * Apply any active Boss debuffs to cards in hand
@@ -466,14 +529,27 @@ export class GameEngine {
       this.discardPile.push(card);
     }
 
+    if (this.statsManager) {
+      this.statsManager.recordCardsDiscarded(selected.length);
+    }
+
     // Trigger on_discard hooks for Jokers (e.g. Castle, Ramen, Green Joker)
+    this.jokerSystem.triggerDiscardDegradation(selected, this);
     for (const joker of this.jokerSystem.getJokers()) {
       if (typeof joker.onDiscard === 'function') {
         joker.onDiscard(selected, this, joker);
       }
     }
 
-    this.drawToHandSize();
+    // BUG FIX #17 (discard path): The Serpent forces exactly 3 cards drawn after each discard.
+    if (this.activeBoss && this.activeBoss.id === 'boss_serpent') {
+      const _origMax = this.maxHandSize;
+      this.maxHandSize = Math.min(3, this.hand.length + this.deck.length);
+      this.drawToHandSize();
+      this.maxHandSize = _origMax;
+    } else {
+      this.drawToHandSize();
+    }
     this.applyBossDebuffs();
     this.notify('DISCARDED', { discardedCount: selected.length });
     return true;
@@ -490,30 +566,150 @@ export class GameEngine {
     const selected = this.getSelectedCards();
     if (selected.length === 0 || selected.length > 5) return null;
 
+    // Check Boss Blind restrictions
+    let isHandDebuffed = false;
+    let debuffMessage = '';
+
+    // The Psychic: Must play exactly 5 cards
+    if (this.activeBoss && this.activeBoss.name === 'The Psychic') {
+      if (selected.length !== 5) {
+        isHandDebuffed = true;
+        debuffMessage = 'The Psychic: Must play exactly 5 cards!';
+      }
+    }
+
+    const evalResult = HandEvaluator.evaluate(selected, this.handLevels);
+
+    // The Eye: No repeat hand types this round
+    if (this.activeBoss && this.activeBoss.name === 'The Eye') {
+      if (this.handsPlayedThisRound && this.handsPlayedThisRound.includes(evalResult.handName)) {
+        isHandDebuffed = true;
+        debuffMessage = 'The Eye: No repeat hand types allowed!';
+      }
+    }
+
+    // The Mouth: Play only 1 hand type this round
+    if (this.activeBoss && this.activeBoss.name === 'The Mouth') {
+      if (this.allowedHandType && this.allowedHandType !== evalResult.handName) {
+        isHandDebuffed = true;
+        debuffMessage = `The Mouth: Only ${this.allowedHandType} allowed!`;
+      } else if (!this.allowedHandType) {
+        this.allowedHandType = evalResult.handName;
+      }
+    }
+
+    // The Ox: Playing most played hand sets money to $0
+    if (this.activeBoss && this.activeBoss.name === 'The Ox') {
+      let mostPlayed = 'High Card';
+      let maxP = 0;
+      for (const [h, count] of Object.entries(this.stats?.handPlayCounts || {})) {
+        if (count > maxP) { maxP = count; mostPlayed = h; }
+      }
+      if (evalResult.handName === mostPlayed) {
+        this.money = 0;
+        this.notify('MONEY_RESET_BY_OX');
+      }
+    }
+
+    this.handsPlayedThisRound.push(evalResult.handName);
     this.handsLeft--;
     this.state = GAME_STATES.SCORING;
 
-    const heldCards = this.hand.filter(c => !c.selected);
-    const context = {
-      discardsLeft: this.discardsLeft,
-      handsLeft: this.handsLeft,
-      money: this.money
-    };
+    // Update run statistics
+    if (this.stats) {
+      this.stats.cardsPlayed += selected.length;
+      this.stats.handPlayCounts[evalResult.handName] = (this.stats.handPlayCounts[evalResult.handName] || 0) + 1;
+    }
 
-    const scoringResult = ScoringEngine.generateScoringSequence(
-      selected,
-      heldCards,
-      this.jokerSystem.getJokers(),
-      this.handLevels,
-      context
+    let scoringResult;
+    if (isHandDebuffed) {
+      scoringResult = {
+        handName: evalResult.handName + ' (DEBUFFED)',
+        level: evalResult.level,
+        chips: 0,
+        mult: 0,
+        totalScore: 0,
+        steps: [
+          { type: 'INITIAL', handName: evalResult.handName, chips: 0, mult: 0, total: 0 },
+          { type: 'DEBUFF', message: debuffMessage || 'Debuffed!', chips: 0, mult: 0, total: 0 }
+        ]
+      };
+    } else {
+      const heldCards = this.hand.filter(c => !c.selected);
+      const context = {
+        discardsLeft: this.discardsLeft,
+        handsLeft: this.handsLeft,
+        money: this.money,
+        heldCards,
+        gameState: this,
+        activeJokers: this.jokerSystem.getJokers(),
+        handsPlayedThisRound: [...(this.handsPlayedThisRound || [])],
+        blindsSkipped: this.stats ? (this.stats.blindsSkipped || 0) : 0,
+        plasmaDeckActive: Boolean(this.plasmaDeckActive),
+        roundTarget: this.roundTarget,
+        roundScore: this.roundScore
+      };
+
+      scoringResult = ScoreCalculator.generateScoringSequence(
+        selected,
+        heldCards,
+        this.jokerSystem.getJokers(),
+        this.handLevels,
+        context
+      );
+    }
+
+    // Determine Single-Hand Overflow status (meeting or exceeding roundTarget in one hand)
+    const isSingleHandOverflow = Boolean(
+      scoringResult.isSingleHandOverflow ||
+      (scoringResult.finalScore >= this.roundTarget && this.roundTarget > 0)
     );
 
     this.notify('PLAY_STARTED', {
       scoringResult,
-      playedCards: selected
+      playedCards: selected,
+      isSingleHandOverflow
     });
 
     return scoringResult;
+  }
+
+  /**
+   * Fast synchronous preview of the current hand score for HUD and fire overflow detection
+   * @returns {Object} { handName, level, chips, mult, totalScore, isSingleHandOverflow }
+   */
+  calculateCurrentHandPreview() {
+    const selected = this.getSelectedCards();
+    if (selected.length === 0) {
+      return {
+        handName: 'Select Cards',
+        level: 1,
+        chips: 0,
+        mult: 0,
+        totalScore: 0,
+        isSingleHandOverflow: false
+      };
+    }
+    const heldCards = this.hand.filter(c => !c.selected);
+    const context = {
+      discardsLeft: this.discardsLeft,
+      handsLeft: this.handsLeft,
+      money: this.money,
+      heldCards,
+      gameState: this,
+      activeJokers: this.jokerSystem.getJokers(),
+      handsPlayedThisRound: [...(this.handsPlayedThisRound || [])],
+      blindsSkipped: this.stats ? (this.stats.blindsSkipped || 0) : 0,
+      plasmaDeckActive: Boolean(this.plasmaDeckActive),
+      roundTarget: this.roundTarget,
+      roundScore: this.roundScore
+    };
+    return ScoreCalculator.preview(
+      selected,
+      this.jokerSystem.getJokers(),
+      this.handLevels,
+      context
+    );
   }
 
   /**
@@ -522,7 +718,18 @@ export class GameEngine {
    * @param {number} scorePoints
    */
   commitScoredPoints(scorePoints) {
+    const previousRoundScore = this.roundScore;
+    const isSingleHandWin = previousRoundScore === 0 && scorePoints >= this.roundTarget;
     this.roundScore += scorePoints;
+
+    // Track best hand score
+    if (this.stats) {
+      if (scorePoints > this.stats.bestHandScore) {
+        this.stats.bestHandScore = scorePoints;
+        const lastHand = this.handsPlayedThisRound[this.handsPlayedThisRound.length - 1];
+        if (lastHand) this.stats.bestHandName = lastHand;
+      }
+    }
 
     // Discard played cards
     const played = this.getSelectedCards();
@@ -532,11 +739,16 @@ export class GameEngine {
       this.discardPile.push(card);
     }
 
-    // Trigger onHandPlayed hooks for Jokers (Loyalty Card countdown & reset)
-    for (const joker of this.jokerSystem.getJokers()) {
-      if (typeof joker.onHandPlayed === 'function') {
-        joker.onHandPlayed(joker, this);
-      }
+    // Trigger onHandPlayed hooks & degradation for Jokers (Ice Cream melting, Loyalty Card, Seltzer)
+    const handDegradations = this.jokerSystem.triggerHandPlayedDegradation(this);
+    if (handDegradations.length > 0) {
+      this.notify('JOKER_DEGRADATION', handDegradations);
+    }
+
+    // BUG FIX #16: Invoke activeBoss.onHandPlayed hook (The Arm: degrade played hand level).
+    if (this.activeBoss && typeof this.activeBoss.onHandPlayed === 'function') {
+      const lastHandName = this.handsPlayedThisRound[this.handsPlayedThisRound.length - 1];
+      this.activeBoss.onHandPlayed(this, lastHandName);
     }
 
     // Boss effect for 'The Hook': Discards 2 random cards per hand played
@@ -546,22 +758,76 @@ export class GameEngine {
 
     // Check Win / Loss / Next Hand
     if (this.roundScore >= this.roundTarget) {
-      this.resolveRoundWin();
+      this.resolveRoundWin(isSingleHandWin);
     } else if (this.handsLeft <= 0) {
       this.resolveGameOver();
     } else {
-      this.drawToHandSize();
+      // BUG FIX #17: The Serpent forces exactly 3 cards drawn after each hand played.
+      if (this.activeBoss && this.activeBoss.id === 'boss_serpent') {
+        const _origMax = this.maxHandSize;
+        this.maxHandSize = Math.min(3, this.hand.length + this.deck.length);
+        this.drawToHandSize();
+        this.maxHandSize = _origMax;
+      } else {
+        this.drawToHandSize();
+      }
       this.applyBossDebuffs();
       this.state = GAME_STATES.SELECTING;
       this.notify('HAND_RESOLVED');
     }
   }
 
+
   /**
    * Round passed: calculate reward money and open Shop
    */
-  resolveRoundWin() {
-    // Exact user rule: +4 coins base per round
+  resolveRoundWin(isSingleHandWin = false) {
+    // BUG FIX #3: Green Deck uses a completely different economy formula:
+    // $2 per remaining hand + $1 per remaining discard, no interest, no base reward.
+    if (this.greenDeckActive) {
+      const greenHandBonus = this.handsLeft * 2;
+      const greenDiscardBonus = this.discardsLeft * 1;
+      const totalEarned = greenHandBonus + greenDiscardBonus;
+      this.money += totalEarned;
+
+      // Joker end-of-round bonuses still apply (e.g. Golden Joker, Rocket)
+      let endRoundJokerBonus = 0;
+      for (const joker of this.jokerSystem.getJokers()) {
+        if (typeof joker.onRoundEnd === 'function') {
+          const bonus = joker.onRoundEnd({ money: this.money });
+          if (bonus && bonus.money) endRoundJokerBonus += bonus.money;
+        }
+      }
+      this.money += endRoundJokerBonus;
+
+      // Rental Jokers: cost -$3 per round
+      let rentalCost = 0;
+      for (const joker of this.jokerSystem.getJokers()) {
+        if (joker.isRental) rentalCost += 3;
+      }
+      this.money = Math.max(0, this.money - rentalCost);
+
+      const roundDegradations = this.jokerSystem.triggerRoundEndDegradation(this);
+      if (roundDegradations.length > 0) {
+        this.notify('JOKER_DEGRADATION', roundDegradations);
+      }
+
+      if (this.anteBlinds && this.anteBlinds[this.blindIndex]) {
+        this.anteBlinds[this.blindIndex].status = 'defeated';
+      }
+
+      this.state = GAME_STATES.ROUND_WON;
+      this.notify('ROUND_WON', {
+        baseReward: 0,
+        handsBonus: greenHandBonus,
+        interest: 0,
+        goldCardBonus: 0,
+        endRoundJokerBonus,
+        rentalCost,
+        totalEarned,
+        isSingleHandWin
+      });
+    } else {
     const baseReward = 4;
     // Any non-used plays = +1 coin each
     const handsBonus = this.handsLeft;
@@ -585,14 +851,10 @@ export class GameEngine {
       }
     }
 
-    // Perishable Jokers: decrement remaining rounds; if 0, debuff joker
-    for (const joker of this.jokerSystem.getJokers()) {
-      if (joker.isPerishable && joker.perishableRoundsLeft !== undefined) {
-        joker.perishableRoundsLeft--;
-        if (joker.perishableRoundsLeft <= 0) {
-          joker.debuffed = true;
-        }
-      }
+    // Automated destruction & degradation hooks (Gros Michel extinction, Popcorn, Perishable)
+    const roundDegradations = this.jokerSystem.triggerRoundEndDegradation(this);
+    if (roundDegradations.length > 0) {
+      this.notify('JOKER_DEGRADATION', roundDegradations);
     }
 
     // Rental Jokers: cost -$3 per round
@@ -616,8 +878,10 @@ export class GameEngine {
       goldCardBonus,
       endRoundJokerBonus,
       rentalCost,
-      totalEarned
+      totalEarned,
+      isSingleHandWin
     });
+    } // end non-Green-Deck branch
 
     // Advance blind progression
     if (this.blindIndex < 2) {
@@ -713,7 +977,9 @@ export class GameEngine {
    * Skip current Small or Big Blind (earns $0 money, awards Skip Tag, advances)
    */
   skipCurrentBlind() {
-    if (this.state !== GAME_STATES.BLIND_SELECT && this.state !== GAME_STATES.SELECTING) return false;
+    // BUG FIX #11: Skipping is only valid from the pre-round blind selection screen.
+    // Previously SELECTING was also allowed, letting players skip mid-round.
+    if (this.state !== GAME_STATES.BLIND_SELECT) return false;
     if (this.blindType === BLIND_TYPES.BOSS || this.blindIndex >= 2) {
       return false; // Boss blinds cannot be skipped!
     }
@@ -848,8 +1114,13 @@ export class GameEngine {
 
   /**
    * Sell a consumable from the top-right consumable bar
+   * BUG FIX #13: Restricted to SHOP phase only (authentic Balatro behaviour).
+   * Previously SELECTING was also permitted, allowing mid-round selling.
    */
   sellConsumable(index) {
+    if (this.state !== GAME_STATES.SHOP) {
+      return false;
+    }
     const item = this.consumableSystem.removeConsumable(index);
     if (item) {
       this.money += item.sellValue || 1;
@@ -860,9 +1131,13 @@ export class GameEngine {
   }
 
   /**
-   * Sell an active Joker for half its value
+   * Sell an active Joker for its sell value.
+   * MID-ROUND SELLING LOCKOUT: Strictly restricted to the SHOP phase via the Buy/Sell Square.
    */
   sellJoker(jokerIndex) {
+    if (this.state !== GAME_STATES.SHOP) {
+      return false;
+    }
     const jokers = this.jokerSystem.getJokers();
     if (jokerIndex < 0 || jokerIndex >= jokers.length) return false;
 
@@ -875,18 +1150,54 @@ export class GameEngine {
     return false;
   }
 
-
   /**
    * Round failed
    */
   resolveGameOver() {
     this.state = GAME_STATES.GAME_OVER;
     if (this.saveManager) this.saveManager.clearActiveRun();
+
+    let defeated = {
+      name: this.blindType || 'Small Blind',
+      type: this.blindType || 'Small Blind',
+      icon: '❂',
+      color: '#0072b2',
+      border: '#54b8ff'
+    };
+
+    if (this.blindType === 'Boss Blind' || this.activeBoss) {
+      defeated = {
+        name: this.activeBoss ? this.activeBoss.name : 'Boss Blind',
+        type: 'Boss Blind',
+        boss: this.activeBoss,
+        icon: this.activeBoss?.icon || '⚓',
+        color: this.activeBoss?.color || '#992d22',
+        border: this.activeBoss?.border || '#e74c3c'
+      };
+    } else if (this.blindType === 'Big Blind') {
+      defeated = {
+        name: 'Big Blind',
+        type: 'Big Blind',
+        icon: '❂',
+        color: '#d48806',
+        border: '#f59e0b'
+      };
+    }
+
+    if (this.statsManager) {
+      this.statsManager.setAnte(this.ante);
+      this.statsManager.setDefeatedBy(defeated);
+    }
+
     this.notify('GAME_OVER', {
       ante: this.ante,
       finalScore: this.roundScore,
-      targetScore: this.roundTarget
+      targetScore: this.roundTarget,
+      stats: this.statsManager ? this.statsManager.getSummary({ finalScore: this.roundScore, ante: this.ante, seed: this.seed }) : this.stats,
+      seed: this.seed,
+      defeatedBy: defeated
     });
   }
 }
+
 

@@ -16,25 +16,20 @@ export const CONSUMABLE_TYPES = {
  * Helper to resolve target cards whether inside Blind or inside Shop
  */
 function resolveTarotTargetCards(gameState, minCount = 1, maxCount = 2) {
-  let selected = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
+  let selected = (gameState.hand || []).filter(c => c.selected);
+  if (selected.length === 0 && gameState.deck) {
+    selected = (gameState.deck || []).filter(c => c.selected);
+  }
   if (selected.length >= minCount && selected.length <= maxCount) {
     return selected;
   }
-  // In shop or when no hand cards are selected: target cards from deck
-  if (gameState.state === 'SHOP' || !gameState.hand || gameState.hand.length === 0) {
-    if (gameState.deck && gameState.deck.length >= minCount) {
-      return gameState.deck.slice(0, Math.min(maxCount, gameState.deck.length));
-    }
-  }
-  return selected;
+  const pool = (gameState.hand && gameState.hand.length > 0) ? gameState.hand : (gameState.deck || []);
+  return pool.slice(0, Math.min(maxCount, pool.length));
 }
 
 function canUseTarotOnCards(gameState, minCount = 1, maxCount = 2) {
-  if (gameState.state === 'SHOP' || !gameState.hand || gameState.hand.length === 0) {
-    return Boolean(gameState.deck && gameState.deck.length >= minCount);
-  }
-  const selected = gameState.getSelectedCards ? gameState.getSelectedCards() : [];
-  return selected.length >= minCount && selected.length <= maxCount;
+  const pool = (gameState.hand && gameState.hand.length > 0) ? gameState.hand : (gameState.deck || []);
+  return pool.length >= minCount;
 }
 
 export const TAROT_CARDS = [
@@ -129,6 +124,8 @@ export const TAROT_CARDS = [
         if (curIdx !== -1 && curIdx < RANKS.length - 1) {
           card.rank = RANKS[curIdx + 1];
           card.order = card.order + 1;
+          // BUG FIX #4: Sync baseChips after rank change so scoring uses correct value.
+          card.baseChips = Card.getRankChips(card.rank);
         }
       });
       return { success: true, message: `Strength: Upgraded ${targetCards.length} card(s)!` };
@@ -360,7 +357,12 @@ export const TAROT_CARDS = [
     sellValue: 1,
     icon: '⚖️',
     description: 'Spawns a random Joker card (Must have room)',
-    canUse: (gameState) => gameState.jokerSystem.count < gameState.jokerSystem.maxJokers,
+    // BUG FIX #6: Guard to SHOP state only. Calling shopEngine.getRandomJoker() mid-round
+    // accidentally consumes Edition Skip Tags (POLY/HOLO/FOIL) set for the next shop.
+    canUse: (gameState) => {
+      const inShop = gameState.state === 'SHOP';
+      return inShop && gameState.jokerSystem.count < gameState.jokerSystem.maxJokers;
+    },
     execute: (gameState) => {
       const newJoker = gameState.shopEngine.getRandomJoker();
       gameState.jokerSystem.addJoker(newJoker);
@@ -387,7 +389,19 @@ export const PLANET_CARDS = [
   type: CONSUMABLE_TYPES.PLANET,
   canUse: () => true,
   execute: (gameState) => {
-    gameState.handLevels[p.hand] = (gameState.handLevels[p.hand] || 1) + 1;
+    if (gameState.handLevelManager) {
+      gameState.handLevelManager.upgradeHand(p.hand, 1);
+    } else {
+      gameState.handLevels[p.hand] = (gameState.handLevels[p.hand] || 1) + 1;
+    }
+    // Constellation synergy: increment Constellation jokers
+    if (gameState.jokerSystem) {
+      for (const j of gameState.jokerSystem.getJokers()) {
+        if (j.id === 'constellation') {
+          j.currentMultMultiplier = (j.currentMultMultiplier !== undefined ? j.currentMultMultiplier : 1) + 0.1;
+        }
+      }
+    }
     return {
       success: true,
       message: `${p.name}: ${p.hand} leveled up to Lv. ${gameState.handLevels[p.hand]}!`
@@ -510,7 +524,15 @@ export const SPECTRAL_CARDS = [
     canUse: (gameState) => gameState.hand && gameState.hand.length > 0,
     execute: (gameState) => {
       const chosenRank = RANKS[Math.floor(Math.random() * RANKS.length)];
-      gameState.hand.forEach(c => { c.rank = chosenRank; });
+      const newOrder = Card.getRankOrder(chosenRank);
+      const newChips = Card.getRankChips(chosenRank);
+      // BUG FIX #5: Sync order and baseChips after mass rank mutation.
+      // Previously only rank was set — HandEvaluator sort (by .order) and scoring (.baseChips) were wrong.
+      gameState.hand.forEach(c => {
+        c.rank = chosenRank;
+        c.order = newOrder;
+        c.baseChips = newChips;
+      });
       gameState.maxHandSize = Math.max(4, gameState.maxHandSize - 1);
       return { success: true, message: `Ouija: Transmuted all hand cards to rank ${chosenRank}! (-1 Hand Size)` };
     }

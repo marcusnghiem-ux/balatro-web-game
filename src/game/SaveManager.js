@@ -99,7 +99,12 @@ export class SaveManager {
           isPerishable: Boolean(j.isPerishable),
           isRental: Boolean(j.isRental),
           perishableRoundsLeft: j.perishableRoundsLeft,
+          // BUG FIX #1: Persist all dynamic runtime counters so they survive save/load.
           handsRemaining: j.handsRemaining,
+          currentMult: j.currentMult,
+          currentChips: j.currentChips,
+          currentMultMultiplier: j.currentMultMultiplier,
+          handSizeBonus: j.handSizeBonus,
           debuffed: Boolean(j.debuffed),
           instanceId: j.instanceId || `joker_${j.id}_${Math.random().toString(36).substr(2, 6)}`
         })),
@@ -179,9 +184,22 @@ export class SaveManager {
 
       // Restore Jokers (exact sequence and custom hooks)
       if (game.jokerSystem) {
-        game.jokerSystem.jokers = [];
+        // BUG FIX #2: Wrong field name '.jokers' → '.activeJokers'.
+        // Using the wrong name meant the old array was never cleared, causing
+        // Jokers to be duplicated on every 'Continue Run' load.
+        game.jokerSystem.activeJokers = [];
         (data.jokers || []).forEach(j => {
           game.jokerSystem.addJoker(j);
+          // BUG FIX #1: Restore dynamic runtime counters after addJoker re-initialises them.
+          const inst = game.jokerSystem.activeJokers[game.jokerSystem.activeJokers.length - 1];
+          if (inst) {
+            if (j.currentMult !== undefined)           inst.currentMult           = j.currentMult;
+            if (j.currentChips !== undefined)          inst.currentChips          = j.currentChips;
+            if (j.currentMultMultiplier !== undefined) inst.currentMultMultiplier = j.currentMultMultiplier;
+            if (j.handsRemaining !== undefined)        inst.handsRemaining        = j.handsRemaining;
+            if (j.handSizeBonus !== undefined)         inst.handSizeBonus         = j.handSizeBonus;
+            if (j.perishableRoundsLeft !== undefined)  inst.perishableRoundsLeft  = j.perishableRoundsLeft;
+          }
         });
         game.jokerSystem.updateBlueprintTargets();
       }

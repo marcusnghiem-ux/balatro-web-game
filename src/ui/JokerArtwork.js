@@ -400,64 +400,40 @@ export function getJokerIllustrationHtml(joker) {
  * Renders complete authentic Balatro Joker card face HTML
  * including side "JOKER" pixel typography ribbons!
  */
+/**
+ * Renders complete authentic Balatro Joker card face HTML with FULL-BLEED illustration.
+ * Expands artwork to fill the face of the card between the iconic vertical JOKER ribbons!
+ */
 export function renderJokerCardFace(joker, options = {}) {
   const {
-    showSell = false,
-    sellIndex = -1,
     badgeHtml = '',
     copyTargetHtml = ''
   } = options;
 
-  const rarity = (joker.rarity || 'common').toLowerCase();
   const illustration = getJokerIllustrationHtml(joker);
 
   return `
-    <!-- Top Rarity Banner -->
-    <div class="joker-rarity-banner rarity-${rarity}">
-      ${rarity.toUpperCase()}
-    </div>
-
-    <!-- Authentic Balatro Layout: Left JOKER ribbon, Center Artwork, Right JOKER ribbon -->
-    <div class="joker-body-grid w-full flex-1 flex items-stretch justify-between my-0.5 relative px-0.5">
-      <!-- Left Vertical JOKER Ribbon -->
-      <div class="joker-side-label-left font-pixel text-[8px] sm:text-[9px] font-black text-slate-800 flex flex-col justify-between items-center select-none py-0.5 leading-none">
+    <!-- Authentic Full-Bleed Balatro Layout: Left Ribbon, Clean Art Canvas, Right Ribbon -->
+    <div class="joker-body-grid w-full h-full flex items-stretch justify-between relative px-0.5 overflow-hidden">
+      <!-- Left Vertical JOKER Ribbon (reading downwards) -->
+      <div class="joker-side-label-left font-pixel text-[8px] sm:text-[9px] font-black text-slate-800 flex flex-col justify-between items-center select-none py-1 leading-none z-10 shrink-0">
         <span>J</span><span>O</span><span>K</span><span>E</span><span>R</span>
       </div>
 
-      <!-- Center Illustration Viewport -->
-      <div class="joker-illustration-frame flex-1 mx-1 rounded-md border border-slate-300/80 bg-white shadow-inner flex flex-col items-center justify-between p-1 overflow-hidden relative">
-        <div class="text-[8px] font-black uppercase text-slate-900 tracking-wider truncate w-full text-center leading-tight mb-0.5">
-          ${joker.name}
-        </div>
-        <div class="w-full flex-1 flex items-center justify-center max-h-[56px] sm:max-h-[64px] relative">
+      <!-- Center Clean Art Canvas (fills the entire card face) -->
+      <div class="joker-fullbleed-canvas flex-1 relative flex items-center justify-center p-0.5 overflow-hidden mx-0.5">
+        <div class="w-full h-full flex items-center justify-center relative">
           ${illustration}
         </div>
         ${badgeHtml}
         ${copyTargetHtml}
       </div>
 
-      <!-- Right Vertical JOKER Ribbon -->
-      <div class="joker-side-label-right font-pixel text-[8px] sm:text-[9px] font-black text-slate-800 flex flex-col justify-between items-center select-none py-0.5 leading-none">
+      <!-- Right Vertical JOKER Ribbon (inverted 180° for authentic playing card rotational symmetry) -->
+      <div class="joker-side-label-right font-pixel text-[8px] sm:text-[9px] font-black text-slate-800 flex flex-col justify-between items-center select-none py-1 leading-none z-10 shrink-0">
         <span>J</span><span>O</span><span>K</span><span>E</span><span>R</span>
       </div>
     </div>
-
-    <!-- Card Footer: Sell value or Type label -->
-    ${showSell 
-      ? `
-        <div class="w-full flex justify-between items-center text-[10px] px-1 font-bold mt-0.5">
-          <span class="text-amber-500 font-pixel text-sm">$${joker.sellValue}</span>
-          ${joker.isEternal 
-            ? '<span class="text-slate-500 text-[8px] font-black uppercase">No Sell</span>'
-            : `<button class="sell-joker-btn text-red-500 hover:text-red-300 font-black px-1 cursor-pointer" data-index="${sellIndex}">Sell</button>`
-          }
-        </div>
-      `
-      : `
-        <div class="text-[8px] font-black text-slate-500 uppercase tracking-widest text-center mt-0.5">
-          JOKER
-        </div>
-      `
-    }
   `;
 }
+

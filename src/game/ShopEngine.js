@@ -94,12 +94,52 @@ export class ShopEngine {
   }
 
   /**
-   * Called upon entering a new shop
+   * Called upon entering a new shop.
+   *
+   * BUG FIX #8: Apply Coupon Tag (50% off) for this shop session.
+   * BUG FIX #10: Inject free Standard/Arcana packs from Skip Tags.
    */
   initShopForRound() {
     this.rerollCost = 5;
+
+    // BUG FIX #8: Coupon Tag → 50% discount for this shop only.
+    const couponIdx = (this.game.activeSkipTags || []).findIndex(t => t.effect === 'FREE_SHOP');
+    if (couponIdx !== -1) {
+      this.game.discountMultiplier = 0.5;
+      this.game.activeSkipTags.splice(couponIdx, 1);
+    }
+
     this.generateShopCards();
     this.generateBoosterPacks();
+
+    // BUG FIX #10: Free Standard Pack tag → inject a zero-cost Standard Pack.
+    const freeStdIdx = (this.game.activeSkipTags || []).findIndex(t => t.effect === 'FREE_STANDARD');
+    if (freeStdIdx !== -1) {
+      const stdTemplate = BOOSTER_PACK_TEMPLATES.find(p => p.id === 'pack_standard');
+      if (stdTemplate) {
+        this.boosterPacks.push({
+          ...stdTemplate,
+          instanceId: `pack_tag_standard_${Math.random().toString(36).substr(2, 6)}`,
+          finalCost: 0
+        });
+      }
+      this.game.activeSkipTags.splice(freeStdIdx, 1);
+    }
+
+    // BUG FIX #10: Free Arcana Pack tag → inject a zero-cost Arcana Pack.
+    const freeArcIdx = (this.game.activeSkipTags || []).findIndex(t => t.effect === 'FREE_ARCANA');
+    if (freeArcIdx !== -1) {
+      const arcTemplate = BOOSTER_PACK_TEMPLATES.find(p => p.id === 'pack_arcana');
+      if (arcTemplate) {
+        this.boosterPacks.push({
+          ...arcTemplate,
+          instanceId: `pack_tag_arcana_${Math.random().toString(36).substr(2, 6)}`,
+          finalCost: 0
+        });
+      }
+      this.game.activeSkipTags.splice(freeArcIdx, 1);
+    }
+
     // Only generate voucher if Ante changed or not already bought this Ante
     if (!this.currentVoucher && !this.game.voucherBoughtThisAnte) {
       this.generateVoucher();
@@ -176,12 +216,34 @@ export class ShopEngine {
   getRandomJoker() {
     const catalog = [...JOKER_CATALOG];
     const joker = catalog[Math.floor(Math.random() * catalog.length)];
-    // Random edition chance: 80% Normal, 10% Foil, 7% Holo, 3% Poly
-    const editionRoll = Math.random();
+
+    // BUG FIX #9: Consume Edition Tags (POLY/HOLO/FOIL) before rolling random edition.
+    // These tags force the NEXT shop joker to appear with the specified edition.
     let edition = EDITIONS.NORMAL;
-    if (editionRoll > 0.97) edition = EDITIONS.POLYCHROME;
-    else if (editionRoll > 0.90) edition = EDITIONS.HOLO;
-    else if (editionRoll > 0.80) edition = EDITIONS.FOIL;
+    const tags = this.game.activeSkipTags || [];
+    const editionTagMap = {
+      POLY_JOKER: EDITIONS.POLYCHROME,
+      HOLO_JOKER: EDITIONS.HOLO,
+      FOIL_JOKER: EDITIONS.FOIL
+    };
+    let editionTagConsumed = false;
+    for (const [effect, edValue] of Object.entries(editionTagMap)) {
+      const idx = tags.findIndex(t => t.effect === effect);
+      if (idx !== -1) {
+        edition = edValue;
+        this.game.activeSkipTags.splice(idx, 1);
+        editionTagConsumed = true;
+        break;
+      }
+    }
+
+    if (!editionTagConsumed) {
+      // Random edition chance: 80% Normal, 10% Foil, 7% Holo, 3% Poly
+      const editionRoll = Math.random();
+      if (editionRoll > 0.97) edition = EDITIONS.POLYCHROME;
+      else if (editionRoll > 0.90) edition = EDITIONS.HOLO;
+      else if (editionRoll > 0.80) edition = EDITIONS.FOIL;
+    }
 
     // Stake stickers (Part 5: 8 Stakes & stickers)
     let isEternal = false;
@@ -274,6 +336,9 @@ export class ShopEngine {
     }
 
     this.shopCards.splice(index, 1);
+    if (this.game && this.game.statsManager) {
+      this.game.statsManager.recordCardPurchased(item);
+    }
     return { success: true, item };
   }
 
@@ -296,19 +361,38 @@ export class ShopEngine {
 
     const bought = this.currentVoucher;
     this.currentVoucher = null;
+    if (this.game && this.game.statsManager) {
+      this.game.statsManager.recordCardPurchased(bought);
+    }
     return { success: true, voucher: bought };
   }
 
   /**
-   * Reroll shop: ONLY regenerates the 2 card shelf slots, NOT packs or vouchers
+   * Reroll shop: ONLY regenerates the 2 card shelf slots, NOT packs or vouchers.
+   *
+   * BUG FIX #7: D6 Tag (FREE_REROLLS) makes the first reroll this Ante cost $0.
    */
   rerollShop() {
+    // BUG FIX #7: Check for FREE_REROLLS tag — if present consume it and reroll free.
+    const freeRerollIdx = (this.game.activeSkipTags || []).findIndex(t => t.effect === 'FREE_REROLLS');
+    if (freeRerollIdx !== -1) {
+      this.game.activeSkipTags.splice(freeRerollIdx, 1);
+      this.generateShopCards();
+      if (this.game && this.game.statsManager) {
+        this.game.statsManager.recordShopReroll();
+      }
+      return { success: true, newCost: this.rerollCost, free: true };
+    }
+
     if (this.game.money < this.rerollCost) {
       return { success: false, message: 'Not enough money to reroll!' };
     }
     this.game.money -= this.rerollCost;
     this.rerollCost += 1;
     this.generateShopCards();
+    if (this.game && this.game.statsManager) {
+      this.game.statsManager.recordShopReroll();
+    }
     return { success: true, newCost: this.rerollCost };
   }
 
@@ -406,6 +490,10 @@ export class ShopEngine {
 
     this.packCards.splice(index, 1);
     this.packChoicesRemaining -= 1;
+
+    if (this.game && this.game.statsManager) {
+      this.game.statsManager.recordCardPurchased(item);
+    }
 
     const packFinished = this.packChoicesRemaining <= 0;
     if (packFinished) {
